@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/lib/AuthContext";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
@@ -26,6 +27,7 @@ interface Post {
 }
 
 export default function EditPostPage() {
+  const { user, claims, loading: authLoading } = useAuth();
   const params = useParams();
   const router = useRouter();
   const slug = decodeURIComponent(params.slug as string);
@@ -62,7 +64,7 @@ export default function EditPostPage() {
         content,
         updatedAt: new Date(),
       });
-      router.push(`/blog/${encodeURIComponent(post.slug)}`);
+      router.push(`/${encodeURIComponent(post.slug)}`);
     } catch (err) {
       console.error("저장 실패:", err);
       alert("저장에 실패했습니다.");
@@ -71,8 +73,23 @@ export default function EditPostPage() {
     }
   }
 
-  if (loading) {
+  useEffect(() => {
+    if (!authLoading && !loading && !user) {
+      router.replace(`/login?redirect=/${slug}/edit`);
+    }
+  }, [authLoading, loading, user, router, slug]);
+
+  if (authLoading || loading) {
     return <p className="text-gray-500">로딩 중...</p>;
+  }
+  if (!user) return null;
+  if (!claims.admin && !claims.editor) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">접근 권한이 없습니다.</p>
+        <p className="text-sm text-gray-400 mt-2">editor 또는 admin 권한이 필요합니다.</p>
+      </div>
+    );
   }
 
   if (!post) {
@@ -83,15 +100,15 @@ export default function EditPostPage() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <Link
-          href={`/blog/${encodeURIComponent(post.slug)}`}
-          className="text-sm text-gray-500 hover:text-gray-700"
+          href={`/${encodeURIComponent(post.slug)}`}
+          className="text-sm text-purple-500 hover:text-purple-700"
         >
           &larr; 돌아가기
         </Link>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition"
         >
           {saving ? "저장 중..." : "저장"}
         </button>
@@ -105,7 +122,7 @@ export default function EditPostPage() {
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
       </div>
 

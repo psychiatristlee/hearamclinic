@@ -162,12 +162,16 @@ async function deleteAllStorageImages() {
   }
 }
 
+// "정신과 설명서" 카테고리 ID
+const MANUAL_CATEGORY_ID = 6;
+
 async function fetchAllPosts(): Promise<WPPost[]> {
   const allPosts: WPPost[] = [];
   let page = 1;
 
   while (true) {
-    const url = `${WP_API_BASE}/posts?per_page=10&page=${page}&_embed`; // TODO: 테스트용 10개 제한
+    // "정신과 설명서" 카테고리만 가져오기
+    const url = `${WP_API_BASE}/posts?per_page=100&page=${page}&categories=${MANUAL_CATEGORY_ID}&_embed`;
     console.log(`Fetching page ${page}...`);
 
     const res = await fetch(url);
@@ -180,10 +184,10 @@ async function fetchAllPosts(): Promise<WPPost[]> {
     if (posts.length === 0) break;
 
     allPosts.push(...posts);
-    break; // TODO: 테스트용 - 첫 페이지만
+    page++;
   }
 
-  console.log(`총 ${allPosts.length}개 포스트를 가져왔습니다.`);
+  console.log(`총 ${allPosts.length}개 포스트를 가져왔습니다 (정신과 설명서 카테고리).`);
   return allPosts;
 }
 

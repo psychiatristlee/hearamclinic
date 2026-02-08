@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { useAuth } from "@/lib/AuthContext";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import Markdown from "react-markdown";
@@ -21,6 +22,7 @@ interface Post {
 }
 
 export default function BlogPostPage() {
+  const { claims } = useAuth();
   const params = useParams();
   const slug = decodeURIComponent(params.slug as string);
   const [post, setPost] = useState<Post | null>(null);
@@ -51,8 +53,8 @@ export default function BlogPostPage() {
     <article>
       <div className="mb-8">
         <Link
-          href="/blog"
-          className="text-sm text-gray-500 hover:text-gray-700"
+          href="/"
+          className="text-sm text-purple-500 hover:text-purple-700"
         >
           &larr; 블로그 목록
         </Link>
@@ -76,16 +78,33 @@ export default function BlogPostPage() {
         {post.categories.length > 0 && (
           <span>{post.categories.join(", ")}</span>
         )}
-        <Link
-          href={`/blog/${encodeURIComponent(post.slug)}/edit`}
-          className="ml-auto text-blue-600 hover:text-blue-800"
-        >
-          수정
-        </Link>
+        {(claims.admin || claims.editor) && (
+          <Link
+            href={`/${encodeURIComponent(post.slug)}/edit`}
+            className="ml-auto text-purple-600 hover:text-purple-800"
+          >
+            수정
+          </Link>
+        )}
       </div>
 
-      <div className="prose prose-lg max-w-none">
-        <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+      <div className="prose prose-lg max-w-none prose-a:text-purple-600 prose-a:hover:text-purple-800">
+        <Markdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw]}
+          components={{
+            a: ({href, children, ...props}) => (
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                {...props}
+              >
+                {children}
+              </a>
+            ),
+          }}
+        >
           {post.content}
         </Markdown>
       </div>

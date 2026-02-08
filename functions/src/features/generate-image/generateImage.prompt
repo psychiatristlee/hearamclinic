@@ -1,0 +1,25 @@
+---
+model: googleai/gemini-2.5-flash-image
+config:
+  responseModalities:
+    - IMAGE
+    - TEXT
+input:
+  schema:
+    sectionText: string
+---
+Generate a warm, comforting illustration for this mental health blog section in Korean webtoon style.
+
+ART STYLE (REQUIRED):
+- Use Korean webtoon (한국 웹툰) illustration style
+- Soft, clean line art with gentle colors
+
+MAIN SUBJECT (REQUIRED):
+- The image MUST feature ONE Korean university student (aged 20-25) as the main character
+- The scene MUST depict everyday life situations (e.g., studying at a cafe, walking on campus, reading in a library, having coffee, relaxing in a park, commuting, eating at a restaurant, sitting in a classroom)
+- The character should look natural, relatable, and approachable
+- Express emotions through subtle facial expressions and body language
+
+CRITICAL: The image must contain ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS, NO SYMBOLS, NO WRITING of any kind. This is a strict requirement.
+
+Section content: {{sectionText}}

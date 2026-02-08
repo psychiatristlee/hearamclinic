@@ -1,5 +1,26 @@
+import {initializeApp} from "firebase-admin/app";
 import {setGlobalOptions} from "firebase-functions";
 
+initializeApp();
 setGlobalOptions({maxInstances: 10});
 
-export {generatePost} from "./generate-post";
+// Generate Post features
+export {
+  generatePost,
+  generatePostImages,
+  finalizePostImages,
+} from "./features/generate-post";
+
+// Draft features
+export {
+  saveDraft,
+  loadDraft,
+  deleteDraft,
+} from "./features/draft";
+
+// Admin features
+export {setRole} from "./set-role";
+export {getUserByEmail} from "./get-user-by-email";
+
+// Sitemap
+export {generateSitemap, sitemap} from "./sitemap";

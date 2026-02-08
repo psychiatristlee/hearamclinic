@@ -3,7 +3,8 @@
   "scripts": {
     "genkit:start": "genkit start -- tsx --watch src/genkit-sample.ts",
     "lint": "eslint --ext .js,.ts .",
-    "build": "tsc",
+    "build": "tsc && npm run copy-prompts",
+    "copy-prompts": "find src -name '*.prompt' -exec sh -c 'mkdir -p lib/$(dirname ${1#src/}) && cp \"$1\" \"lib/${1#src/}\"' _ {} \\;",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
@@ -13,7 +14,7 @@
   },
   "name": "functions",
   "engines": {
-    "node": "24"
+    "node": "22"
   },
   "dependencies": {
     "@genkit-ai/firebase": "^1.28.0",

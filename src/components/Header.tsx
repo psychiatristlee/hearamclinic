@@ -13,7 +13,7 @@ const menuItems = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  const { user, claims, loading, signInWithGoogle, signOut } = useAuth();
+  const { user, claims, loading, signOut } = useAuth();
 
   return (
     <nav className="border-b border-purple-100 bg-white sticky top-0 z-50">
@@ -46,7 +46,7 @@ export default function Header() {
                   ⚙️ 관리
                 </Link>
               )}
-              {user ? (
+              {user && (
                 <div className="flex items-center gap-3">
                   <Link
                     href="/profile"
@@ -61,13 +61,6 @@ export default function Header() {
                     👋 로그아웃
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={signInWithGoogle}
-                  className="text-sm text-gray-600 hover:text-purple-700 transition"
-                >
-                  🔑 로그인
-                </button>
               )}
             </>
           )}
@@ -118,7 +111,7 @@ export default function Header() {
                     ⚙️ 관리
                   </Link>
                 )}
-                {user ? (
+                {user && (
                   <>
                     <Link
                       href="/profile"
@@ -137,16 +130,6 @@ export default function Header() {
                       👋 로그아웃
                     </button>
                   </>
-                ) : (
-                  <button
-                    onClick={() => {
-                      signInWithGoogle();
-                      setOpen(false);
-                    }}
-                    className="block py-3 text-sm text-gray-600 hover:text-purple-700 transition"
-                  >
-                    🔑 로그인
-                  </button>
                 )}
               </>
             )}

@@ -8,13 +8,15 @@ const CLINIC_NAME = "해람정신건강의학과";
 
 declare global {
   interface Window {
-    naver: typeof naver;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    naver: any;
   }
 }
 
 export default function NaverMap() {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<naver.maps.Map | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapInstanceRef = useRef<any>(null);
 
   useEffect(() => {
     const clientId = process.env.NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID;

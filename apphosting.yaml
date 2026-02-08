@@ -18,7 +18,7 @@ env:
   - variable: NEXT_PUBLIC_FIREBASE_APP_ID
     value: 1:773269931834:web:c6aa257a4284f24d653203
   - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-    value: G-XXXXXXXXXX
+    value: G-5R2BD851S2
   - variable: NEXT_PUBLIC_NAVER_MAPS_CLIENT_ID
     value: b665q5a9ln
   - variable: GOOGLE_GENAI_API_KEY

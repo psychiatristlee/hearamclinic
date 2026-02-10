@@ -5,6 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/AuthContext";
 
+function safeDecodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
 function decodeHtmlEntities(text: string): string {
   return text
     .replace(/&amp;/g, "&")
@@ -110,7 +118,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
           {filtered.map((post) => (
             <Link
               key={post.id}
-              href={`/${encodeURIComponent(post.slug)}`}
+              href={`/${encodeURIComponent(safeDecodeSlug(post.slug))}`}
               className="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition"
             >
               <div className="flex flex-col sm:flex-row">

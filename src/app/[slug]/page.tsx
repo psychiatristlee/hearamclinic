@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/firebaseAdmin";
 import Link from "next/link";
@@ -8,6 +9,15 @@ import rehypeRaw from "rehype-raw";
 import EditLink from "@/components/EditLink";
 
 export const revalidate = 60;
+
+// Decode percent-encoded slugs to Unicode (handles legacy encoded slugs)
+function safeDecodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
 
 interface Post {
   id: string;
@@ -74,6 +84,56 @@ async function getPost(slug: string): Promise<Post | null> {
   };
 }
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
+
+  let post = await getPost(decodedSlug);
+  if (!post) {
+    const encodedSlug = encodeURIComponent(decodedSlug);
+    if (encodedSlug !== decodedSlug) {
+      post = await getPost(encodedSlug);
+    }
+  }
+
+  if (!post) return {};
+
+  const description = post.content
+    .replace(/!\[.*?\]\(.*?\)/g, "")
+    .replace(/\[([^\]]*)\]\(.*?\)/g, "$1")
+    .replace(/#{1,6}\s/g, "")
+    .replace(/[*_~`>]/g, "")
+    .replace(/\n+/g, " ")
+    .trim()
+    .slice(0, 160);
+
+  return {
+    title: post.title,
+    description,
+    openGraph: {
+      title: `${post.title} - 해람정신건강의학과`,
+      description,
+      url: `https://hearam.kr/${encodeURIComponent(post.slug)}`,
+      siteName: "해람정신건강의학과",
+      locale: "ko_KR",
+      type: "article",
+      ...(post.featuredImage && {
+        images: [{ url: post.featuredImage, alt: post.title }],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      ...(post.featuredImage && { images: [post.featuredImage] }),
+    },
+  };
+}
+
 export default async function BlogPostPage({
   params,
 }: {
@@ -81,14 +141,22 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const [post, recommended] = await Promise.all([
-    getPost(decodedSlug),
-    getRandomPost(decodedSlug),
-  ]);
+
+  let post = await getPost(decodedSlug);
+
+  // Fallback: old posts have percent-encoded slugs in Firestore
+  if (!post) {
+    const encodedSlug = encodeURIComponent(decodedSlug);
+    if (encodedSlug !== decodedSlug) {
+      post = await getPost(encodedSlug);
+    }
+  }
 
   if (!post) {
     notFound();
   }
+
+  const recommended = await getRandomPost(post.slug);
 
   return (
     <article>
@@ -154,7 +222,7 @@ export default async function BlogPostPage({
             이런 글은 어떠세요?
           </p>
           <Link
-            href={`/${encodeURIComponent(recommended.slug)}`}
+            href={`/${encodeURIComponent(safeDecodeSlug(recommended.slug))}`}
             className="block border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition group"
           >
             <div className="flex flex-col sm:flex-row">

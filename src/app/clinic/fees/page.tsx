@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     url: "https://hearam.kr/clinic/fees",
     siteName: "해람정신건강의학과",
     locale: "ko_KR",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "해람정신건강의학과 로고" }],
   },
 };
 

@@ -5,6 +5,14 @@ import {getStorage} from "firebase-admin/storage";
 
 const SITE_URL = "https://hearam.kr";
 
+function safeDecodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
 interface PostDoc {
   slug: string;
   date: {seconds: number};
@@ -61,7 +69,7 @@ async function generateSitemapXml(): Promise<string> {
       .toISOString()
       .split("T")[0];
     urls.push(`  <url>
-    <loc>${SITE_URL}/${encodeURIComponent(post.slug)}</loc>
+    <loc>${SITE_URL}/${encodeURIComponent(safeDecodeSlug(post.slug))}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

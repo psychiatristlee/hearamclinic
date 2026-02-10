@@ -40,6 +40,14 @@ interface ImageResult {
   featuredImage: string;
 }
 
+function safeDecodeSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
 const SpinnerIcon = ({ className = "h-4 w-4" }: { className?: string }) => (
   <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
     <circle
@@ -82,8 +90,19 @@ export default function EditPostPage() {
 
   useEffect(() => {
     async function fetchPost() {
-      const q = query(collection(db, "posts"), where("slug", "==", slug));
-      const snapshot = await getDocs(q);
+      // Try decoded slug first (new Unicode slugs + Google-normalized URLs)
+      let q = query(collection(db, "posts"), where("slug", "==", slug));
+      let snapshot = await getDocs(q);
+
+      // Fallback: try percent-encoded slug (legacy posts)
+      if (snapshot.empty) {
+        const encodedSlug = encodeURIComponent(slug);
+        if (encodedSlug !== slug) {
+          q = query(collection(db, "posts"), where("slug", "==", encodedSlug));
+          snapshot = await getDocs(q);
+        }
+      }
+
       if (!snapshot.empty) {
         const docData = snapshot.docs[0];
         const data = { id: docData.id, ...docData.data() } as Post;
@@ -177,7 +196,7 @@ export default function EditPostPage() {
         featuredImage,
         updatedAt: Timestamp.now(),
       });
-      router.push(`/${encodeURIComponent(post.slug)}`);
+      router.push(`/${encodeURIComponent(safeDecodeSlug(post.slug))}`);
     } catch (err) {
       console.error("저장 실패:", err);
       alert("저장에 실패했습니다.");
@@ -218,7 +237,7 @@ export default function EditPostPage() {
       {/* 상단 네비게이션 */}
       <div className="mb-8">
         <Link
-          href={`/${encodeURIComponent(post.slug)}`}
+          href={`/${encodeURIComponent(safeDecodeSlug(post.slug))}`}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-purple-600 transition"
         >
           <svg

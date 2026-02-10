@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     url: "https://hearam.kr/clinic/diagnosis-info",
     siteName: "해람정신건강의학과",
     locale: "ko_KR",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "해람정신건강의학과 로고" }],
   },
 };
 
@@ -137,6 +138,7 @@ export default function DiagnosisInfoPage() {
                   src={post.image}
                   alt={post.title}
                   fill
+                  unoptimized
                   className="object-cover"
                 />
               </div>

@@ -124,9 +124,7 @@ export const generatePost = onCall(
 
     const titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
     const title = titleMatch?.[1] ?? topic;
-    const slug = encodeURIComponent(
-      title.replace(/\s+/g, "-").toLowerCase().slice(0, 100),
-    );
+    const slug = title.replace(/\s+/g, "-").toLowerCase().slice(0, 100);
 
     return {
       title,

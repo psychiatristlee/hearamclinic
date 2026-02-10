@@ -2,9 +2,18 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "진단서 발급 안내 - 해람정신건강의학과",
+  title: "진단서 발급 안내",
   description:
     "진단서 발급 절차 및 유의사항 안내. 진단서 발급 권한, 발급 일정, 초진 당일 발급 제한 등.",
+  alternates: { canonical: "https://hearam.kr/clinic/diagnosis-info" },
+  openGraph: {
+    title: "진단서 발급 안내 - 해람정신건강의학과",
+    description:
+      "진단서 발급 절차 및 유의사항 안내. 진단서 발급 권한, 발급 일정, 초진 당일 발급 제한 등.",
+    url: "https://hearam.kr/clinic/diagnosis-info",
+    siteName: "해람정신건강의학과",
+    locale: "ko_KR",
+  },
 };
 
 const blogPosts = [

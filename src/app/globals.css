@@ -21,3 +21,21 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* MDXEditor 테마 */
+.mdxeditor {
+  --accentBase: #f3e8ff;
+  --accentBgSubtle: #f5f3ff;
+  --accentBg: #ede9fe;
+  --accentBgHover: #ddd6fe;
+  --accentBgActive: #c4b5fd;
+  --accentLine: #a78bfa;
+  --accentBorder: #8b5cf6;
+  --accentBorderHover: #7c3aed;
+  --accentSolid: #6b3fa0;
+  --accentSolidHover: #5b2d8e;
+  --accentText: #6b3fa0;
+  --accentTextContrast: #4c1d95;
+  border-radius: 0.75rem;
+  font-family: Arial, Helvetica, sans-serif;
+}

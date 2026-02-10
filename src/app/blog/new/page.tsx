@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   collection,
   addDoc,
@@ -16,9 +16,9 @@ import { db, functions } from "@/lib/firebase";
 import { useAuth } from "@/lib/AuthContext";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-
-const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
+import MarkdownEditor, {
+  type MDXEditorMethods,
+} from "@/components/MarkdownEditor";
 
 interface GenerateResult {
   title: string;
@@ -79,6 +79,12 @@ export default function NewPostPage() {
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [draftUpdatedAt, setDraftUpdatedAt] = useState<string | null>(null);
   const [loadingDraft, setLoadingDraft] = useState(true);
+
+  const editorRef = useRef<MDXEditorMethods>(null);
+  const updateContent = useCallback((newContent: string) => {
+    setContent(newContent);
+    editorRef.current?.setMarkdown(newContent);
+  }, []);
 
   // 카테고리 관련 state
   const [categories, setCategories] = useState<string[]>([]);
@@ -174,7 +180,7 @@ export default function NewPostPage() {
 
         if (data.exists && (data.title || data.content)) {
           setTitle(data.title || "");
-          setContent(data.content || "");
+          updateContent(data.content || "");
           setSlug(data.slug || "");
           setFeaturedImage(data.featuredImage || "");
           setTopic(data.topic || "");
@@ -233,7 +239,7 @@ export default function NewPostPage() {
       setDraftUpdatedAt(null);
       setGenerated(false);
       setTitle("");
-      setContent("");
+      updateContent("");
       setSlug("");
       setFeaturedImage("");
       setTopic("");
@@ -257,7 +263,7 @@ export default function NewPostPage() {
       const data = result.data;
 
       setTitle(data.title);
-      setContent(data.content);
+      updateContent(data.content);
       setFeaturedImage(data.featuredImage);
       setSlug(data.slug);
       setGenerated(true);
@@ -334,7 +340,7 @@ export default function NewPostPage() {
         ImageResult
       >(functions, "generatePostImages");
       const result = await generatePostImages({ content, slug });
-      setContent(result.data.content);
+      updateContent(result.data.content);
       setFeaturedImage(result.data.featuredImage);
     } catch (err) {
       setError(
@@ -491,7 +497,7 @@ export default function NewPostPage() {
             <button
               onClick={() => {
                 setGenerated(false);
-                setContent("");
+                updateContent("");
                 setTitle("");
               }}
               className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-purple-600 transition"
@@ -672,13 +678,13 @@ export default function NewPostPage() {
           {/* 마크다운 에디터 */}
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <label className="block text-sm font-semibold text-gray-700 mb-3">
-              내용 (마크다운)
+              내용
             </label>
-            <div data-color-mode="light" className="rounded-xl overflow-hidden">
-              <MDEditor
-                value={content}
-                onChange={(v) => setContent(v || "")}
-                height={600}
+            <div className="rounded-xl overflow-hidden border border-gray-200">
+              <MarkdownEditor
+                ref={editorRef}
+                markdown={content}
+                onChange={(v) => setContent(v)}
               />
             </div>
           </div>

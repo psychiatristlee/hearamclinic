@@ -137,7 +137,7 @@ export const generatePost = onCall(
   },
 );
 
-// 이미지 별도 생성 (각 h2 섹션 하단에 삽입)
+// 이미지 별도 생성 (각 문단 뒤에 삽입)
 export const generatePostImages = onCall(
   {
     secrets: [apiKey],
@@ -171,17 +171,21 @@ export const generatePostImages = onCall(
     }
 
     const genkitAi = createGenkitInstance(apiKey.value());
-    const sections = splitSections(content);
+    // 기존 이미지 마크다운 모두 제거 후 섹션 분리
+    const cleanedContent = content.replace(/\n\n!\[[^\]]*\]\([^)]+\)/g, "");
+    const sections = splitSections(cleanedContent);
 
     const sectionsWithImages: string[] = [];
+    let imageIndex = 0;
+
     // 첫 섹션(인트로)은 이미지 없이 추가
     if (sections.length > 0) {
       sectionsWithImages.push(sections[0]);
     }
 
-    // h2 섹션들에 이미지 생성
+    // h2 섹션들: 각 문단 뒤에 이미지 생성
     for (let i = 1; i < sections.length; i++) {
-      let section = sections[i];
+      const section = sections[i];
       // "참고 문헌/참고 자료" 섹션은 이미지 생성 건너뛰기
       if (
         section.startsWith("## 참고 문헌") ||
@@ -191,16 +195,26 @@ export const generatePostImages = onCall(
         continue;
       }
 
-      // 이미 이미지가 있으면 제거 (재생성 대비)
-      section = section.replace(/\n\n!\[[^\]]*\]\([^)]+\)$/, "");
+      // 문단별로 분리하여 각 문단 뒤에 이미지 삽입
+      const paragraphs = section.split("\n\n");
+      const paragraphsWithImages: string[] = [];
 
-      const imageBuffer = await generateImage(genkitAi, section);
-      if (imageBuffer) {
-        const imageUrl = await uploadImage(imageBuffer, userId, slug, i);
-        sectionsWithImages.push(section + `\n\n![](${imageUrl})`);
-      } else {
-        sectionsWithImages.push(section);
+      for (const paragraph of paragraphs) {
+        paragraphsWithImages.push(paragraph);
+        const trimmed = paragraph.trim();
+        // h2 제목, 빈 줄, 링크 목록은 이미지 생성 건너뛰기
+        if (!trimmed || trimmed.startsWith("## ") || trimmed.startsWith("- [")) {
+          continue;
+        }
+        const imageBuffer = await generateImage(genkitAi, paragraph);
+        if (imageBuffer) {
+          imageIndex++;
+          const imageUrl = await uploadImage(imageBuffer, userId, slug, imageIndex);
+          paragraphsWithImages.push(`![](${imageUrl})`);
+        }
       }
+
+      sectionsWithImages.push(paragraphsWithImages.join("\n\n"));
     }
 
     const finalMarkdown = sectionsWithImages.join("\n\n");

@@ -27,6 +27,32 @@ async function generateSitemapXml(): Promise<string> {
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>`,
+    // 클리닉 정적 페이지
+    `  <url>
+    <loc>${SITE_URL}/clinic</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>`,
+    `  <url>
+    <loc>${SITE_URL}/clinic/diagnosis-info</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`,
+    `  <url>
+    <loc>${SITE_URL}/clinic/fees</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`,
+    `  <url>
+    <loc>${SITE_URL}/clinic/prescriptions-info</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`,
+    `  <url>
+    <loc>${SITE_URL}/clinic/medical-records-info</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>`,
   ];
 
   // 블로그 포스트들
@@ -35,7 +61,7 @@ async function generateSitemapXml(): Promise<string> {
       .toISOString()
       .split("T")[0];
     urls.push(`  <url>
-    <loc>${SITE_URL}/blog/${encodeURIComponent(post.slug)}</loc>
+    <loc>${SITE_URL}/${encodeURIComponent(post.slug)}</loc>
     <lastmod>${lastmod}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

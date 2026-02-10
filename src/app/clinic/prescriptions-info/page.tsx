@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "대리처방 서류 안내 - 해람정신건강의학과",
+  title: "대리처방 서류 안내",
   description:
     "대리처방 안내, 필요 서류, 처방전 대리수령 신청서 다운로드",
+  alternates: { canonical: "https://hearam.kr/clinic/prescriptions-info" },
+  openGraph: {
+    title: "대리처방 서류 안내 - 해람정신건강의학과",
+    description: "대리처방 안내, 필요 서류, 처방전 대리수령 신청서 다운로드",
+    url: "https://hearam.kr/clinic/prescriptions-info",
+    siteName: "해람정신건강의학과",
+    locale: "ko_KR",
+  },
 };
 
 export default function PrescriptionsInfoPage() {

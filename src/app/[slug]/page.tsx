@@ -20,6 +20,38 @@ interface Post {
   author: string;
 }
 
+interface RecommendedPost {
+  slug: string;
+  title: string;
+  featuredImage: string;
+  categories: string[];
+  excerpt: string;
+}
+
+async function getRandomPost(excludeSlug: string): Promise<RecommendedPost | null> {
+  const snapshot = await adminDb.collection("posts").orderBy("date", "desc").get();
+  const others = snapshot.docs.filter((d) => d.data().slug !== excludeSlug);
+  if (others.length === 0) return null;
+
+  const doc = others[Math.floor(Math.random() * others.length)];
+  const data = doc.data();
+  const plain = (data.content ?? "")
+    .replace(/!\[.*?\]\(.*?\)/g, "")
+    .replace(/\[([^\]]*)\]\(.*?\)/g, "$1")
+    .replace(/#{1,6}\s/g, "")
+    .replace(/[*_~`>]/g, "")
+    .replace(/\n+/g, " ")
+    .trim();
+
+  return {
+    slug: data.slug ?? "",
+    title: data.title ?? "",
+    featuredImage: data.featuredImage ?? "",
+    categories: data.categories ?? [],
+    excerpt: plain.length > 80 ? plain.slice(0, 80).replace(/\s+\S*$/, "") + "…" : plain,
+  };
+}
+
 async function getPost(slug: string): Promise<Post | null> {
   const snapshot = await adminDb
     .collection("posts")
@@ -49,7 +81,10 @@ export default async function BlogPostPage({
 }) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const post = await getPost(decodedSlug);
+  const [post, recommended] = await Promise.all([
+    getPost(decodedSlug),
+    getRandomPost(decodedSlug),
+  ]);
 
   if (!post) {
     notFound();
@@ -112,6 +147,52 @@ export default async function BlogPostPage({
           {post.content}
         </Markdown>
       </div>
+
+      {recommended && (
+        <div className="mt-16 pt-8 border-t border-gray-200">
+          <p className="text-sm font-medium text-gray-500 mb-4">
+            이런 글은 어떠세요?
+          </p>
+          <Link
+            href={`/${encodeURIComponent(recommended.slug)}`}
+            className="block border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition group"
+          >
+            <div className="flex flex-col sm:flex-row">
+              {recommended.featuredImage && (
+                <div className="relative w-full sm:w-48 h-40 sm:h-auto flex-shrink-0">
+                  <Image
+                    src={recommended.featuredImage}
+                    alt={recommended.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 192px"
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div className="p-5 flex flex-col justify-center">
+                <p className="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
+                  {recommended.title}
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  {recommended.excerpt}
+                </p>
+                {recommended.categories.length > 0 && (
+                  <div className="flex gap-2 mt-3">
+                    {recommended.categories.map((cat) => (
+                      <span
+                        key={cat}
+                        className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full"
+                      >
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Link>
+        </div>
+      )}
     </article>
   );
 }

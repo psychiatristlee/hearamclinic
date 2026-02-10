@@ -4,7 +4,58 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "해람정신건강의학과 소개",
-  description: "서울 마포구 홍대입구역 정신건강의학과 - 의료진 소개, 진료시간, 위치 안내",
+  description:
+    "서울 마포구 홍대입구역 정신건강의학과 - 의료진 소개, 진료시간, 위치 안내",
+  alternates: { canonical: "https://hearam.kr/clinic" },
+  openGraph: {
+    type: "website",
+    title: "해람정신건강의학과 소개",
+    description:
+      "서울 마포구 홍대입구역 정신건강의학과 - 8인의 전문의, 진료시간, 위치 안내",
+    url: "https://hearam.kr/clinic",
+    siteName: "해람정신건강의학과",
+    locale: "ko_KR",
+  },
+};
+
+const clinicJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "MedicalBusiness",
+  name: "해람정신건강의학과",
+  description:
+    "서울 마포구 홍대입구역 정신건강의학과 - 우울증, 불안장애, ADHD, 불면증, 공황장애 등 정신건강 전문 진료",
+  url: "https://hearam.kr/clinic",
+  telephone: "02-498-2024",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "양화로 178 4층, 7층",
+    addressLocality: "마포구",
+    addressRegion: "서울특별시",
+    postalCode: "04051",
+    addressCountry: "KR",
+  },
+  geo: {
+    "@type": "GeoCoordinates",
+    latitude: 37.5571,
+    longitude: 126.9236,
+  },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      opens: "10:00",
+      closes: "20:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: "Saturday",
+      opens: "10:00",
+      closes: "14:00",
+    },
+  ],
+  medicalSpecialty: "Psychiatric",
+  image: "https://hearam.kr/logo.png",
+  priceRange: "$$",
 };
 
 const doctors = [
@@ -127,6 +178,10 @@ const doctors = [
 export default function ClinicPage() {
   return (
     <div className="space-y-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(clinicJsonLd) }}
+      />
       {/* 클리닉 소개 */}
       <section className="text-center">
         <h1 className="text-3xl font-bold text-purple-900 mb-4">

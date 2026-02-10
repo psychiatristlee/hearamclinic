@@ -2,9 +2,18 @@ import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "진료기록사본 안내 - 해람정신건강의학과",
+  title: "진료기록사본 안내",
   description:
     "진료기록사본 발급 안내, 대리수령 시 필요서류, 동의서 및 위임장 양식 다운로드",
+  alternates: { canonical: "https://hearam.kr/clinic/medical-records-info" },
+  openGraph: {
+    title: "진료기록사본 안내 - 해람정신건강의학과",
+    description:
+      "진료기록사본 발급 안내, 대리수령 시 필요서류, 동의서 및 위임장 양식 다운로드",
+    url: "https://hearam.kr/clinic/medical-records-info",
+    siteName: "해람정신건강의학과",
+    locale: "ko_KR",
+  },
 };
 
 export default function MedicalRecordsInfoPage() {

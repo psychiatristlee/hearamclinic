@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "비급여진료비용 안내 - 해람정신건강의학과",
+  title: "비급여진료비용 안내",
   description:
     "해람정신건강의학과 비급여 진료비용 안내 - 진단서, 진료확인서, 심리검사 등 항목별 비용",
+  alternates: { canonical: "https://hearam.kr/clinic/fees" },
+  openGraph: {
+    title: "비급여진료비용 안내 - 해람정신건강의학과",
+    description:
+      "해람정신건강의학과 비급여 진료비용 안내 - 진단서, 진료확인서, 심리검사 등 항목별 비용",
+    url: "https://hearam.kr/clinic/fees",
+    siteName: "해람정신건강의학과",
+    locale: "ko_KR",
+  },
 };
 
 const fees = [

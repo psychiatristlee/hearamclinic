@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/AuthContext";
 
 const menuItems = [
   { label: "🏥 해람정신과", href: "/clinic", external: false },
-  { label: "🔬 해람검사실", href: "https://test.hearam.kr", external: true },
+  { label: "🔬 해람검사실", href: "/test", external: false },
   { label: "📅 예약하기", href: "https://naver.me/Fy2FWU9A", external: true },
 ];
 

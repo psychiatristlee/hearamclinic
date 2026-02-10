@@ -94,9 +94,9 @@ export default function EditPostPage() {
       let q = query(collection(db, "posts"), where("slug", "==", slug));
       let snapshot = await getDocs(q);
 
-      // Fallback: try percent-encoded slug (legacy posts)
+      // Fallback: try percent-encoded slug with lowercase hex (legacy posts)
       if (snapshot.empty) {
-        const encodedSlug = encodeURIComponent(slug);
+        const encodedSlug = encodeURIComponent(slug).toLowerCase();
         if (encodedSlug !== slug) {
           q = query(collection(db, "posts"), where("slug", "==", encodedSlug));
           snapshot = await getDocs(q);

@@ -94,7 +94,7 @@ export async function generateMetadata({
 
   let post = await getPost(decodedSlug);
   if (!post) {
-    const encodedSlug = encodeURIComponent(decodedSlug);
+    const encodedSlug = encodeURIComponent(decodedSlug).toLowerCase();
     if (encodedSlug !== decodedSlug) {
       post = await getPost(encodedSlug);
     }
@@ -144,9 +144,9 @@ export default async function BlogPostPage({
 
   let post = await getPost(decodedSlug);
 
-  // Fallback: old posts have percent-encoded slugs in Firestore
+  // Fallback: old posts have percent-encoded slugs (lowercase hex) in Firestore
   if (!post) {
-    const encodedSlug = encodeURIComponent(decodedSlug);
+    const encodedSlug = encodeURIComponent(decodedSlug).toLowerCase();
     if (encodedSlug !== decodedSlug) {
       post = await getPost(encodedSlug);
     }

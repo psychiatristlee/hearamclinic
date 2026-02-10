@@ -138,7 +138,6 @@ export default function DiagnosisInfoPage() {
                   alt={post.title}
                   fill
                   className="object-cover"
-                  unoptimized
                 />
               </div>
               <div className="p-5 flex flex-col justify-center min-w-0">

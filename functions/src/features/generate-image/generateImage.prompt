@@ -8,18 +8,33 @@ input:
   schema:
     sectionText: string
 ---
-Generate a warm, comforting illustration for this mental health blog section in Korean webtoon style.
+You are an illustrator for a Korean mental health clinic blog. Read the section content below carefully, then create an illustration that directly represents the topic and emotions described.
 
-ART STYLE (REQUIRED):
-- Use Korean webtoon (한국 웹툰) illustration style
-- Soft, clean line art with gentle colors
+SECTION CONTENT:
+{{sectionText}}
 
-MAIN SUBJECT (REQUIRED):
-- The image MUST feature ONE Korean university student (aged 20-25) as the main character
-- The scene MUST depict everyday life situations (e.g., studying at a cafe, walking on campus, reading in a library, having coffee, relaxing in a park, commuting, eating at a restaurant, sitting in a classroom)
-- The character should look natural, relatable, and approachable
-- Express emotions through subtle facial expressions and body language
+INSTRUCTIONS:
+1. First, identify the key theme, emotion, and situation from the section content above.
+2. Create a scene that visually represents THAT SPECIFIC topic — do NOT default to generic cafe/coffee scenes.
+3. The illustration should help the reader understand and empathize with the topic.
 
-CRITICAL: The image must contain ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS, NO SYMBOLS, NO WRITING of any kind. This is a strict requirement.
+ART STYLE:
+- Korean webtoon (한국 웹툰) style with soft, clean line art and gentle pastel colors
+- Warm and comforting atmosphere
+- Use a variety of color palettes — choose colors that match the mood of the content (e.g., cool blues for sadness/anxiety, warm yellows for hope/recovery, soft greens for calm/nature)
 
-Section content: {{sectionText}}
+SUBJECT:
+- Feature a Korean person (age 20-35) as the main character
+- The character's activity and environment MUST directly relate to the section content
+- Express the topic's emotion through facial expressions, body language, and surroundings
+- Examples of diverse scenes (choose based on content, NOT randomly):
+  - Anxiety: lying awake at night, clutching a pillow, standing in a crowded space feeling overwhelmed
+  - Depression: sitting alone by a window on a rainy day, struggling to get out of bed
+  - Recovery/Hope: stepping outside into sunlight, talking with a friend, planting flowers
+  - Stress: surrounded by stacked books/papers, rubbing temples at a desk
+  - Therapy: sitting across from a counselor in a warm office
+  - Relationships: walking together, having a heart-to-heart conversation
+  - Sleep issues: tossing in bed with a clock visible, staring at a phone in the dark
+  - Self-care: stretching, journaling, taking a walk in nature
+
+CRITICAL: The image must contain ABSOLUTELY NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS, NO SYMBOLS, NO WRITING of any kind.

@@ -160,7 +160,7 @@ export const generatePostImages = onCall(
 
     // 기존 임시 이미지 삭제 (재생성 시)
     const bucket = getStorage().bucket();
-    const [existingFiles] = await bucket.getFiles({prefix: `temp/${userId}/${slug}/`});
+    const [existingFiles] = await bucket.getFiles({prefix: `blog-images/posts/${slug}/`});
     for (const file of existingFiles) {
       try {
         await file.delete();
@@ -271,7 +271,7 @@ export const finalizePostImages = onCall(
         );
 
         // 콘텐츠에서 이 파일의 temp URL을 찾아 교체
-        const urlEncodedPath = tempPath.replace(/\//g, "%2F");
+        const urlEncodedPath = encodeURIComponent(tempPath);
         const escapedPath = urlEncodedPath.replace(/[.*+?^${}()|[\]\\%]/g, "\\$&");
         const tempUrlRegex = new RegExp(
           `https://firebasestorage\\.googleapis\\.com/v0/b/[^/]+/o/${escapedPath}\\?[^)\\s]*`,

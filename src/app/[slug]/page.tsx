@@ -1,52 +1,58 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { useAuth } from "@/lib/AuthContext";
+import { notFound } from "next/navigation";
+import { adminDb } from "@/lib/firebaseAdmin";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import Image from "next/image";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import EditLink from "@/components/EditLink";
+
+export const revalidate = 60;
 
 interface Post {
   id: string;
   title: string;
   slug: string;
   content: string;
-  date: { seconds: number };
+  dateSeconds: number;
   categories: string[];
   featuredImage: string;
   author: string;
 }
 
-export default function BlogPostPage() {
-  const { claims } = useAuth();
-  const params = useParams();
-  const slug = decodeURIComponent(params.slug as string);
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState(true);
+async function getPost(slug: string): Promise<Post | null> {
+  const snapshot = await adminDb
+    .collection("posts")
+    .where("slug", "==", slug)
+    .get();
 
-  useEffect(() => {
-    async function fetchPost() {
-      const q = query(collection(db, "posts"), where("slug", "==", slug));
-      const snapshot = await getDocs(q);
-      if (!snapshot.empty) {
-        const doc = snapshot.docs[0];
-        setPost({ id: doc.id, ...doc.data() } as Post);
-      }
-      setLoading(false);
-    }
-    fetchPost();
-  }, [slug]);
+  if (snapshot.empty) return null;
 
-  if (loading) {
-    return <p className="text-gray-500">로딩 중...</p>;
-  }
+  const doc = snapshot.docs[0];
+  const data = doc.data();
+  return {
+    id: doc.id,
+    title: data.title ?? "",
+    slug: data.slug ?? "",
+    content: data.content ?? "",
+    dateSeconds: data.date?.seconds ?? 0,
+    categories: data.categories ?? [],
+    featuredImage: data.featuredImage ?? "",
+    author: data.author ?? "",
+  };
+}
+
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const decodedSlug = decodeURIComponent(slug);
+  const post = await getPost(decodedSlug);
 
   if (!post) {
-    return <p className="text-gray-500">글을 찾을 수 없습니다.</p>;
+    notFound();
   }
 
   return (
@@ -61,11 +67,16 @@ export default function BlogPostPage() {
       </div>
 
       {post.featuredImage && (
-        <img
-          src={post.featuredImage}
-          alt={post.title}
-          className="w-full max-h-96 object-cover rounded-lg mb-8"
-        />
+        <div className="relative w-full h-96 mb-8">
+          <Image
+            src={post.featuredImage}
+            alt={post.title}
+            fill
+            sizes="(max-width: 896px) 100vw, 896px"
+            className="object-cover rounded-lg"
+            priority
+          />
+        </div>
       )}
 
       <h1 className="text-3xl font-bold text-gray-900 mb-4">{post.title}</h1>
@@ -73,19 +84,12 @@ export default function BlogPostPage() {
       <div className="flex items-center gap-4 text-sm text-gray-500 mb-8 pb-4 border-b">
         <span>{post.author}</span>
         <span>
-          {new Date(post.date.seconds * 1000).toLocaleDateString("ko-KR")}
+          {new Date(post.dateSeconds * 1000).toLocaleDateString("ko-KR")}
         </span>
         {post.categories.length > 0 && (
           <span>{post.categories.join(", ")}</span>
         )}
-        {(claims.admin || claims.editor) && (
-          <Link
-            href={`/${encodeURIComponent(post.slug)}/edit`}
-            className="ml-auto text-purple-600 hover:text-purple-800"
-          >
-            수정
-          </Link>
-        )}
+        <EditLink slug={post.slug} />
       </div>
 
       <div className="prose prose-lg max-w-none prose-a:text-purple-600 prose-a:hover:text-purple-800">
@@ -93,7 +97,7 @@ export default function BlogPostPage() {
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw]}
           components={{
-            a: ({href, children, ...props}) => (
+            a: ({ href, children, ...props }) => (
               <a
                 href={href}
                 target="_blank"

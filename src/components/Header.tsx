@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useAuth } from "@/lib/AuthContext";
 
 const menuItems = [
-  { label: "🏥 해람정신과", href: "https://clinic.hearam.kr", external: true },
+  { label: "🏥 해람정신과", href: "/clinic", external: false },
   { label: "🔬 해람검사실", href: "https://test.hearam.kr", external: true },
   { label: "📅 예약하기", href: "https://naver.me/Fy2FWU9A", external: true },
 ];
@@ -25,17 +25,27 @@ export default function Header() {
 
         {/* 데스크탑 메뉴 */}
         <div className="hidden md:flex items-center gap-6">
-          {menuItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-600 hover:text-purple-700 transition"
-            >
-              {item.label}
-            </a>
-          ))}
+          {menuItems.map((item) =>
+            item.external ? (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-purple-700 transition"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="text-gray-600 hover:text-purple-700 transition"
+              >
+                {item.label}
+              </Link>
+            )
+          )}
           {!loading && (
             <>
               {claims.admin && (
@@ -88,18 +98,29 @@ export default function Header() {
       {open && (
         <div className="md:hidden border-t border-purple-100 bg-white">
           <div className="px-4 py-2 space-y-1">
-            {menuItems.map((item) => (
-              <a
-                key={item.label}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block py-3 text-gray-600 hover:text-purple-700 transition"
-                onClick={() => setOpen(false)}
-              >
-                {item.label}
-              </a>
-            ))}
+            {menuItems.map((item) =>
+              item.external ? (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block py-3 text-gray-600 hover:text-purple-700 transition"
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="block py-3 text-gray-600 hover:text-purple-700 transition"
+                  onClick={() => setOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
             {!loading && (
               <>
                 {claims.admin && (

@@ -19,7 +19,7 @@ export async function uploadImage(
   index: number,
 ): Promise<string> {
   const bucket = getStorage().bucket();
-  const storagePath = `temp/${userId}/${postSlug}/section-${index}.png`;
+  const storagePath = `blog-images/posts/${postSlug}/section-${index}.png`;
   console.log("[uploadImage] bucket:", bucket.name);
   console.log("[uploadImage] storagePath:", storagePath);
   const file = bucket.file(storagePath);

@@ -18,6 +18,9 @@ export {
   deleteDraft,
 } from "./features/draft";
 
+// Delete Post
+export {deletePost} from "./features/delete-post";
+
 // Admin features
 export {setRole} from "./set-role";
 export {getUserByEmail} from "./get-user-by-email";

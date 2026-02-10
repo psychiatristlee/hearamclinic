@@ -8,7 +8,6 @@ import {
   getDocs,
   doc,
   updateDoc,
-  deleteDoc,
   Timestamp,
 } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
@@ -147,7 +146,11 @@ export default function EditPostPage() {
     setDeleting(true);
 
     try {
-      await deleteDoc(doc(db, "posts", post.id));
+      const deletePostFn = httpsCallable<
+        { postId: string; slug: string },
+        { success: boolean }
+      >(functions, "deletePost");
+      await deletePostFn({ postId: post.id, slug: post.slug });
       router.push("/");
     } catch (err) {
       console.error("삭제 실패:", err);

@@ -23,16 +23,14 @@ const blogPosts = [
     title: "정신과 진단서 바로 발급받고 싶은데 왜 안된다는 건가요?",
     description:
       "안녕하세요 홍대 해람 정신과 원장 입니다 월요일 아침만 되면 진단서를 바로 발급해줄 수 없느냐는 수 많은 문의가...",
-    image:
-      "https://blogthumb.pstatic.net/MjAyMzA4MDNfNTMg/MDAxNjkxMDc0NTAyNjg0.RnVh_EhXN7i7r7JNhSprnhBQnRI4S9jdEsW6xIihkysg.-M-KcOy6ZO4DdtNupC9RoX9_GIqzypLZ3S32b9dJ3bIg.JPEG.hearimclinic/7BA56E9F-1EFD-4CBF-BC6C-33A599497458_1_105_c.jpeg?type=w2",
+    image: "/images/blog/diagnosis-1.jpeg",
   },
   {
     href: "https://blog.naver.com/hearimclinic/223179599073",
     title: "정신과 진단서 내용에 원인과 판단을 써줄 수 없는 이유는 무엇일까요?",
     description:
       "안녕하세요 홍대 해람 정신과 원장입니다 지난 포스팅에서는 정신과 진단서가 바로 못나오는 이유에 대해서...",
-    image:
-      "https://blogthumb.pstatic.net/MjAyMzA4MDlfODAg/MDAxNjkxNTgzNDczMTcx.qc84Z2etGwbtrIl0j7fqd5k3bo_6kUzeR0OB2_t2xc8g.OHy6-AoQg0ew7axosZ2oLSLNYdawdmdDmRgcXRRHJ3Mg.PNG.hearimclinic/drlee2976_a_medical_document_that_is_lying_on_the_wood_table_2afb04e7-7f51-4.png?type=w2",
+    image: "/images/blog/diagnosis-2.png",
   },
 ];
 
@@ -138,7 +136,7 @@ export default function DiagnosisInfoPage() {
                   src={post.image}
                   alt={post.title}
                   fill
-                  unoptimized
+                  sizes="(max-width: 640px) 100vw, 208px"
                   className="object-cover"
                 />
               </div>

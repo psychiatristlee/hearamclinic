@@ -2,8 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = {
   title: "해람정신건강의학과 소개",
   description:

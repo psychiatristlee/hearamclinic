@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-
-export const revalidate = 3600;
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "진단서 발급 안내",
@@ -24,12 +23,14 @@ const blogPosts = [
     title: "정신과 진단서 바로 발급받고 싶은데 왜 안된다는 건가요?",
     description:
       "안녕하세요 홍대 해람 정신과 원장 입니다 월요일 아침만 되면 진단서를 바로 발급해줄 수 없느냐는 수 많은 문의가...",
+    image: "/images/blog/diagnosis-1.jpeg",
   },
   {
     href: "https://blog.naver.com/hearimclinic/223179599073",
     title: "정신과 진단서 내용에 원인과 판단을 써줄 수 없는 이유는 무엇일까요?",
     description:
       "안녕하세요 홍대 해람 정신과 원장입니다 지난 포스팅에서는 정신과 진단서가 바로 못나오는 이유에 대해서...",
+    image: "/images/blog/diagnosis-2.png",
   },
 ];
 
@@ -130,6 +131,15 @@ export default function DiagnosisInfoPage() {
               rel="noopener noreferrer"
               className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col sm:flex-row hover:border-purple-300 hover:shadow-md transition-all"
             >
+              <div className="sm:w-52 sm:h-auto h-48 relative flex-shrink-0">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 208px"
+                  className="object-cover"
+                />
+              </div>
               <div className="p-5 flex flex-col justify-center min-w-0">
                 <p className="text-xs text-purple-600 font-medium mb-1">
                   네이버 블로그

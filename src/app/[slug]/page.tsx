@@ -212,7 +212,7 @@ export default async function BlogPostPage({
             ),
           }}
         >
-          {post.content}
+          {post.content.replace(/^\s*#\s+.+\n*/, "").trimStart()}
         </Markdown>
       </div>
 

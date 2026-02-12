@@ -262,8 +262,13 @@ export default function NewPostPage() {
       const result = await generatePost({ topic });
       const data = result.data;
 
+      // 본문에서 첫 번째 h1 제거 (제목 필드와 중복 방지)
+      const contentWithoutH1 = data.content
+        .replace(/^\s*#\s+.+\n*/, "")
+        .trimStart();
+
       setTitle(data.title);
-      updateContent(data.content);
+      updateContent(contentWithoutH1);
       setFeaturedImage(data.featuredImage);
       setSlug(data.slug);
       setGenerated(true);

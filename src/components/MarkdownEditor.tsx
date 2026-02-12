@@ -30,8 +30,17 @@ import {
   type MDXEditorMethods,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import { forwardRef } from "react";
+import { forwardRef, useCallback } from "react";
 import dynamic from "next/dynamic";
+
+// Escape <text> where text starts with non-ASCII (Korean etc.) — not valid HTML/JSX
+function escapeNonHtmlTags(md: string): string {
+  return md.replace(/<(\/?)([^\x00-\x7F][^>]*)>/g, "&lt;$1$2&gt;");
+}
+
+function unescapeNonHtmlTags(md: string): string {
+  return md.replace(/&lt;(\/?)([^\x00-\x7F][^&]*)&gt;/g, "<$1$2>");
+}
 
 interface MarkdownEditorProps {
   markdown: string;
@@ -40,11 +49,16 @@ interface MarkdownEditorProps {
 
 const MarkdownEditorBase = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
   ({ markdown, onChange }, ref) => {
+    const safeMarkdown = escapeNonHtmlTags(markdown);
+    const handleChange = useCallback(
+      (value: string) => onChange(unescapeNonHtmlTags(value)),
+      [onChange]
+    );
     return (
       <MDXEditor
         ref={ref}
-        markdown={markdown}
-        onChange={onChange}
+        markdown={safeMarkdown}
+        onChange={handleChange}
         contentEditableClassName="prose prose-lg max-w-none min-h-[500px] focus:outline-none"
         plugins={[
           headingsPlugin(),

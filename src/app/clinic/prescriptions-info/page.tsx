@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "대리처방 서류 안내",
   description:

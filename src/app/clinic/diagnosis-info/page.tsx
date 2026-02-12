@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "진단서 발급 안내",
   description:

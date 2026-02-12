@@ -13,12 +13,13 @@ const attentionTests = [
   "interference-attention",
 ];
 
-function buildTestUrls(): string {
-  const today = new Date().toISOString().split("T")[0];
+// 검사 페이지 최초 배포일 (내용이 변경되면 이 날짜를 업데이트)
+const TEST_LAST_MODIFIED = "2025-02-10";
 
+function buildTestUrls(): string {
   let urls = `  <url>
     <loc>${BASE_URL}/test</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`;
@@ -27,7 +28,7 @@ function buildTestUrls(): string {
     urls += `
   <url>
     <loc>${BASE_URL}/test/${q.name}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;
@@ -37,7 +38,7 @@ function buildTestUrls(): string {
     urls += `
   <url>
     <loc>${BASE_URL}/test/${name}</loc>
-    <lastmod>${today}</lastmod>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`;
@@ -49,7 +50,7 @@ function buildTestUrls(): string {
 export async function GET() {
   try {
     const response = await fetch(FUNCTION_URL, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 60 },
     });
 
     if (!response.ok) {
@@ -65,7 +66,7 @@ export async function GET() {
     return new NextResponse(xml, {
       headers: {
         "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=3600, s-maxage=86400",
+        "Cache-Control": "public, max-age=60, s-maxage=300",
       },
     });
   } catch (error) {

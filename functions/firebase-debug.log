@@ -1,0 +1,103 @@
+[debug] [2026-02-12T23:29:13.175Z] ----------------------------------------------------------------------
+[debug] [2026-02-12T23:29:13.178Z] Command:       /Users/jungsoklee/.nvm/versions/node/v22.21.0/bin/node /Users/jungsoklee/.nvm/versions/node/v22.21.0/bin/firebase deploy --only functions
+[debug] [2026-02-12T23:29:13.178Z] CLI Version:   15.4.0
+[debug] [2026-02-12T23:29:13.178Z] Platform:      darwin
+[debug] [2026-02-12T23:29:13.178Z] Node Version:  v22.21.0
+[debug] [2026-02-12T23:29:13.178Z] Time:          Fri Feb 13 2026 08:29:13 GMT+0900 (Korean Standard Time)
+[debug] [2026-02-12T23:29:13.178Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-02-12T23:29:14.301Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-12T23:29:14.301Z] > authorizing via signed-in user (psychiatristlee@gmail.com)
+[debug] [2026-02-12T23:29:14.301Z] [iam] checking project hearamclinic-ef507 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2026-02-12T23:29:14.302Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:14.302Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:14.302Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions [none]
+[debug] [2026-02-12T23:29:14.302Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions x-goog-quota-user=projects/hearamclinic-ef507
+[debug] [2026-02-12T23:29:14.302Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-02-12T23:29:15.745Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions 200
+[debug] [2026-02-12T23:29:15.745Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2026-02-12T23:29:15.745Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:15.745Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:15.745Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/hearamclinic-ef507/serviceAccounts/hearamclinic-ef507@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-02-12T23:29:15.745Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/hearamclinic-ef507/serviceAccounts/hearamclinic-ef507@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-02-12T23:29:17.081Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/hearamclinic-ef507/serviceAccounts/hearamclinic-ef507@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2026-02-12T23:29:17.081Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/hearamclinic-ef507/serviceAccounts/hearamclinic-ef507@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'hearamclinic-ef507'...
+[info] 
+[info] i  deploying functions 
+[debug] [2026-02-12T23:29:17.083Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:17.083Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:17.084Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507 [none]
+[debug] [2026-02-12T23:29:17.648Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507 200
+[debug] [2026-02-12T23:29:17.648Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507 {"projectNumber":"773269931834","projectId":"hearamclinic-ef507","lifecycleState":"ACTIVE","name":"hearamclinic","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2026-02-01T03:30:47.354774Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2026-02-12T23:29:17.649Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:17.649Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:17.649Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/hearamclinic-ef507/adminSdkConfig [none]
+[debug] [2026-02-12T23:29:18.378Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/hearamclinic-ef507/adminSdkConfig 200
+[debug] [2026-02-12T23:29:18.378Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/hearamclinic-ef507/adminSdkConfig {"projectId":"hearamclinic-ef507","storageBucket":"hearamclinic-ef507.firebasestorage.app"}
+[debug] [2026-02-12T23:29:18.379Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:18.379Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:18.379Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/hearamclinic-ef507/configs [none]
+[debug] [2026-02-12T23:29:18.944Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/hearamclinic-ef507/configs 200
+[debug] [2026-02-12T23:29:18.944Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/hearamclinic-ef507/configs {}
+[debug] [2026-02-12T23:29:18.944Z] Validating nodejs source
+[debug] [2026-02-12T23:29:19.911Z] > [functions] package.json contents: {
+  "main": "lib/index.js",
+  "scripts": {
+    "genkit:start": "genkit start -- tsx --watch src/genkit-sample.ts",
+    "lint": "eslint --ext .js,.ts .",
+    "build": "tsc && npm run copy-prompts",
+    "copy-prompts": "find src -name '*.prompt' -exec sh -c 'mkdir -p lib/$(dirname ${1#src/}) && cp \"$1\" \"lib/${1#src/}\"' _ {} \\;",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "name": "functions",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "@genkit-ai/firebase": "^1.28.0",
+    "@genkit-ai/google-genai": "^1.28.0",
+    "@google/genai": "^1.39.0",
+    "express": "^5.2.1",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "genkit": "^1.28.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "private": true
+}
+[debug] [2026-02-12T23:29:19.911Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2026-02-12T23:29:19.912Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-02-12T23:29:19.918Z] Found firebase-functions binary at '/Users/jungsoklee/hearamclinic/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8008
+
+[debug] [2026-02-12T23:29:20.835Z] Got response from /__/functions.yaml {"endpoints":{"generatePost":{"availableMemoryMb":1024,"timeoutSeconds":300,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"secretEnvironmentVariables":[{"key":"GOOGLE_GENAI_API_KEY"}],"labels":{},"callableTrigger":{},"entryPoint":"generatePost"},"generatePostImages":{"availableMemoryMb":1024,"timeoutSeconds":300,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"secretEnvironmentVariables":[{"key":"GOOGLE_GENAI_API_KEY"}],"labels":{},"callableTrigger":{},"entryPoint":"generatePostImages"},"finalizePostImages":{"availableMemoryMb":512,"timeoutSeconds":120,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"callableTrigger":{},"entryPoint":"finalizePostImages"},"saveDraft":{"availableMemoryMb":256,"timeoutSeconds":30,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"callableTrigger":{},"entryPoint":"saveDraft"},"loadDraft":{"availableMemoryMb":256,"timeoutSeconds":30,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"callableTrigger":{},"entryPoint":"loadDraft"},"deleteDraft":{"availableMemoryMb":256,"timeoutSeconds":30,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"callableTrigger":{},"entryPoint":"deleteDraft"},"deletePost":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"callableTrigger":{},"entryPoint":"deletePost"},"setRole":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"callableTrigger":{},"entryPoint":"setRole"},"getUserByEmail":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"callableTrigger":{},"entryPoint":"getUserByEmail"},"generateSitemap":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"scheduleTrigger":{"schedule":"0 0 * * *","retryConfig":{},"timeZone":"Asia/Seoul"},"entryPoint":"generateSitemap"},"sitemap":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":10,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-northeast3"],"labels":{},"httpsTrigger":{},"entryPoint":"sitemap"}},"specVersion":"v1alpha1","requiredAPIs":[{"api":"cloudscheduler.googleapis.com","reason":"Needed for scheduled functions."}],"extensions":{},"params":[{"type":"secret","name":"GOOGLE_GENAI_API_KEY"}]}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2026-02-12T23:29:24.872Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-12T23:29:24.872Z] > authorizing via signed-in user (psychiatristlee@gmail.com)
+[debug] [2026-02-12T23:29:24.872Z] [iam] checking project hearamclinic-ef507 for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2026-02-12T23:29:24.872Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:24.872Z] Checked if tokens are valid: true, expires at: 1770942219127
+[debug] [2026-02-12T23:29:24.872Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions [none]
+[debug] [2026-02-12T23:29:24.872Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions x-goog-quota-user=projects/hearamclinic-ef507
+[debug] [2026-02-12T23:29:24.873Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/hearamclinic-ef507:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}

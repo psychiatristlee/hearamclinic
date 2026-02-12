@@ -189,7 +189,7 @@ export const generatePostImages = onCall(
       sectionsWithImages.push(sections[0]);
     }
 
-    // h2 섹션들: 각 문단 뒤에 이미지 생성
+    // h2 섹션들: 소제목 1개당 이미지 1개 생성 (섹션 끝에 배치)
     for (let i = 1; i < sections.length; i++) {
       const section = sections[i];
       // "참고 문헌/참고 자료" 섹션은 이미지 생성 건너뛰기
@@ -201,26 +201,14 @@ export const generatePostImages = onCall(
         continue;
       }
 
-      // 문단별로 분리하여 각 문단 뒤에 이미지 삽입
-      const paragraphs = section.split("\n\n");
-      const paragraphsWithImages: string[] = [];
-
-      for (const paragraph of paragraphs) {
-        paragraphsWithImages.push(paragraph);
-        const trimmed = paragraph.trim();
-        // h2 제목, 빈 줄, 링크 목록은 이미지 생성 건너뛰기
-        if (!trimmed || trimmed.startsWith("## ") || trimmed.startsWith("- [")) {
-          continue;
-        }
-        const imageBuffer = await generateImage(genkitAi, paragraph);
-        if (imageBuffer) {
-          imageIndex++;
-          const imageUrl = await uploadImage(imageBuffer, userId, slug, imageIndex);
-          paragraphsWithImages.push(`![](${imageUrl})`);
-        }
+      const imageBuffer = await generateImage(genkitAi, section);
+      if (imageBuffer) {
+        imageIndex++;
+        const imageUrl = await uploadImage(imageBuffer, userId, slug, imageIndex);
+        sectionsWithImages.push(section + `\n\n![](${imageUrl})`);
+      } else {
+        sectionsWithImages.push(section);
       }
-
-      sectionsWithImages.push(paragraphsWithImages.join("\n\n"));
     }
 
     const finalMarkdown = sectionsWithImages.join("\n\n");

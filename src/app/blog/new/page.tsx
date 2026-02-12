@@ -343,7 +343,7 @@ export default function NewPostPage() {
       const generatePostImages = httpsCallable<
         { content: string; slug: string },
         ImageResult
-      >(functions, "generatePostImages");
+      >(functions, "generatePostImages", { timeout: 300_000 });
       const result = await generatePostImages({ content, slug });
       updateContent(result.data.content);
       setFeaturedImage(result.data.featuredImage);

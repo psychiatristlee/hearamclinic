@@ -124,11 +124,19 @@ export const generatePost = onCall(
 
     const titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
     const title = titleMatch?.[1] ?? topic;
-    const slug = title.replace(/\s+/g, "-").toLowerCase().slice(0, 100);
+    // 제목(h1)을 content에서 제거 (title 필드에 별도 저장되므로 중복 방지)
+    const content = rawMarkdown.replace(/^#\s+.+\n*/m, "").trimStart();
+    const slug = title
+      .replace(/\s+/g, "-")
+      .toLowerCase()
+      .replace(/[^가-힣ㄱ-ㅎㅏ-ㅣa-z0-9-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 100);
 
     return {
       title,
-      content: rawMarkdown,
+      content,
       featuredImage: "",
       slug,
     };
@@ -218,9 +226,9 @@ export const generatePostImages = onCall(
     const finalMarkdown = sectionsWithImages.join("\n\n");
 
     const firstImageMatch = finalMarkdown.match(
-      /!\[.*?\]\((https:\/\/firebasestorage\.googleapis\.com\/[^)]+)\)/,
+      /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^\s"<>)]+\?alt=media&token=[a-f0-9-]+/,
     );
-    const featuredImage = firstImageMatch?.[1] ?? "";
+    const featuredImage = firstImageMatch?.[0] ?? "";
 
     return {
       content: finalMarkdown,
@@ -304,9 +312,9 @@ export const finalizePostImages = onCall(
 
     // featuredImage 추출
     const firstImageMatch = updatedContent.match(
-      /!\[.*?\]\((https:\/\/firebasestorage\.googleapis\.com\/[^)]+)\)/,
+      /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^\s"<>)]+\?alt=media&token=[a-f0-9-]+/,
     );
-    const featuredImage = firstImageMatch?.[1] ?? "";
+    const featuredImage = firstImageMatch?.[0] ?? "";
 
     return {
       content: updatedContent,

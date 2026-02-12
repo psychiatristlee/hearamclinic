@@ -7,7 +7,11 @@ export function makeDownloadUrl(
   storagePath: string,
   token: string,
 ): string {
-  const encodedPath = encodeURIComponent(storagePath);
+  const encodedPath = encodeURIComponent(storagePath)
+    .replace(/\(/g, "%28")
+    .replace(/\)/g, "%29")
+    .replace(/!/g, "%21")
+    .replace(/'/g, "%27");
   return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedPath}?alt=media&token=${token}`;
 }
 

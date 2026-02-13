@@ -6,6 +6,8 @@ import {
   query,
   where,
   getDocs,
+  orderBy,
+  addDoc,
   doc,
   updateDoc,
   Timestamp,
@@ -76,6 +78,12 @@ export default function EditPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [addingCategory, setAddingCategory] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -87,6 +95,54 @@ export default function EditPostPage() {
     setContent(newContent);
     editorRef.current?.setMarkdown(newContent);
   }, []);
+
+  // 카테고리 목록 불러오기
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const q = query(collection(db, "categories"), orderBy("order", "asc"));
+        const snap = await getDocs(q);
+        const names = snap.docs.map((d) => d.data().name as string);
+        if (names.length > 0) {
+          setCategories(names);
+        } else {
+          setCategories(["정신과 설명서", "서평", "기타"]);
+        }
+      } catch {
+        setCategories(["정신과 설명서", "서평", "기타"]);
+      } finally {
+        setLoadingCategories(false);
+      }
+    }
+    fetchCategories();
+  }, []);
+
+  async function handleAddCategory() {
+    const name = newCategoryName.trim();
+    if (!name) return;
+    if (categories.includes(name)) {
+      setCategory(name);
+      setShowNewCategory(false);
+      setNewCategoryName("");
+      return;
+    }
+    setAddingCategory(true);
+    try {
+      await addDoc(collection(db, "categories"), {
+        name,
+        order: categories.length,
+        createdAt: Timestamp.now(),
+      });
+      setCategories((prev) => [...prev, name]);
+      setCategory(name);
+      setShowNewCategory(false);
+      setNewCategoryName("");
+    } catch {
+      alert("카테고리 추가에 실패했습니다.");
+    } finally {
+      setAddingCategory(false);
+    }
+  }
 
   useEffect(() => {
     async function fetchPost() {
@@ -110,6 +166,7 @@ export default function EditPostPage() {
         setTitle(data.title);
         updateContent(data.content);
         setFeaturedImage(data.featuredImage || "");
+        setCategory(data.categories?.[0] || "");
       }
       setLoading(false);
     }
@@ -188,6 +245,7 @@ export default function EditPostPage() {
       await updateDoc(postRef, {
         title,
         content,
+        categories: category ? [category] : post.categories,
         excerpt: content
           .replace(/[#*!\[\]()]/g, "")
           .replace(/\n+/g, " ")
@@ -278,16 +336,72 @@ export default function EditPostPage() {
         )}
 
         {/* 글 정보 카드 */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            제목
-          </label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          />
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              제목
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              카테고리
+            </label>
+            {showNewCategory ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
+                  placeholder="새 카테고리 이름"
+                  className="flex-1 px-4 py-2.5 border border-purple-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  autoFocus
+                />
+                <button
+                  onClick={handleAddCategory}
+                  disabled={addingCategory || !newCategoryName.trim()}
+                  className="px-4 py-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 transition text-sm font-medium"
+                >
+                  {addingCategory ? <SpinnerIcon className="h-4 w-4" /> : "추가"}
+                </button>
+                <button
+                  onClick={() => { setShowNewCategory(false); setNewCategoryName(""); }}
+                  className="px-3 py-2.5 border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50 transition text-sm"
+                >
+                  취소
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  disabled={loadingCategories}
+                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                >
+                  {categories.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+                <button
+                  onClick={() => setShowNewCategory(true)}
+                  className="px-3 py-2.5 border border-gray-200 text-gray-500 rounded-xl hover:bg-purple-50 hover:text-purple-600 hover:border-purple-200 transition"
+                  title="새 카테고리 추가"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* 마크다운 에디터 */}

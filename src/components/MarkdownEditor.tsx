@@ -14,24 +14,12 @@ import {
   codeMirrorPlugin,
   markdownShortcutPlugin,
   diffSourcePlugin,
-  toolbarPlugin,
-  BoldItalicUnderlineToggles,
-  StrikeThroughSupSubToggles,
-  BlockTypeSelect,
-  CodeToggle,
-  CreateLink,
-  InsertImage,
-  InsertTable,
-  InsertThematicBreak,
-  ListsToggle,
-  UndoRedo,
-  Separator,
-  DiffSourceToggleWrapper,
   type MDXEditorMethods,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { forwardRef, useCallback } from "react";
 import dynamic from "next/dynamic";
+import { floatingToolbarPlugin } from "./FloatingToolbar";
 
 // Escape <text> where text starts with non-ASCII (Korean etc.) — not valid HTML/JSX
 function escapeNonHtmlTags(md: string): string {
@@ -54,6 +42,7 @@ const MarkdownEditorBase = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
       (value: string) => onChange(unescapeNonHtmlTags(value)),
       [onChange]
     );
+
     return (
       <MDXEditor
         ref={ref}
@@ -84,30 +73,7 @@ const MarkdownEditorBase = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
           }),
           markdownShortcutPlugin(),
           diffSourcePlugin({ viewMode: "rich-text" }),
-          toolbarPlugin({
-            toolbarContents: () => (
-              <>
-                <UndoRedo />
-                <Separator />
-                <BlockTypeSelect />
-                <Separator />
-                <BoldItalicUnderlineToggles />
-                <StrikeThroughSupSubToggles />
-                <CodeToggle />
-                <Separator />
-                <ListsToggle />
-                <Separator />
-                <CreateLink />
-                <InsertImage />
-                <InsertTable />
-                <InsertThematicBreak />
-                <Separator />
-                <DiffSourceToggleWrapper>
-                  {" "}
-                </DiffSourceToggleWrapper>
-              </>
-            ),
-          }),
+          floatingToolbarPlugin(),
         ]}
       />
     );

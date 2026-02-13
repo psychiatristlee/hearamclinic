@@ -39,8 +39,3 @@ body {
   border-radius: 0.75rem;
   font-family: Arial, Helvetica, sans-serif;
 }
-
-/* MDXEditor 툴바 sticky 해제 */
-.mdxeditor [class*="_toolbarRoot"] {
-  position: relative;
-}

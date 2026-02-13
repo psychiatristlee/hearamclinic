@@ -184,9 +184,16 @@ export const generatePostImages = onCall(
     const sectionsWithImages: string[] = [];
     let imageIndex = 0;
 
-    // 첫 섹션(인트로)은 이미지 없이 추가
+    // 첫 섹션(인트로)에도 이미지 생성
     if (sections.length > 0) {
-      sectionsWithImages.push(sections[0]);
+      const introBuffer = await generateImage(genkitAi, sections[0]);
+      if (introBuffer) {
+        imageIndex++;
+        const introUrl = await uploadImage(introBuffer, userId, slug, imageIndex);
+        sectionsWithImages.push(sections[0] + `\n\n![](${introUrl})`);
+      } else {
+        sectionsWithImages.push(sections[0]);
+      }
     }
 
     // h2 섹션들: 소제목 1개당 이미지 1개 생성 (섹션 끝에 배치)

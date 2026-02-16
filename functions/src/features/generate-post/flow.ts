@@ -143,6 +143,112 @@ export const generatePost = onCall(
   },
 );
 
+// 기존 블로그 글 수정 (지시사항 기반)
+async function editBlogText(
+  ai: GoogleGenAI,
+  existingContent: string,
+  instructions: string,
+): Promise<string> {
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: `당신은 해람정신건강의학과의 블로그 작성자입니다.
+아래 기존 블로그 글을 사용자의 수정 지시사항에 따라 수정해주세요.
+
+규칙:
+- 기존 글의 형식(마크다운, h2 소제목 구조)을 유지하세요
+- 수정 지시사항에 해당하는 부분만 변경하고, 나머지는 최대한 보존하세요
+- 전문적이지만 친근한 어조를 유지하세요
+- 제목(h1)은 첫 줄에 # 으로 작성하세요
+- 웹 검색을 통해 최신 정보를 반영하세요
+- "## 참고 문헌" 섹션을 유지하거나 업데이트하세요
+
+기존 글:
+${existingContent}
+
+수정 지시사항:
+${instructions}
+
+수정된 마크다운 블로그 글을 작성해주세요.`,
+    config: {
+      tools: [{googleSearch: {}}],
+    },
+  });
+
+  let text = response.text ?? "";
+
+  const groundingChunks =
+    response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+
+  const existingUrls = new Set<string>();
+  const urlRegex = /\[.*?\]\((https?:\/\/[^)]+)\)/g;
+  let match;
+  while ((match = urlRegex.exec(text)) !== null) {
+    existingUrls.add(match[1]);
+  }
+
+  if (groundingChunks && groundingChunks.length > 0) {
+    const additionalRefs: string[] = [];
+    for (const chunk of groundingChunks) {
+      const uri = chunk.web?.uri;
+      const title = chunk.web?.title;
+      if (uri && !existingUrls.has(uri)) {
+        existingUrls.add(uri);
+        additionalRefs.push(`- [${title || uri}](${uri})`);
+      }
+    }
+    if (additionalRefs.length > 0) {
+      const refSectionRegex = /## 참고 문헌\s*\n/;
+      if (refSectionRegex.test(text)) {
+        text = text.trimEnd() + "\n" + additionalRefs.join("\n");
+      } else {
+        text =
+          text.trimEnd() +
+          "\n\n---\n\n## 참고 문헌\n\n" +
+          additionalRefs.join("\n");
+      }
+    }
+  }
+
+  return text;
+}
+
+// 기존 글 수정 함수
+export const editPost = onCall(
+  {
+    secrets: [apiKey],
+    timeoutSeconds: 300,
+    memory: "1GiB",
+    region: "asia-northeast3",
+  },
+  async (request) => {
+    verifyEditorAuth(request);
+
+    const existingContent = request.data?.content;
+    const title = request.data?.title;
+    const instructions = request.data?.instructions;
+
+    if (!existingContent || typeof existingContent !== "string") {
+      throw new HttpsError("invalid-argument", "기존 콘텐츠가 필요합니다.");
+    }
+    if (!instructions || typeof instructions !== "string") {
+      throw new HttpsError("invalid-argument", "수정 지시사항을 입력해주세요.");
+    }
+
+    const ai = new GoogleGenAI({apiKey: apiKey.value()});
+    const fullContent = title ? `# ${title}\n\n${existingContent}` : existingContent;
+    const rawMarkdown = await editBlogText(ai, fullContent, instructions);
+
+    const titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
+    const newTitle = titleMatch?.[1] ?? title ?? "";
+    const content = rawMarkdown.replace(/^#\s+.+\n*/m, "").trimStart();
+
+    return {
+      title: newTitle,
+      content,
+    };
+  },
+);
+
 // 이미지 별도 생성 (각 문단 뒤에 삽입)
 export const generatePostImages = onCall(
   {

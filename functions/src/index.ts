@@ -7,6 +7,7 @@ setGlobalOptions({maxInstances: 10});
 // Generate Post features
 export {
   generatePost,
+  editPost,
   generatePostImages,
   finalizePostImages,
 } from "./features/generate-post";

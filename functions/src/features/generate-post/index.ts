@@ -1,4 +1,4 @@
-export {generatePost, generatePostImages, finalizePostImages} from "./flow";
+export {generatePost, editPost, generatePostImages, finalizePostImages} from "./flow";
 export {
   GeneratePostInputSchema,
   GeneratePostOutputSchema,

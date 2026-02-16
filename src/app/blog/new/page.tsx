@@ -27,6 +27,11 @@ interface GenerateResult {
   slug: string;
 }
 
+interface EditResult {
+  title: string;
+  content: string;
+}
+
 interface ImageResult {
   content: string;
   featuredImage: string;
@@ -73,6 +78,8 @@ export default function NewPostPage() {
   const [saving, setSaving] = useState(false);
   const [generatingImages, setGeneratingImages] = useState(false);
   const [error, setError] = useState("");
+  const [editInstructions, setEditInstructions] = useState("");
+  const [showEditInput, setShowEditInput] = useState(false);
   const [authorName, setAuthorName] = useState("");
   const [category, setCategory] = useState("");
   const [savingDraft, setSavingDraft] = useState(false);
@@ -274,6 +281,32 @@ export default function NewPostPage() {
       setGenerated(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "생성 중 오류 발생");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function handleEdit() {
+    if (!editInstructions.trim() || !content) return;
+    setGenerating(true);
+    setError("");
+
+    try {
+      const editPostFn = httpsCallable<
+        { content: string; title: string; instructions: string },
+        EditResult
+      >(functions, "editPost", { timeout: 300_000 });
+      const result = await editPostFn({
+        content,
+        title,
+        instructions: editInstructions,
+      });
+      setTitle(result.data.title);
+      updateContent(result.data.content);
+      setShowEditInput(false);
+      setEditInstructions("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "수정 중 오류 발생");
     } finally {
       setGenerating(false);
     }
@@ -694,38 +727,65 @@ export default function NewPostPage() {
             </div>
           </div>
 
+          {/* AI 수정 지시사항 입력 */}
+          {showEditInput && (
+            <div className="bg-white border border-purple-200 rounded-2xl p-5 shadow-sm space-y-3">
+              <label className="block text-sm font-semibold text-gray-700">
+                어떻게 수정할까요?
+              </label>
+              <textarea
+                value={editInstructions}
+                onChange={(e) => setEditInstructions(e.target.value)}
+                placeholder="예: 두 번째 섹션에 약물 부작용 내용을 추가해줘 / 어조를 더 친근하게 바꿔줘 / 결론 부분을 보강해줘"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none placeholder:text-gray-400"
+                rows={3}
+                disabled={generating}
+                autoFocus
+              />
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => { setShowEditInput(false); setEditInstructions(""); }}
+                  disabled={generating}
+                  className="px-4 py-2 border border-gray-200 text-gray-500 rounded-xl hover:bg-gray-50 transition text-sm"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleEdit}
+                  disabled={generating || !editInstructions.trim()}
+                  className="inline-flex items-center gap-2 px-5 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+                >
+                  {generating ? (
+                    <>
+                      <SpinnerIcon />
+                      AI 수정 중...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                      </svg>
+                      AI로 수정
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* 하단 액션 바 */}
           <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             {/* 보조 액션 */}
             <div className="flex gap-2">
               <button
-                onClick={handleGenerate}
-                disabled={isBusy}
+                onClick={() => setShowEditInput(!showEditInput)}
+                disabled={isBusy || !content}
                 className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm font-medium"
               >
-                {generating ? (
-                  <>
-                    <SpinnerIcon />
-                    재생성 중...
-                  </>
-                ) : (
-                  <>
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"
-                      />
-                    </svg>
-                    재생성
-                  </>
-                )}
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                </svg>
+                AI 수정
               </button>
               <button
                 onClick={handleGenerateImages}

@@ -8,72 +8,55 @@ import {generateImage} from "../generate-image";
 
 const apiKey = defineSecret("GOOGLE_GENAI_API_KEY");
 
-// Wikimedia Commons에서 저작권 프리 이미지 검색
-interface WikiImageResult {
-  url: string;
-  license: string;
-  artist: string;
-}
-
-async function searchWikimediaImage(
-  query: string, offset: number = 0,
-): Promise<WikiImageResult | null> {
-  try {
-    const searchUrl = "https://commons.wikimedia.org/w/api.php?" +
-      `action=query&generator=search&gsrsearch=${encodeURIComponent(query)}` +
-      `&gsrnamespace=6&gsrlimit=5&gsroffset=${offset}` +
-      "&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=800&format=json";
-    const res = await fetch(searchUrl, {
-      headers: {"User-Agent": "HearamClinicBlog/1.0"},
-    });
-    if (!res.ok) return null;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data: any = await res.json();
-    const pages = data.query?.pages;
-    if (!pages) return null;
-
-    for (const page of Object.values(pages) as any[]) {
-      const info = page.imageinfo?.[0];
-      if (!info) continue;
-
-      const imageUrl = info.thumburl || info.url;
-      const meta = info.extmetadata || {};
-      const license = meta.LicenseShortName?.value || "";
-      const artist = (meta.Artist?.value || "").replace(/<[^>]*>/g, "");
-
-      // CC, Public Domain, GFDL 라이센스만 허용
-      const safeLicenses = ["cc", "public domain", "pd", "gfdl"];
-      const isFreeLicense = safeLicenses.some((l) =>
-        license.toLowerCase().includes(l),
-      );
-      if (!isFreeLicense) continue;
-
-      return {url: imageUrl, license, artist};
-    }
-    return null;
-  } catch (err) {
-    console.error("[searchWikimediaImage] error:", err);
-    return null;
-  }
-}
-
-// WEB_IMAGE 플레이스홀더를 실제 Wikimedia 이미지 URL로 교체
-async function resolveWebImages(text: string): Promise<string> {
+// WEB_IMAGE 플레이스홀더를 Google Search grounding으로 찾은 이미지 URL로 교체
+async function resolveWebImages(
+  text: string, ai: GoogleGenAI,
+): Promise<string> {
   const regex = /!\[([^\]]*)\]\(WEB_IMAGE:([^)]+)\)/g;
   const matches = [...text.matchAll(regex)];
   if (matches.length === 0) return text;
 
   let result = text;
-  for (let i = 0; i < matches.length; i++) {
-    const [full, alt, query] = matches[i];
-    const img = await searchWikimediaImage(query.trim(), i * 5);
-    if (img) {
-      const credit = `*출처: Wikimedia Commons (${img.license})${img.artist ? ` - ${img.artist}` : ""}*`;
-      result = result.replace(full, `![${alt}](${img.url})\n\n${credit}`);
-    } else {
-      result = result.replace(full, "");
+  for (const [full, alt, query] of matches) {
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: `Find a copyright-free image for: "${query.trim()}"
+
+Search the web for a freely usable image from sources like Unsplash, Pixabay, Pexels, or Wikimedia Commons.
+
+IMPORTANT:
+- Return a DIRECT image file URL that can be embedded in a webpage
+- The image must be free to use (Creative Commons, Public Domain, or similar free license)
+- Prefer high-quality, landscape-oriented images
+
+Respond ONLY in this exact JSON format:
+{"url":"<direct image URL>","source":"<source name>","license":"<license>"}
+
+If no image found: {"url":"","source":"","license":""}`,
+        config: {
+          tools: [{googleSearch: {}}],
+        },
+      });
+
+      const responseText = (response.text ?? "").trim();
+      const jsonMatch = responseText.match(/\{[\s\S]*?\}/);
+      if (jsonMatch) {
+        const data = JSON.parse(jsonMatch[0]);
+        if (data.url) {
+          const credit = `*출처: ${data.source || "Web"}` +
+            `${data.license ? ` (${data.license})` : ""}*`;
+          result = result.replace(
+            full, `![${alt}](${data.url})\n\n${credit}`,
+          );
+          continue;
+        }
+      }
+    } catch (err) {
+      console.error("[resolveWebImages] grounding search error:", err);
     }
+    // 실패 시 플레이스홀더 제거
+    result = result.replace(full, "");
   }
   return result;
 }
@@ -318,8 +301,8 @@ export const editPost = onCall(
     const newTitle = titleMatch?.[1] ?? title ?? "";
     let content = rawMarkdown.replace(/^#\s+.+\n*/m, "").trimStart();
 
-    // WEB_IMAGE 플레이스홀더를 Wikimedia Commons 이미지로 교체
-    content = await resolveWebImages(content);
+    // WEB_IMAGE 플레이스홀더를 Google Search grounding으로 찾은 이미지로 교체
+    content = await resolveWebImages(content, ai);
 
     return {
       title: newTitle,

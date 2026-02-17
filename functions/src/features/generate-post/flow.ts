@@ -8,6 +8,76 @@ import {generateImage} from "../generate-image";
 
 const apiKey = defineSecret("GOOGLE_GENAI_API_KEY");
 
+// Wikimedia Commons에서 저작권 프리 이미지 검색
+interface WikiImageResult {
+  url: string;
+  license: string;
+  artist: string;
+}
+
+async function searchWikimediaImage(
+  query: string, offset: number = 0,
+): Promise<WikiImageResult | null> {
+  try {
+    const searchUrl = "https://commons.wikimedia.org/w/api.php?" +
+      `action=query&generator=search&gsrsearch=${encodeURIComponent(query)}` +
+      `&gsrnamespace=6&gsrlimit=5&gsroffset=${offset}` +
+      "&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=800&format=json";
+    const res = await fetch(searchUrl, {
+      headers: {"User-Agent": "HearamClinicBlog/1.0"},
+    });
+    if (!res.ok) return null;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any = await res.json();
+    const pages = data.query?.pages;
+    if (!pages) return null;
+
+    for (const page of Object.values(pages) as any[]) {
+      const info = page.imageinfo?.[0];
+      if (!info) continue;
+
+      const imageUrl = info.thumburl || info.url;
+      const meta = info.extmetadata || {};
+      const license = meta.LicenseShortName?.value || "";
+      const artist = (meta.Artist?.value || "").replace(/<[^>]*>/g, "");
+
+      // CC, Public Domain, GFDL 라이센스만 허용
+      const safeLicenses = ["cc", "public domain", "pd", "gfdl"];
+      const isFreeLicense = safeLicenses.some((l) =>
+        license.toLowerCase().includes(l),
+      );
+      if (!isFreeLicense) continue;
+
+      return {url: imageUrl, license, artist};
+    }
+    return null;
+  } catch (err) {
+    console.error("[searchWikimediaImage] error:", err);
+    return null;
+  }
+}
+
+// WEB_IMAGE 플레이스홀더를 실제 Wikimedia 이미지 URL로 교체
+async function resolveWebImages(text: string): Promise<string> {
+  const regex = /!\[([^\]]*)\]\(WEB_IMAGE:([^)]+)\)/g;
+  const matches = [...text.matchAll(regex)];
+  if (matches.length === 0) return text;
+
+  let result = text;
+  for (let i = 0; i < matches.length; i++) {
+    const [full, alt, query] = matches[i];
+    const img = await searchWikimediaImage(query.trim(), i * 5);
+    if (img) {
+      const credit = `*출처: Wikimedia Commons (${img.license})${img.artist ? ` - ${img.artist}` : ""}*`;
+      result = result.replace(full, `![${alt}](${img.url})\n\n${credit}`);
+    } else {
+      result = result.replace(full, "");
+    }
+  }
+  return result;
+}
+
 // 마크다운을 h2 섹션으로 분리
 function splitSections(markdown: string): string[] {
   const lines = markdown.split("\n");
@@ -161,6 +231,12 @@ async function editBlogText(
 - 제목(h1)은 첫 줄에 # 으로 작성하세요
 - 웹 검색을 통해 최신 정보를 반영하세요
 - "## 참고 문헌" 섹션을 유지하거나 업데이트하세요
+- 사용자가 웹에서 사진/이미지를 찾아 넣어달라고 요청하면, 적절한 위치에 이미지 플레이스홀더를 삽입하세요:
+  ![이미지 설명](WEB_IMAGE:english search keyword)
+  예: ![상담 장면](WEB_IMAGE:therapy counseling session)
+- 검색 키워드는 반드시 영어로 작성하세요 (검색 정확도를 위해)
+- 이미지 설명은 한국어로 작성하세요
+- 각 이미지마다 서로 다른 구체적인 검색 키워드를 사용하세요
 
 기존 글:
 ${existingContent}
@@ -240,7 +316,10 @@ export const editPost = onCall(
 
     const titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
     const newTitle = titleMatch?.[1] ?? title ?? "";
-    const content = rawMarkdown.replace(/^#\s+.+\n*/m, "").trimStart();
+    let content = rawMarkdown.replace(/^#\s+.+\n*/m, "").trimStart();
+
+    // WEB_IMAGE 플레이스홀더를 Wikimedia Commons 이미지로 교체
+    content = await resolveWebImages(content);
 
     return {
       title: newTitle,

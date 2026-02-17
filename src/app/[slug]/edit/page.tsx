@@ -432,7 +432,7 @@ export default function EditPostPage() {
             <textarea
               value={editInstructions}
               onChange={(e) => setEditInstructions(e.target.value)}
-              placeholder="예: 두 번째 섹션에 약물 부작용 내용을 추가해줘 / 어조를 더 친근하게 바꿔줘 / 결론 부분을 보강해줘"
+              placeholder="예: 두 번째 섹션에 약물 부작용 내용을 추가해줘 / 어조를 더 친근하게 바꿔줘 / 웹에서 관련 사진을 찾아서 넣어줘"
               className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none placeholder:text-gray-400"
               rows={3}
               disabled={generating}

@@ -281,16 +281,16 @@ export default function ClinicPage() {
         </div>
       </section>
 
-      {/* 안내사항 */}
+      {/* 주차 안내사항 */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">안내사항</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">주차 안내사항</h2>
         <div className="grid gap-4">
           <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="font-bold text-gray-900 mb-2">주차 안내</h3>
             <ul className="text-sm text-gray-600 leading-relaxed space-y-1.5">
               <li>건물 내 기계식 주차장이 있습니다.</li>
               <li>승용차량 이외는 주차가 불가합니다. (SUV, RV, 승합차량 불가)</li>
               <li>기계식 주차장 앞에 주차하시고 들어오시면 안 됩니다. 관리인이 안 보이더라도 대기 후 주차하셔야 합니다. (건물 내 다른 분들 출차가 불가능합니다)</li>
+              <li>평일 오후 5시 이후와 주말 및 공휴일에는 주차가 어려우니 외부 유료주차장을 이용해 주시기 바랍니다.</li>
             </ul>
           </div>
         </div>

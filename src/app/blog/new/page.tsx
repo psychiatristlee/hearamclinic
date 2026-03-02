@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import MarkdownEditor, {
   type MDXEditorMethods,
 } from "@/components/MarkdownEditor";
+import SectionImageList from "@/components/SectionImageList";
 
 interface GenerateResult {
   title: string;
@@ -726,6 +727,15 @@ export default function NewPostPage() {
               />
             </div>
           </div>
+
+          {/* 섹션별 이미지 관리 */}
+          <SectionImageList
+            content={content}
+            slug={slug}
+            onContentUpdate={updateContent}
+            onFeaturedImageUpdate={setFeaturedImage}
+            disabled={isBusy}
+          />
 
           {/* AI 수정 지시사항 입력 */}
           {showEditInput && (

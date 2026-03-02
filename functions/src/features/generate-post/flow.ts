@@ -88,13 +88,15 @@ async function generateBlogText(
 ): Promise<string> {
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: `당신은 정신건강 전문 블로그 작성자입니다. 정신건강 관련 블로그 글을 작성합니다.
+    contents: `당신은 정신건강의학과 전문의입니다. 의사의 관점에서 환자분들에게 직접 설명하듯이 정신건강 관련 블로그 글을 작성합니다.
 웹 검색을 통해 최신 의학 정보와 근거를 바탕으로 글을 작성하세요.
 
 [절대 금지 사항 - 반드시 지켜야 합니다]
 - "해람", "해람정신건강의학과", "해람클리닉", "안녕하세요, ~입니다", "저희 병원", "저희 의원", "저희 클리닉" 등 특정 병원/의원 이름이나 인사말을 절대 사용하지 마세요. "해람"이라는 단어가 글 어디에도 등장하면 안 됩니다.
 - "~에서 알려드립니다", "~에서 안내해 드립니다" 같은 표현을 사용하지 마세요.
 - 인트로를 이탤릭(*...*) 한 문단으로 쓰지 마세요. 이것은 절대 금지입니다.
+- 참고 문헌 섹션을 추가하지 마세요.
+- 각 섹션 마지막 문단을 **볼드**로 강조하지 마세요. 모든 문단은 일반 텍스트로 작성하세요.
 
 [잘못된 인트로 예시 - 이렇게 쓰면 안 됩니다]
 ❌ "*자신을 더 깊이 이해하고 싶거나, 마음의 어려움으로 전문가의 도움을 받고자 할 때 심리 검사는 중요한 첫걸음이 됩니다. 그중에서도... 해람정신건강의학과에서 알려드립니다.*"
@@ -105,21 +107,25 @@ async function generateBlogText(
 - 인트로는 반드시 3개의 독립된 문단으로 구성하세요. (빈 줄로 구분된 3개 문단)
 - 각 문단은 2~3문장으로 작성하세요.
 - 인트로에는 이탤릭(*...*) 서식을 절대 사용하지 마세요. 일반 텍스트로만 작성하세요.
-- 인트로는 주제에 대한 정보를 자연스럽게 설명하는 방식으로 작성하세요.
+- 의사가 환자에게 자연스럽게 설명하는 어조로 작성하세요.
 
 [본문 형식]
-- h2(##)로 소제목 3~4개를 만들고 각 소제목 아래에 2~3개 문단 작성
-- 각 섹션의 마지막 문단은 **볼드**로 핵심 내용 강조
-- 문단과 문단 사이에 반드시 빈 줄을 넣어 간격을 만드세요
-- 전문적이지만 친근한 어조 사용
-- 마크다운 형식으로 작성
-- 제목(h1)은 첫 줄에 # 으로 작성
+- h2(##)로 소제목 3~4개를 만드세요.
+- 소제목은 대화형 질문이나 짧은 문장으로 작성하세요.
+  예: "스프라바토는 어떻게 개발되게 되었나요?", "스프라바토 치료를 잘 권하지 않는 이유"
+- 일부 소제목 아래에는 질문을 좀 더 풀어서 설명하는 부연 문장(2~3줄)을 추가할 수 있습니다.
+  예:
+  ## 그런데 스프라바토를 왜 사용하는 걸까요?
 
-[참고 문헌]
-- 글 마지막에 반드시 "## 참고 문헌" 섹션을 추가하세요
-- 참고 문헌은 실제 검색 결과를 기반으로 논문, 기관 자료, 의학 정보 사이트 등을 포함하세요
-- 각 참고 문헌은 마크다운 링크 형식으로 작성: - [출처 제목](URL)
-- 참고 문헌은 최소 3개 이상 포함하세요
+  그런데 다른 우울증 약도 있는데
+  굳이 스프라바토를 왜 사용하는 걸까요?
+- 각 소제목 아래에 3~4개 문단을 작성하세요.
+- 각 섹션의 마지막 문단을 볼드로 강조하지 마세요. 일반 텍스트로 자연스럽게 마무리하세요.
+- 문단과 문단 사이에 반드시 빈 줄을 넣어 간격을 만드세요.
+- 의사가 환자에게 직접 설명하는 듯한 자연스럽고 친근한 어조를 사용하세요.
+- 마크다운 형식으로 작성하세요.
+- 제목(h1)은 첫 줄에 # 으로 작성하세요.
+- 참고 문헌 섹션은 추가하지 마세요.
 
 주제: ${topic}
 
@@ -129,49 +135,7 @@ async function generateBlogText(
     },
   });
 
-  let text = response.text ?? "";
-
-  // grounding metadata에서 추가 참고 문헌 추출
-  const groundingChunks =
-    response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-
-  // AI 텍스트에서 이미 포함된 URL 추출
-  const existingUrls = new Set<string>();
-  const urlRegex = /\[.*?\]\((https?:\/\/[^)]+)\)/g;
-  let match;
-  while ((match = urlRegex.exec(text)) !== null) {
-    existingUrls.add(match[1]);
-  }
-
-  // grounding metadata에서 중복되지 않는 추가 참고 문헌 수집
-  if (groundingChunks && groundingChunks.length > 0) {
-    const additionalRefs: string[] = [];
-
-    for (const chunk of groundingChunks) {
-      const uri = chunk.web?.uri;
-      const title = chunk.web?.title;
-      if (uri && !existingUrls.has(uri)) {
-        existingUrls.add(uri);
-        additionalRefs.push(`- [${title || uri}](${uri})`);
-      }
-    }
-
-    if (additionalRefs.length > 0) {
-      // AI 텍스트에 "참고 문헌" 섹션이 이미 있으면 그 아래에 추가
-      const refSectionRegex = /## 참고 문헌\s*\n/;
-      if (refSectionRegex.test(text)) {
-        text = text.trimEnd() + "\n" + additionalRefs.join("\n");
-      } else {
-        // 없으면 새로 생성
-        text =
-          text.trimEnd() +
-          "\n\n---\n\n## 참고 문헌\n\n" +
-          additionalRefs.join("\n");
-      }
-    }
-  }
-
-  return text;
+  return response.text ?? "";
 }
 
 // 텍스트만 생성 (이미지 없음)
@@ -222,7 +186,7 @@ async function editBlogText(
 ): Promise<string> {
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
-    contents: `당신은 정신건강 전문 블로그 작성자입니다.
+    contents: `당신은 정신건강의학과 전문의입니다. 의사의 관점에서 환자분들에게 직접 설명하듯이 블로그 글을 수정합니다.
 아래 기존 블로그 글을 사용자의 수정 지시사항에 따라 수정해주세요.
 
 중요: "해람", "해람정신건강의학과", "저희 병원", "저희 의원", "저희 클리닉" 등 특정 병원/의원을 절대 언급하지 마세요. "해람"이라는 단어가 글 어디에도 등장하면 안 됩니다. "~에서 알려드립니다" 같은 표현도 금지입니다.
@@ -232,11 +196,14 @@ async function editBlogText(
 - 수정 지시사항에 해당하는 부분만 변경하고, 나머지는 최대한 보존하세요
 - 첫 부분(인트로)은 반드시 3개의 독립된 문단(빈 줄로 구분)으로 작성하세요. 이탤릭 한 문단으로 쓰면 안 됩니다.
 - 인트로에 이탤릭(*...*) 서식을 사용하지 마세요. 일반 텍스트로만 작성하세요.
+- 소제목은 대화형 질문이나 짧은 문장으로 작성하세요.
+- 일부 소제목 아래에는 질문을 좀 더 풀어서 설명하는 부연 문장을 추가할 수 있습니다.
+- 각 섹션의 마지막 문단을 볼드로 강조하지 마세요. 일반 텍스트로 자연스럽게 마무리하세요.
 - 문단과 문단 사이에 반드시 빈 줄을 넣어 간격을 만드세요
-- 전문적이지만 친근한 어조를 유지하세요
+- 의사가 환자에게 직접 설명하는 듯한 자연스럽고 친근한 어조를 유지하세요
 - 제목(h1)은 첫 줄에 # 으로 작성하세요
 - 웹 검색을 통해 최신 정보를 반영하세요
-- "## 참고 문헌" 섹션을 유지하거나 업데이트하세요
+- 참고 문헌 섹션은 추가하지 마세요. 기존에 있다면 제거하세요.
 - 사용자가 웹에서 사진/이미지를 찾아 넣어달라고 요청하면, 적절한 위치에 이미지 플레이스홀더를 삽입하세요:
   ![이미지 설명](WEB_IMAGE:english search keyword)
   예: ![상담 장면](WEB_IMAGE:therapy counseling session)
@@ -256,42 +223,7 @@ ${instructions}
     },
   });
 
-  let text = response.text ?? "";
-
-  const groundingChunks =
-    response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-
-  const existingUrls = new Set<string>();
-  const urlRegex = /\[.*?\]\((https?:\/\/[^)]+)\)/g;
-  let match;
-  while ((match = urlRegex.exec(text)) !== null) {
-    existingUrls.add(match[1]);
-  }
-
-  if (groundingChunks && groundingChunks.length > 0) {
-    const additionalRefs: string[] = [];
-    for (const chunk of groundingChunks) {
-      const uri = chunk.web?.uri;
-      const title = chunk.web?.title;
-      if (uri && !existingUrls.has(uri)) {
-        existingUrls.add(uri);
-        additionalRefs.push(`- [${title || uri}](${uri})`);
-      }
-    }
-    if (additionalRefs.length > 0) {
-      const refSectionRegex = /## 참고 문헌\s*\n/;
-      if (refSectionRegex.test(text)) {
-        text = text.trimEnd() + "\n" + additionalRefs.join("\n");
-      } else {
-        text =
-          text.trimEnd() +
-          "\n\n---\n\n## 참고 문헌\n\n" +
-          additionalRefs.join("\n");
-      }
-    }
-  }
-
-  return text;
+  return response.text ?? "";
 }
 
 // 기존 글 수정 함수
@@ -420,6 +352,71 @@ export const generatePostImages = onCall(
       content: finalMarkdown,
       featuredImage,
     };
+  },
+);
+
+// 개별 섹션 이미지 재생성
+export const regenerateSectionImage = onCall(
+  {
+    secrets: [apiKey],
+    timeoutSeconds: 120,
+    memory: "1GiB",
+    region: "asia-northeast3",
+  },
+  async (request) => {
+    verifyEditorAuth(request);
+
+    const sectionText = request.data?.sectionText;
+    const slug = request.data?.slug;
+    const oldImageUrl = request.data?.oldImageUrl;
+
+    if (!sectionText || typeof sectionText !== "string") {
+      throw new HttpsError("invalid-argument", "섹션 텍스트가 필요합니다.");
+    }
+    if (!slug || typeof slug !== "string") {
+      throw new HttpsError("invalid-argument", "slug이 필요합니다.");
+    }
+
+    // 기존 이미지 삭제
+    if (oldImageUrl && typeof oldImageUrl === "string") {
+      try {
+        const bucket = getStorage().bucket();
+        const pathMatch = oldImageUrl.match(
+          /\/o\/([^?]+)\?/,
+        );
+        if (pathMatch) {
+          const storagePath = decodeURIComponent(pathMatch[1]);
+          await bucket.file(storagePath).delete();
+          console.log("[regenerateSectionImage] 기존 이미지 삭제:", storagePath);
+        }
+      } catch (err) {
+        console.error("[regenerateSectionImage] 기존 이미지 삭제 실패:", err);
+      }
+    }
+
+    // 새 이미지 생성
+    const genkitAi = createGenkitInstance(apiKey.value());
+    const imageBuffer = await generateImage(genkitAi, sectionText);
+    if (!imageBuffer) {
+      throw new HttpsError("internal", "이미지 생성에 실패했습니다.");
+    }
+
+    // 고유 이름으로 업로드
+    const bucket = getStorage().bucket();
+    const storagePath = `blog-images/posts/${slug}/section-${randomUUID()}.png`;
+    const downloadToken = randomUUID();
+    const file = bucket.file(storagePath);
+    await file.save(imageBuffer, {
+      metadata: {
+        contentType: "image/png",
+        metadata: {
+          firebaseStorageDownloadTokens: downloadToken,
+        },
+      },
+    });
+
+    const imageUrl = makeDownloadUrl(bucket.name, storagePath, downloadToken);
+    return {imageUrl};
   },
 );
 

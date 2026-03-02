@@ -9,6 +9,7 @@ export {
   generatePost,
   editPost,
   generatePostImages,
+  regenerateSectionImage,
   finalizePostImages,
 } from "./features/generate-post";
 

@@ -89,6 +89,7 @@ export default function NewPostPage() {
   const [loadingDraft, setLoadingDraft] = useState(true);
 
   const editorRef = useRef<MDXEditorMethods>(null);
+  const savingRef = useRef(false);
   const updateContent = useCallback((newContent: string) => {
     setContent(newContent);
     editorRef.current?.setMarkdown(newContent);
@@ -315,6 +316,8 @@ export default function NewPostPage() {
 
   async function handleSave() {
     if (!title || !content) return;
+    if (savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
 
     try {
@@ -364,6 +367,7 @@ export default function NewPostPage() {
       console.error("저장 실패:", err);
       alert("저장에 실패했습니다.");
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }

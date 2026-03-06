@@ -15,6 +15,7 @@ import {
   FORMAT_TEXT_COMMAND,
   $getSelection,
   $isRangeSelection,
+  $createParagraphNode,
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
   type LexicalEditor,
@@ -28,6 +29,8 @@ import {
   ListNode,
 } from "@lexical/list";
 import { $getNearestNodeOfType } from "@lexical/utils";
+import { $createHeadingNode, $createQuoteNode, $isHeadingNode, type HeadingTagType } from "@lexical/rich-text";
+import { $setBlocksType } from "@lexical/selection";
 
 type Coords = { x: number; y: number } | null;
 
@@ -164,7 +167,20 @@ function FloatingToolbarUI() {
   };
 
   const toggleBlockType = (type: BlockType) => {
-    applyBlockType(currentBlockType === type ? "paragraph" : type);
+    editor.update(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return;
+
+      if (currentBlockType === type) {
+        $setBlocksType(selection, () => $createParagraphNode());
+      } else if (type === "h1" || type === "h2" || type === "h3" || type === "h4" || type === "h5" || type === "h6") {
+        $setBlocksType(selection, () => $createHeadingNode(type as HeadingTagType));
+      } else if (type === "quote") {
+        $setBlocksType(selection, () => $createQuoteNode());
+      } else {
+        $setBlocksType(selection, () => $createParagraphNode());
+      }
+    });
   };
 
   const toggleList = (type: "ul" | "ol") => {

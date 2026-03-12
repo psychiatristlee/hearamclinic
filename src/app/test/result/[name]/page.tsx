@@ -1,6 +1,7 @@
 import questionnaires from "@/lib/test/questionnaires";
 import QuestionnaireResult from "@/components/test/QuestionnaireResult";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
@@ -28,22 +29,20 @@ export default async function ResultPage(props: ResultPageProps) {
   const params = await props.params;
   const questionnaire = questionnaires.find((q) => q.name === params.name);
 
+  if (!questionnaire) {
+    notFound();
+  }
+
   const otherTests = questionnaires
     .filter((q) => q.name !== params.name)
     .slice(0, 4);
 
   return (
     <div>
-      {questionnaire ? (
-        <QuestionnaireResult
-          questionnaire={questionnaire}
-          searchParams={searchParams}
-        />
-      ) : (
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold text-gray-900">결과가 없습니다</h1>
-        </div>
-      )}
+      <QuestionnaireResult
+        questionnaire={questionnaire}
+        searchParams={searchParams}
+      />
 
       {/* 다른 검사 추천 */}
       <div className="max-w-2xl mx-auto mt-8">

@@ -14,7 +14,7 @@ const attentionTests = [
 ];
 
 // 검사 페이지 최초 배포일 (내용이 변경되면 이 날짜를 업데이트)
-const TEST_LAST_MODIFIED = "2025-02-10";
+const TEST_LAST_MODIFIED = "2026-03-12";
 
 function buildTestUrls(): string {
   let urls = `  <url>

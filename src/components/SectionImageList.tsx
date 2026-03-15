@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase";
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 interface SectionImage {
   sectionTitle: string;
@@ -162,12 +162,10 @@ export default function SectionImageList({
                   </div>
                 </div>
               ) : (
-                <Image
+                <img
                   src={section.imageUrl}
                   alt={section.sectionTitle}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               )}
             </div>

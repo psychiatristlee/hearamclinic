@@ -82,10 +82,30 @@ function splitSections(markdown: string): string[] {
 }
 
 // 블로그 텍스트 생성 (Google Search grounding 적용)
+interface TopicOutline {
+  intro: string;
+  sections: Array<{heading: string; summary: string}>;
+}
+
 async function generateBlogText(
   ai: GoogleGenAI,
   topic: string,
+  outline?: TopicOutline,
 ): Promise<string> {
+  let outlineInstruction = "";
+  if (outline) {
+    const sectionList = outline.sections
+      .map((s, i) => `  ${i + 1}. ## ${s.heading}\n     → ${s.summary}`)
+      .join("\n");
+    outlineInstruction = `
+[글 구성 - 반드시 이 구성을 따르세요]
+- 인트로: ${outline.intro}
+- 본문 소제목과 내용:
+${sectionList}
+- 위 소제목과 내용 구성을 정확히 따르되, 각 섹션을 3~4개 문단으로 풍부하게 작성하세요.
+`;
+  }
+
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: `당신은 정신건강의학과 전문의입니다. 의사의 관점에서 환자분들에게 직접 설명하듯이 정신건강 관련 블로그 글을 작성합니다.
@@ -126,7 +146,7 @@ async function generateBlogText(
 - 마크다운 형식으로 작성하세요.
 - 제목(h1)은 첫 줄에 # 으로 작성하세요.
 - 참고 문헌 섹션은 추가하지 마세요.
-
+${outlineInstruction}
 주제: ${topic}
 
 마크다운 블로그 글을 작성해주세요.`,
@@ -161,11 +181,12 @@ export const suggestTopics = onCall(
 - 정신건강의학과 전문의가 설명하면 도움이 될 주제
 
 각 주제에 대해:
-1. 구체적인 블로그 글 제목 (클릭하고 싶게 만드는 제목)
-2. 왜 지금 이 주제가 유용한지 한 줄 설명
+1. title: 구체적인 블로그 글 제목 (클릭하고 싶게 만드는 제목)
+2. reason: 왜 지금 이 주제가 유용한지 한 줄 설명
+3. outline: 블로그 글의 구체적인 구성 (인트로 요약 + h2 소제목 3~4개와 각 소제목별 다룰 핵심 내용 1~2줄)
 
 반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 텍스트 없이 JSON만 출력하세요:
-[{"title":"제목1","reason":"이유1"},{"title":"제목2","reason":"이유2"},{"title":"제목3","reason":"이유3"}]`,
+[{"title":"제목1","reason":"이유1","outline":{"intro":"인트로에서 다룰 내용 요약","sections":[{"heading":"소제목1","summary":"이 섹션에서 다룰 핵심 내용"},{"heading":"소제목2","summary":"이 섹션에서 다룰 핵심 내용"},{"heading":"소제목3","summary":"이 섹션에서 다룰 핵심 내용"}]}},{"title":"제목2","reason":"이유2","outline":{"intro":"...","sections":[...]}},{"title":"제목3","reason":"이유3","outline":{"intro":"...","sections":[...]}}]`,
       config: {
         tools: [{googleSearch: {}}],
       },
@@ -177,7 +198,14 @@ export const suggestTopics = onCall(
       throw new HttpsError("internal", "주제 추천 결과를 파싱할 수 없습니다.");
     }
 
-    const topics = JSON.parse(jsonMatch[0]) as Array<{title: string; reason: string}>;
+    const topics = JSON.parse(jsonMatch[0]) as Array<{
+      title: string;
+      reason: string;
+      outline: {
+        intro: string;
+        sections: Array<{heading: string; summary: string}>;
+      };
+    }>;
     return {topics: topics.slice(0, 3)};
   },
 );
@@ -197,9 +225,10 @@ export const generatePost = onCall(
     if (!topic || typeof topic !== "string") {
       throw new HttpsError("invalid-argument", "주제를 입력해주세요.");
     }
+    const outline = request.data?.outline as TopicOutline | undefined;
 
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
-    const rawMarkdown = await generateBlogText(ai, topic);
+    const rawMarkdown = await generateBlogText(ai, topic, outline);
 
     const titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
     const title = titleMatch?.[1] ?? topic;

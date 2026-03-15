@@ -82,10 +82,21 @@ export default function NewPostPage() {
   const [editInstructions, setEditInstructions] = useState("");
   const [showEditInput, setShowEditInput] = useState(false);
   const [suggestedTopics, setSuggestedTopics] = useState<
-    { title: string; reason: string }[]
+    {
+      title: string;
+      reason: string;
+      outline: {
+        intro: string;
+        sections: { heading: string; summary: string }[];
+      };
+    }[]
   >([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [showManualInput, setShowManualInput] = useState(false);
+  const [selectedOutline, setSelectedOutline] = useState<{
+    intro: string;
+    sections: { heading: string; summary: string }[];
+  } | null>(null);
   const [authorName, setAuthorName] = useState("");
   const [category, setCategory] = useState("");
   const [savingDraft, setSavingDraft] = useState(false);
@@ -269,7 +280,16 @@ export default function NewPostPage() {
     try {
       const suggestTopicsFn = httpsCallable<
         void,
-        { topics: { title: string; reason: string }[] }
+        {
+          topics: {
+            title: string;
+            reason: string;
+            outline: {
+              intro: string;
+              sections: { heading: string; summary: string }[];
+            };
+          }[];
+        }
       >(functions, "suggestTopics");
       const result = await suggestTopicsFn();
       setSuggestedTopics(result.data.topics);
@@ -280,8 +300,12 @@ export default function NewPostPage() {
     }
   }
 
-  function handleSelectTopic(topicTitle: string) {
+  function handleSelectTopic(
+    topicTitle: string,
+    outline: { intro: string; sections: { heading: string; summary: string }[] }
+  ) {
     setTopic(topicTitle);
+    setSelectedOutline(outline);
     setShowManualInput(true);
   }
 
@@ -291,11 +315,23 @@ export default function NewPostPage() {
     setError("");
 
     try {
-      const generatePost = httpsCallable<{ topic: string }, GenerateResult>(
+      const generatePost = httpsCallable<
+        {
+          topic: string;
+          outline?: {
+            intro: string;
+            sections: { heading: string; summary: string }[];
+          };
+        },
+        GenerateResult
+      >(
         functions,
         "generatePost"
       );
-      const result = await generatePost({ topic });
+      const result = await generatePost({
+        topic,
+        ...(selectedOutline ? { outline: selectedOutline } : {}),
+      });
       const data = result.data;
 
       // 본문에서 첫 번째 h1 제거 (제목 필드와 중복 방지)
@@ -548,20 +584,36 @@ export default function NewPostPage() {
                   {suggestedTopics.map((t, i) => (
                     <button
                       key={i}
-                      onClick={() => handleSelectTopic(t.title)}
+                      onClick={() => handleSelectTopic(t.title, t.outline)}
                       className="w-full text-left p-4 border border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition group"
                     >
                       <div className="flex items-start gap-3">
                         <span className="flex-shrink-0 w-7 h-7 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-sm font-bold">
                           {i + 1}
                         </span>
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <p className="font-semibold text-gray-900 group-hover:text-purple-700 transition">
                             {t.title}
                           </p>
                           <p className="text-sm text-gray-500 mt-1">
                             {t.reason}
                           </p>
+                          {t.outline?.sections && (
+                            <div className="mt-2 space-y-0.5">
+                              {t.outline.sections.map((s, j) => (
+                                <p
+                                  key={j}
+                                  className="text-xs text-gray-400 truncate"
+                                >
+                                  {j + 1}. {s.heading}
+                                  <span className="text-gray-300">
+                                    {" "}
+                                    — {s.summary}
+                                  </span>
+                                </p>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </button>
@@ -620,6 +672,7 @@ export default function NewPostPage() {
                   onClick={() => {
                     setShowManualInput(false);
                     setTopic("");
+                    setSelectedOutline(null);
                   }}
                   className="text-sm text-gray-400 hover:text-purple-600 transition"
                 >
@@ -684,7 +737,10 @@ export default function NewPostPage() {
             </div>
           ) : (
             <button
-              onClick={() => setShowManualInput(true)}
+              onClick={() => {
+                setShowManualInput(true);
+                setSelectedOutline(null);
+              }}
               className="w-full py-3 text-sm text-gray-500 hover:text-purple-600 border border-dashed border-gray-300 hover:border-purple-300 rounded-xl transition"
             >
               직접 주제를 입력하고 싶어요

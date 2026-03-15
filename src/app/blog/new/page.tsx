@@ -81,6 +81,11 @@ export default function NewPostPage() {
   const [error, setError] = useState("");
   const [editInstructions, setEditInstructions] = useState("");
   const [showEditInput, setShowEditInput] = useState(false);
+  const [suggestedTopics, setSuggestedTopics] = useState<
+    { title: string; reason: string }[]
+  >([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [showManualInput, setShowManualInput] = useState(false);
   const [authorName, setAuthorName] = useState("");
   const [category, setCategory] = useState("");
   const [savingDraft, setSavingDraft] = useState(false);
@@ -256,6 +261,28 @@ export default function NewPostPage() {
       console.error("임시 저장 삭제 실패:", err);
       alert("임시 저장 삭제에 실패했습니다.");
     }
+  }
+
+  async function handleSuggestTopics() {
+    setLoadingSuggestions(true);
+    setError("");
+    try {
+      const suggestTopicsFn = httpsCallable<
+        void,
+        { topics: { title: string; reason: string }[] }
+      >(functions, "suggestTopics");
+      const result = await suggestTopicsFn();
+      setSuggestedTopics(result.data.topics);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "추천 중 오류 발생");
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  }
+
+  function handleSelectTopic(topicTitle: string) {
+    setTopic(topicTitle);
+    setShowManualInput(true);
   }
 
   async function handleGenerate() {
@@ -471,66 +498,198 @@ export default function NewPostPage() {
       </h1>
 
       {!generated ? (
-        /* ========== 주제 입력 단계 ========== */
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-          <label className="block text-sm font-semibold text-gray-700 mb-3">
-            어떤 주제로 글을 작성할까요?
-          </label>
-          <textarea
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="예: 불안장애의 증상과 치료 방법"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none placeholder:text-gray-400"
-            rows={3}
-            disabled={generating}
-          />
+        /* ========== 주제 선택 단계 ========== */
+        <div className="space-y-6">
+          {/* 주제 추천 카드 */}
+          {!showManualInput && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+              <label className="block text-sm font-semibold text-gray-700 mb-1">
+                AI 추천 주제
+              </label>
+              <p className="text-sm text-gray-400 mb-5">
+                Gemini가 최신 트렌드를 분석해서 지금 가장 유용한 주제를
+                추천합니다.
+              </p>
 
-          {error && (
-            <p className="mt-3 text-red-500 text-sm flex items-center gap-1.5">
-              <svg
-                className="w-4 h-4 shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {error}
-            </p>
+              {suggestedTopics.length === 0 && !loadingSuggestions && (
+                <button
+                  onClick={handleSuggestTopics}
+                  disabled={loadingSuggestions}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-sm"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"
+                    />
+                  </svg>
+                  주제 추천받기
+                </button>
+              )}
+
+              {loadingSuggestions && (
+                <div className="flex items-center gap-3 text-purple-600 py-4">
+                  <SpinnerIcon className="h-5 w-5" />
+                  <span className="text-sm font-medium">
+                    트렌드를 분석하고 있습니다...
+                  </span>
+                </div>
+              )}
+
+              {suggestedTopics.length > 0 && (
+                <div className="space-y-3">
+                  {suggestedTopics.map((t, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handleSelectTopic(t.title)}
+                      className="w-full text-left p-4 border border-gray-200 rounded-xl hover:border-purple-300 hover:bg-purple-50 transition group"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-7 h-7 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center text-sm font-bold">
+                          {i + 1}
+                        </span>
+                        <div>
+                          <p className="font-semibold text-gray-900 group-hover:text-purple-700 transition">
+                            {t.title}
+                          </p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {t.reason}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={handleSuggestTopics}
+                    disabled={loadingSuggestions}
+                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-purple-600 transition mt-2"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"
+                      />
+                    </svg>
+                    다른 주제 추천받기
+                  </button>
+                </div>
+              )}
+
+              {error && (
+                <p className="mt-3 text-red-500 text-sm flex items-center gap-1.5">
+                  <svg
+                    className="w-4 h-4 shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {error}
+                </p>
+              )}
+            </div>
           )}
 
-          <button
-            onClick={handleGenerate}
-            disabled={generating || !topic.trim()}
-            className="mt-5 inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-sm"
-          >
-            {generating ? (
-              <>
-                <SpinnerIcon className="h-5 w-5" />
-                AI가 글을 작성하고 있습니다...
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
+          {/* 직접 주제 입력 */}
+          {showManualInput ? (
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  어떤 주제로 글을 작성할까요?
+                </label>
+                <button
+                  onClick={() => {
+                    setShowManualInput(false);
+                    setTopic("");
+                  }}
+                  className="text-sm text-gray-400 hover:text-purple-600 transition"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"
-                  />
-                </svg>
-                AI로 글 작성
-              </>
-            )}
-          </button>
+                  추천 목록으로 돌아가기
+                </button>
+              </div>
+              <textarea
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="예: 불안장애의 증상과 치료 방법"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none placeholder:text-gray-400"
+                rows={3}
+                disabled={generating}
+              />
+
+              {error && (
+                <p className="mt-3 text-red-500 text-sm flex items-center gap-1.5">
+                  <svg
+                    className="w-4 h-4 shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  {error}
+                </p>
+              )}
+
+              <button
+                onClick={handleGenerate}
+                disabled={generating || !topic.trim()}
+                className="mt-5 inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-sm"
+              >
+                {generating ? (
+                  <>
+                    <SpinnerIcon className="h-5 w-5" />
+                    AI가 글을 작성하고 있습니다...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"
+                      />
+                    </svg>
+                    AI로 글 작성
+                  </>
+                )}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowManualInput(true)}
+              className="w-full py-3 text-sm text-gray-500 hover:text-purple-600 border border-dashed border-gray-300 hover:border-purple-300 rounded-xl transition"
+            >
+              직접 주제를 입력하고 싶어요
+            </button>
+          )}
         </div>
       ) : (
         /* ========== 편집 단계 ========== */

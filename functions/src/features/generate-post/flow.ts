@@ -138,6 +138,50 @@ async function generateBlogText(
   return response.text ?? "";
 }
 
+// 블로그 주제 추천 (Google Search grounding)
+export const suggestTopics = onCall(
+  {
+    secrets: [apiKey],
+    timeoutSeconds: 60,
+    memory: "512MiB",
+    region: "asia-northeast3",
+  },
+  async (request) => {
+    verifyEditorAuth(request);
+
+    const ai = new GoogleGenAI({apiKey: apiKey.value()});
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `당신은 정신건강의학과 전문의이자 블로그 운영자입니다.
+웹 검색을 통해 현재 사람들이 가장 관심을 갖고 있는 정신건강 관련 주제를 파악하세요.
+
+다음 기준으로 블로그 글 주제 3개를 추천해주세요:
+- 최근 뉴스, SNS, 검색 트렌드에서 화제가 되는 정신건강 관련 주제
+- 일반인이 궁금해할 만한 정신건강 정보
+- 정신건강의학과 전문의가 설명하면 도움이 될 주제
+
+각 주제에 대해:
+1. 구체적인 블로그 글 제목 (클릭하고 싶게 만드는 제목)
+2. 왜 지금 이 주제가 유용한지 한 줄 설명
+
+반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 텍스트 없이 JSON만 출력하세요:
+[{"title":"제목1","reason":"이유1"},{"title":"제목2","reason":"이유2"},{"title":"제목3","reason":"이유3"}]`,
+      config: {
+        tools: [{googleSearch: {}}],
+      },
+    });
+
+    const text = (response.text ?? "").trim();
+    const jsonMatch = text.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      throw new HttpsError("internal", "주제 추천 결과를 파싱할 수 없습니다.");
+    }
+
+    const topics = JSON.parse(jsonMatch[0]) as Array<{title: string; reason: string}>;
+    return {topics: topics.slice(0, 3)};
+  },
+);
+
 // 텍스트만 생성 (이미지 없음)
 export const generatePost = onCall(
   {

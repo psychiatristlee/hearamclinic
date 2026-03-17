@@ -173,8 +173,20 @@ export const suggestTopics = onCall(
     const previousTopics = (request.data as {previousTopics?: string[]})
       ?.previousTopics ?? [];
 
-    const excludeClause = previousTopics.length > 0
-      ? `\n\n중요: 다음 주제들은 이미 추천했으므로 절대 다시 추천하지 마세요. 완전히 다른 주제를 추천하세요:\n${previousTopics.map((t) => `- ${t}`).join("\n")}`
+    // Firestore에서 최근 50개 블로그 제목 조회
+    const db = getFirestore();
+    const recentPostsSnap = await db.collection("posts")
+      .orderBy("date", "desc")
+      .limit(50)
+      .select("title")
+      .get();
+    const existingTitles = recentPostsSnap.docs.map((d) => d.data().title as string);
+
+    // 기존 블로그 제목 + 이번 세션에서 이미 추천된 주제 합산
+    const allExcluded = [...new Set([...existingTitles, ...previousTopics])];
+
+    const excludeClause = allExcluded.length > 0
+      ? `\n\n중요: 다음은 이미 작성되었거나 추천된 주제들입니다. 이와 동일하거나 유사한 주제는 절대 추천하지 마세요. 완전히 다른 새로운 주제를 추천하세요:\n${allExcluded.map((t) => `- ${t}`).join("\n")}`
       : "";
 
     const ai = new GoogleGenAI({apiKey: apiKey.value()});

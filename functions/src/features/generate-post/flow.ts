@@ -1,6 +1,7 @@
 import {onCall, HttpsError} from "firebase-functions/https";
 import {defineSecret} from "firebase-functions/params";
 import {getStorage} from "firebase-admin/storage";
+import {getFirestore, FieldValue} from "firebase-admin/firestore";
 import {GoogleGenAI} from "@google/genai";
 import {randomUUID} from "crypto";
 import {verifyEditorAuth, createGenkitInstance, uploadImage, makeDownloadUrl} from "../../shared";
@@ -169,6 +170,13 @@ export const suggestTopics = onCall(
   async (request) => {
     verifyEditorAuth(request);
 
+    const previousTopics = (request.data as {previousTopics?: string[]})
+      ?.previousTopics ?? [];
+
+    const excludeClause = previousTopics.length > 0
+      ? `\n\n중요: 다음 주제들은 이미 추천했으므로 절대 다시 추천하지 마세요. 완전히 다른 주제를 추천하세요:\n${previousTopics.map((t) => `- ${t}`).join("\n")}`
+      : "";
+
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -184,7 +192,7 @@ export const suggestTopics = onCall(
 1. title: 구체적인 블로그 글 제목 (클릭하고 싶게 만드는 제목)
 2. reason: 왜 지금 이 주제가 유용한지 한 줄 설명
 3. outline: 블로그 글의 구체적인 구성 (인트로 요약 + h2 소제목 3~4개와 각 소제목별 다룰 핵심 내용 1~2줄)
-
+${excludeClause}
 반드시 아래 JSON 배열 형식으로만 응답하세요. 다른 텍스트 없이 JSON만 출력하세요:
 [{"title":"제목1","reason":"이유1","outline":{"intro":"인트로에서 다룰 내용 요약","sections":[{"heading":"소제목1","summary":"이 섹션에서 다룰 핵심 내용"},{"heading":"소제목2","summary":"이 섹션에서 다룰 핵심 내용"},{"heading":"소제목3","summary":"이 섹션에서 다룰 핵심 내용"}]}},{"title":"제목2","reason":"이유2","outline":{"intro":"...","sections":[...]}},{"title":"제목3","reason":"이유3","outline":{"intro":"...","sections":[...]}}]`,
       config: {
@@ -420,6 +428,22 @@ export const generatePostImages = onCall(
       /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^\s"<>)]+\?alt=media&token=[a-f0-9-]+/,
     );
     const featuredImage = firstImageMatch?.[0] ?? "";
+
+    // 결과를 draft에 자동 저장 (백그라운드 탭 대응)
+    try {
+      const db = getFirestore();
+      await db.collection("drafts").doc(userId).set({
+        content: finalMarkdown,
+        featuredImage,
+        slug,
+        title: "",
+        topic: "",
+        imageJobDone: true,
+        updatedAt: FieldValue.serverTimestamp(),
+      }, {merge: true});
+    } catch (err) {
+      console.error("[generatePostImages] draft 저장 실패:", err);
+    }
 
     return {
       content: finalMarkdown,

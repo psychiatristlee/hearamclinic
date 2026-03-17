@@ -187,6 +187,52 @@ export default function NewPostPage() {
     });
   }, [user]);
 
+  // 생성 중 페이지 이탈 경고
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (generating || generatingImages) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [generating, generatingImages]);
+
+  // 백그라운드에서 이미지 생성 완료 시 결과 반영
+  const wasGeneratingImages = useRef(false);
+  useEffect(() => {
+    if (generatingImages) wasGeneratingImages.current = true;
+  }, [generatingImages]);
+
+  useEffect(() => {
+    const handleVisibility = async () => {
+      if (
+        document.visibilityState === "visible" &&
+        wasGeneratingImages.current &&
+        !generatingImages &&
+        user
+      ) {
+        // 이미지 생성이 백그라운드에서 완료되었을 수 있으므로 draft 확인
+        try {
+          const loadDraftFn = httpsCallable<void, DraftResult & { imageJobDone?: boolean }>(
+            functions,
+            "loadDraft"
+          );
+          const result = await loadDraftFn();
+          if (result.data.exists && result.data.content?.includes("firebasestorage.googleapis.com")) {
+            updateContent(result.data.content || "");
+            setFeaturedImage(result.data.featuredImage || "");
+            wasGeneratingImages.current = false;
+          }
+        } catch (err) {
+          console.error("백그라운드 결과 확인 실패:", err);
+        }
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [generatingImages, user, updateContent]);
+
   // 임시 저장 불러오기
   useEffect(() => {
     if (!user || (!claims.admin && !claims.editor)) {
@@ -274,12 +320,14 @@ export default function NewPostPage() {
     }
   }
 
+  const previousTopicsRef = useRef<string[]>([]);
+
   async function handleSuggestTopics() {
     setLoadingSuggestions(true);
     setError("");
     try {
       const suggestTopicsFn = httpsCallable<
-        void,
+        { previousTopics: string[] },
         {
           topics: {
             title: string;
@@ -291,8 +339,15 @@ export default function NewPostPage() {
           }[];
         }
       >(functions, "suggestTopics");
-      const result = await suggestTopicsFn();
-      setSuggestedTopics(result.data.topics);
+      const result = await suggestTopicsFn({
+        previousTopics: previousTopicsRef.current,
+      });
+      const newTopics = result.data.topics;
+      previousTopicsRef.current = [
+        ...previousTopicsRef.current,
+        ...newTopics.map((t) => t.title),
+      ];
+      setSuggestedTopics(newTopics);
     } catch (err) {
       setError(err instanceof Error ? err.message : "추천 중 오류 발생");
     } finally {

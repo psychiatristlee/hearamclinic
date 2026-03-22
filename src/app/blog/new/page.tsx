@@ -198,40 +198,6 @@ export default function NewPostPage() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [generating, generatingImages]);
 
-  // 백그라운드에서 이미지 생성 완료 시 결과 반영
-  const wasGeneratingImages = useRef(false);
-  useEffect(() => {
-    if (generatingImages) wasGeneratingImages.current = true;
-  }, [generatingImages]);
-
-  useEffect(() => {
-    const handleVisibility = async () => {
-      if (
-        document.visibilityState === "visible" &&
-        wasGeneratingImages.current &&
-        !generatingImages &&
-        user
-      ) {
-        // 이미지 생성이 백그라운드에서 완료되었을 수 있으므로 draft 확인
-        try {
-          const loadDraftFn = httpsCallable<void, DraftResult & { imageJobDone?: boolean }>(
-            functions,
-            "loadDraft"
-          );
-          const result = await loadDraftFn();
-          if (result.data.exists && result.data.content?.includes("firebasestorage.googleapis.com")) {
-            updateContent(result.data.content || "");
-            setFeaturedImage(result.data.featuredImage || "");
-            wasGeneratingImages.current = false;
-          }
-        } catch (err) {
-          console.error("백그라운드 결과 확인 실패:", err);
-        }
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibility);
-    return () => document.removeEventListener("visibilitychange", handleVisibility);
-  }, [generatingImages, user, updateContent]);
 
   // 임시 저장 불러오기
   useEffect(() => {

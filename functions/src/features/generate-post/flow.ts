@@ -1,7 +1,7 @@
 import {onCall, HttpsError} from "firebase-functions/https";
 import {defineSecret} from "firebase-functions/params";
 import {getStorage} from "firebase-admin/storage";
-import {getFirestore, FieldValue} from "firebase-admin/firestore";
+import {getFirestore} from "firebase-admin/firestore";
 import {GoogleGenAI} from "@google/genai";
 import {randomUUID} from "crypto";
 import {verifyEditorAuth, createGenkitInstance, uploadImage, makeDownloadUrl} from "../../shared";
@@ -94,6 +94,7 @@ async function generateBlogText(
   outline?: TopicOutline,
 ): Promise<string> {
   let outlineInstruction = "";
+  console.log("[generateBlogText] outline received:", !!outline, outline?.sections?.length, "sections");
   if (outline) {
     const sectionList = outline.sections
       .map((s, i) => `  ${i + 1}. ## ${s.heading}\n     → ${s.summary}`)
@@ -248,6 +249,8 @@ export const generatePost = onCall(
       throw new HttpsError("invalid-argument", "주제를 입력해주세요.");
     }
     const outline = request.data?.outline as TopicOutline | undefined;
+    console.log("[generatePost] topic:", topic);
+    console.log("[generatePost] outline:", JSON.stringify(outline));
 
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
     const rawMarkdown = await generateBlogText(ai, topic, outline);
@@ -442,22 +445,6 @@ export const generatePostImages = onCall(
       /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^\s"<>)]+\?alt=media&token=[a-f0-9-]+/,
     );
     const featuredImage = firstImageMatch?.[0] ?? "";
-
-    // 결과를 draft에 자동 저장 (백그라운드 탭 대응)
-    try {
-      const db = getFirestore();
-      await db.collection("drafts").doc(userId).set({
-        content: finalMarkdown,
-        featuredImage,
-        slug,
-        title: "",
-        topic: "",
-        imageJobDone: true,
-        updatedAt: FieldValue.serverTimestamp(),
-      }, {merge: true});
-    } catch (err) {
-      console.error("[generatePostImages] draft 저장 실패:", err);
-    }
 
     return {
       content: finalMarkdown,

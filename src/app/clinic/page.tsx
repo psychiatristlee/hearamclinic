@@ -150,19 +150,6 @@ const doctors = [
     ],
   },
   {
-    name: "김혜영",
-    role: "원장",
-    photo: "/doctors/kim-hyeyoung.webp",
-    schedule: "월 · 화 · 수 · 금",
-    credentials: [
-      "서울대학교 의과대학 졸업",
-      "서울대학교병원 전공의 및 전임의 수료",
-      "정신건강의학과 전문의 · 지도전문의",
-      "전) 인하대학교병원 정신건강의학과 조교수",
-      "심층정신치료 고급훈련과정 졸업",
-    ],
-  },
-  {
     name: "이정석",
     role: "원장",
     photo: "/doctors/lee-jungsok.webp",

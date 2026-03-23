@@ -3,11 +3,13 @@ import {defineSecret} from "firebase-functions/params";
 import {getStorage} from "firebase-admin/storage";
 import {getFirestore} from "firebase-admin/firestore";
 import {GoogleGenAI} from "@google/genai";
+import Anthropic from "@anthropic-ai/sdk";
 import {randomUUID} from "crypto";
 import {verifyEditorAuth, createGenkitInstance, uploadImage, makeDownloadUrl} from "../../shared";
 import {generateImage} from "../generate-image";
 
 const apiKey = defineSecret("GOOGLE_GENAI_API_KEY");
+const anthropicApiKey = defineSecret("ANTHROPIC_API_KEY");
 
 // WEB_IMAGE 플레이스홀더를 Google Search grounding으로 찾은 이미지 URL로 교체
 async function resolveWebImages(
@@ -234,10 +236,51 @@ ${excludeClause}
   },
 );
 
+// Claude를 이용한 블로그 글 교정
+async function reviewWithClaude(
+  claudeApiKey: string,
+  markdown: string,
+): Promise<string> {
+  const claude = new Anthropic({apiKey: claudeApiKey});
+  const response = await claude.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 8192,
+    messages: [{
+      role: "user",
+      content: `당신은 정신건강의학과 전문의이자 블로그 에디터입니다.
+아래 블로그 글을 검토하고 자연스럽게 교정해주세요.
+
+[교정 기준]
+- 어색하거나 기계적인 문장을 자연스러운 한국어로 다듬기
+- 같은 표현이 반복되면 다양하게 변경
+- 문장이 너무 길면 적절히 나누기
+- 의학적으로 부정확하거나 오해를 줄 수 있는 표현 수정
+- 전문의가 환자에게 직접 설명하는 자연스럽고 친근한 어조 유지
+- "전문의와 상담하세요", "의료진과 상의하세요" 등 의료진 상담 권유 마무리 멘트 삭제
+
+[반드시 지킬 것]
+- 마크다운 구조(h1, h2, 문단 구분)는 그대로 유지
+- 소제목(h2)은 변경하지 않기
+- 내용의 핵심 정보나 의미를 변경하지 않기
+- "해람", 병원 이름, "저희 병원" 등이 있으면 삭제
+- 교정된 마크다운만 출력하고 다른 설명은 하지 않기
+
+${markdown}`,
+    }],
+  });
+
+  const text = response.content
+    .filter((b): b is Anthropic.TextBlock => b.type === "text")
+    .map((b) => b.text)
+    .join("");
+
+  return text.trim();
+}
+
 // 텍스트만 생성 (이미지 없음)
 export const generatePost = onCall(
   {
-    secrets: [apiKey],
+    secrets: [apiKey, anthropicApiKey],
     timeoutSeconds: 300,
     memory: "1GiB",
     region: "asia-northeast3",
@@ -256,10 +299,17 @@ export const generatePost = onCall(
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
     const rawMarkdown = await generateBlogText(ai, topic, outline);
 
-    const titleMatch = rawMarkdown.match(/^#\s+(.+)$/m);
+    // Claude로 교정
+    console.log("[generatePost] reviewing with Claude...");
+    const reviewedMarkdown = await reviewWithClaude(
+      anthropicApiKey.value(),
+      rawMarkdown,
+    );
+    console.log("[generatePost] Claude review complete");
+
+    const titleMatch = reviewedMarkdown.match(/^#\s+(.+)$/m);
     const title = titleMatch?.[1] ?? topic;
-    // 제목(h1)을 content에서 제거 (title 필드에 별도 저장되므로 중복 방지)
-    const content = rawMarkdown.replace(/^#\s+.+\n*/m, "").trimStart();
+    const content = reviewedMarkdown.replace(/^#\s+.+\n*/m, "").trimStart();
     const slug = title
       .replace(/\s+/g, "-")
       .toLowerCase()

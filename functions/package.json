@@ -17,6 +17,7 @@
     "node": "22"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@genkit-ai/firebase": "^1.28.0",
     "@genkit-ai/google-genai": "^1.28.0",
     "@google/genai": "^1.39.0",

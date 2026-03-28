@@ -778,11 +778,11 @@ export default function NewPostPage() {
 
           {/* 직접 주제 입력 + 토론 */}
           {showManualInput ? (
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
               {/* 헤더 */}
-              <div className="flex items-center justify-between px-8 pt-8 pb-4">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Gemini와 주제 토론
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-gray-700">
+                  주제 입력
                 </label>
                 <button
                   onClick={() => {
@@ -792,137 +792,103 @@ export default function NewPostPage() {
                     setChatMessages([]);
                     setChatInput("");
                   }}
-                  className="text-sm text-gray-400 hover:text-purple-600 transition"
+                  className="text-xs text-gray-400 hover:text-purple-600 transition"
                 >
-                  추천 목록으로 돌아가기
+                  추천 목록으로
                 </button>
               </div>
 
-              {/* 주제 + outline 표시 */}
-              {topic && (
-                <div className="mx-8 mb-4 px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl">
-                  <span className="text-xs text-purple-500 font-medium">주제</span>
-                  <p className="text-sm text-purple-900 mt-0.5 font-medium">{topic}</p>
-                  {selectedOutline && (
-                    <div className="mt-3 pt-3 border-t border-purple-100 space-y-1.5">
-                      <span className="text-xs text-purple-500 font-medium">구성</span>
-                      <p className="text-xs text-purple-700">인트로: {selectedOutline.intro}</p>
-                      {selectedOutline.sections.map((s, j) => (
-                        <p key={j} className="text-xs text-purple-700">
-                          {j + 1}. {s.heading}
-                          <span className="text-purple-400"> — {s.summary}</span>
-                        </p>
-                      ))}
+              {/* outline 표시 (추천 주제 선택 시) */}
+              {selectedOutline && (
+                <div className="px-4 py-3 bg-purple-50 border border-purple-100 rounded-xl text-xs space-y-1">
+                  <p className="text-purple-500 font-medium">구성</p>
+                  <p className="text-purple-700">인트로: {selectedOutline.intro}</p>
+                  {selectedOutline.sections.map((s, j) => (
+                    <p key={j} className="text-purple-700">
+                      {j + 1}. {s.heading}
+                      <span className="text-purple-400"> — {s.summary}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {/* 채팅 메시지 */}
+              {chatMessages.length > 0 && (
+                <div className="max-h-80 overflow-y-auto border border-gray-100 rounded-xl p-3 space-y-3">
+                  {chatMessages.map((msg, i) => (
+                    <div
+                      key={i}
+                      className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                          msg.role === "user"
+                            ? "bg-purple-600 text-white rounded-br-sm"
+                            : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+                    </div>
+                  ))}
+                  {chatSending && (
+                    <div className="flex justify-start">
+                      <div className="bg-gray-100 text-gray-400 px-3.5 py-2.5 rounded-2xl rounded-bl-sm text-sm flex items-center gap-2">
+                        <SpinnerIcon className="h-3.5 w-3.5" />
+                        답변 중...
+                      </div>
                     </div>
                   )}
+                  <div ref={chatEndRef} />
                 </div>
               )}
 
-              {/* 채팅 메시지 영역 */}
-              {chatMessages.length > 0 && (
-                <div className="mx-8 mb-4 max-h-96 overflow-y-auto border border-gray-100 rounded-xl">
-                  <div className="p-4 space-y-4">
-                    {chatMessages.map((msg, i) => (
-                      <div
-                        key={i}
-                        className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div
-                          className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
-                            msg.role === "user"
-                              ? "bg-purple-600 text-white rounded-br-md"
-                              : "bg-gray-100 text-gray-800 rounded-bl-md"
-                          }`}
-                        >
-                          {msg.content}
-                        </div>
-                      </div>
-                    ))}
-                    {chatSending && (
-                      <div className="flex justify-start">
-                        <div className="bg-gray-100 text-gray-500 px-4 py-3 rounded-2xl rounded-bl-md text-sm flex items-center gap-2">
-                          <SpinnerIcon className="h-4 w-4" />
-                          생각하는 중...
-                        </div>
-                      </div>
-                    )}
-                    <div ref={chatEndRef} />
-                  </div>
-                </div>
-              )}
-
-              {/* 채팅 입력 */}
-              <div className="px-8 pb-4">
-                <div className="flex gap-2">
-                  <textarea
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        handleChatSend();
-                      }
-                    }}
-                    placeholder={chatMessages.length === 0
-                      ? "주제를 입력하고 Gemini와 토론하세요. 예: 불안장애의 증상과 치료 방법"
-                      : "메시지를 입력하세요... (Shift+Enter로 줄바꿈)"
+              {/* 입력 + 전송 */}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleChatSend();
                     }
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none placeholder:text-gray-400"
-                    rows={2}
-                    disabled={chatSending || generating}
-                  />
-                  <button
-                    onClick={handleChatSend}
-                    disabled={chatSending || generating || !chatInput.trim()}
-                    className="self-end px-4 py-3 bg-gray-700 text-white rounded-xl hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition"
-                    title="전송"
-                  >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                    </svg>
-                  </button>
-                </div>
+                  }}
+                  placeholder={chatMessages.length === 0 ? "주제를 입력하세요" : "이어서 토론하기..."}
+                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder:text-gray-400"
+                  disabled={chatSending || generating}
+                />
+                <button
+                  onClick={handleChatSend}
+                  disabled={chatSending || generating || !chatInput.trim()}
+                  className="px-3.5 py-2.5 bg-gray-700 text-white rounded-xl hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                  </svg>
+                </button>
               </div>
 
               {error && (
-                <div className="mx-8 mb-4">
-                  <p className="text-red-500 text-sm flex items-center gap-1.5">
-                    <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    {error}
-                  </p>
-                </div>
+                <p className="text-red-500 text-sm">{error}</p>
               )}
 
-              {/* 하단 액션 바 */}
-              <div className="px-8 pb-8 pt-2 flex items-center justify-between">
-                <p className="text-xs text-gray-400">
-                  {chatMessages.length === 0
-                    ? "주제에 대해 토론한 후 글을 작성하거나, 바로 글쓰기를 시작할 수 있습니다."
-                    : `${chatMessages.filter((m) => m.role === "user").length}개의 메시지로 토론 중`
-                  }
-                </p>
-                <button
-                  onClick={handleGenerate}
-                  disabled={generating || (!topic.trim() && chatMessages.length === 0)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-sm"
-                >
-                  {generating ? (
-                    <>
-                      <SpinnerIcon className="h-5 w-5" />
-                      AI가 글을 작성하고 있습니다...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                      </svg>
-                      {chatMessages.length > 0 ? "토론 기반으로 글쓰기" : "AI로 글 작성"}
-                    </>
-                  )}
-                </button>
-              </div>
+              {/* 글쓰기 버튼 */}
+              <button
+                onClick={handleGenerate}
+                disabled={generating || (!topic.trim() && chatMessages.length === 0)}
+                className="w-full py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-40 disabled:cursor-not-allowed transition text-sm font-medium flex items-center justify-center gap-2"
+              >
+                {generating ? (
+                  <>
+                    <SpinnerIcon />
+                    글을 작성하고 있습니다...
+                  </>
+                ) : (
+                  chatMessages.length > 0 ? "토론 내용으로 글쓰기" : "AI로 글 작성"
+                )}
+              </button>
             </div>
           ) : (
             <button

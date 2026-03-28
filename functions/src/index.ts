@@ -7,6 +7,7 @@ setGlobalOptions({maxInstances: 10});
 // Generate Post features
 export {
   suggestTopics,
+  chatAboutTopic,
   generatePost,
   editPost,
   generatePostImages,
@@ -27,6 +28,9 @@ export {deletePost} from "./features/delete-post";
 // Admin features
 export {setRole} from "./set-role";
 export {getUserByEmail} from "./get-user-by-email";
+
+// Search Keywords
+export {getSearchKeywords} from "./features/search-keywords";
 
 // Sitemap
 export {generateSitemap, sitemap} from "./sitemap";

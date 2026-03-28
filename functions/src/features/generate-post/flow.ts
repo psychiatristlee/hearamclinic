@@ -84,6 +84,12 @@ function splitSections(markdown: string): string[] {
   return sections;
 }
 
+// 채팅 메시지 타입
+interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 // 블로그 텍스트 생성 (Google Search grounding 적용)
 interface TopicOutline {
   intro: string;
@@ -94,6 +100,7 @@ async function generateBlogText(
   ai: GoogleGenAI,
   topic: string,
   outline?: TopicOutline,
+  chatHistory?: ChatMessage[],
 ): Promise<string> {
   let outlineInstruction = "";
   console.log("[generateBlogText] outline received:", !!outline, outline?.sections?.length, "sections");
@@ -155,6 +162,12 @@ ${sectionList}
 - 제목(h1)은 첫 줄에 # 으로 작성하세요.
 - 참고 문헌 섹션은 추가하지 마세요.
 ${outlineInstruction}
+${chatHistory && chatHistory.length > 0 ? `
+[사전 토론 내용 - 이 토론에서 다뤄진 핵심 내용과 관점을 글에 반영하세요]
+${chatHistory.map((m) => `${m.role === "user" ? "사용자" : "AI"}: ${m.content}`).join("\n\n")}
+
+위 토론에서 논의된 핵심 포인트, 사용자가 관심을 보인 부분, 합의된 관점을 블로그 글에 자연스럽게 녹여내세요.
+` : ""}
 주제: ${topic}
 
 마크다운 블로그 글을 작성해주세요.`,
@@ -237,6 +250,56 @@ ${excludeClause}
   },
 );
 
+// 주제 토론 채팅
+export const chatAboutTopic = onCall(
+  {
+    secrets: [apiKey],
+    timeoutSeconds: 60,
+    memory: "512MiB",
+    region: "asia-northeast3",
+  },
+  async (request) => {
+    verifyEditorAuth(request);
+
+    const message = request.data?.message;
+    const history = request.data?.history as ChatMessage[] | undefined;
+
+    if (!message || typeof message !== "string") {
+      throw new HttpsError("invalid-argument", "메시지를 입력해주세요.");
+    }
+
+    const ai = new GoogleGenAI({apiKey: apiKey.value()});
+
+    // 이전 대화 기록을 포함한 컨텍스트 구성
+    const historyContext = history && history.length > 0
+      ? history.map((m) =>
+        `${m.role === "user" ? "사용자" : "AI"}: ${m.content}`
+      ).join("\n\n") + "\n\n"
+      : "";
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `당신은 정신건강의학과 전문의입니다. 사용자(동료 의사 또는 블로그 작성자)와 블로그 글 주제에 대해 토론하고 있습니다.
+
+웹 검색을 통해 최신 의학 정보를 바탕으로 답변하세요.
+
+역할:
+- 주제에 대한 의학적 관점, 최신 연구, 임상 경험을 공유하세요
+- 블로그 글에 포함하면 좋을 포인트를 제안하세요
+- 사용자의 질문에 구체적으로 답변하세요
+- 간결하고 핵심적으로 답변하세요 (3~5문단 이내)
+- 토론이므로 마크다운 형식이 아닌 자연스러운 대화체로 답변하세요
+
+${historyContext}사용자: ${message}`,
+      config: {
+        tools: [{googleSearch: {}}],
+      },
+    });
+
+    return {reply: response.text ?? ""};
+  },
+);
+
 // Claude를 이용한 블로그 글 교정
 async function reviewWithClaude(
   claudeApiKey: string,
@@ -296,11 +359,13 @@ export const generatePost = onCall(
       throw new HttpsError("invalid-argument", "주제를 입력해주세요.");
     }
     const outline = request.data?.outline as TopicOutline | undefined;
+    const chatHistory = request.data?.chatHistory as ChatMessage[] | undefined;
     console.log("[generatePost] topic:", topic);
     console.log("[generatePost] outline:", JSON.stringify(outline));
+    console.log("[generatePost] chatHistory:", chatHistory?.length ?? 0, "messages");
 
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
-    const rawMarkdown = await generateBlogText(ai, topic, outline);
+    const rawMarkdown = await generateBlogText(ai, topic, outline, chatHistory);
 
     // Claude로 교정
     console.log("[generatePost] reviewing with Claude...");

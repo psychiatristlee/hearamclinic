@@ -1,4 +1,4 @@
-export {suggestTopics, generatePost, editPost, generatePostImages, regenerateSectionImage, finalizePostImages} from "./flow";
+export {suggestTopics, chatAboutTopic, generatePost, editPost, generatePostImages, regenerateSectionImage, finalizePostImages} from "./flow";
 export {
   GeneratePostInputSchema,
   GeneratePostOutputSchema,

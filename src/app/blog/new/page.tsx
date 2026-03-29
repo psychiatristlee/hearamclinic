@@ -852,7 +852,7 @@ export default function NewPostPage() {
                     }
                   }}
                   placeholder={chatMessages.length === 0 ? "주제를 입력하세요" : "수정 요청 또는 이어서 토론하기..."}
-                  className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder:text-gray-400"
+                  className="flex-1 min-w-0 px-4 py-2.5 border border-gray-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent placeholder:text-gray-400"
                   disabled={chatSending || generating}
                 />
                 <button

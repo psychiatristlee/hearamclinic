@@ -384,25 +384,43 @@ export default function NewPostPage() {
       const chatFn = httpsCallable<
         { message: string; history: { role: string; content: string }[] },
         { reply: string }
-      >(functions, "chatAboutTopic", { timeout: 60_000 });
-      const result = await chatFn({
-        message: msg,
-        history: chatMessages,
-      });
+      >(functions, "chatAboutTopic", { timeout: 120_000 });
+
+      let result;
+      try {
+        result = await chatFn({ message: msg, history: chatMessages });
+      } catch (firstErr: unknown) {
+        const code = (firstErr as { code?: string }).code;
+        if (code === "deadline-exceeded" || code === "unavailable") {
+          // 한 번 자동 재시도
+          result = await chatFn({ message: msg, history: chatMessages });
+        } else {
+          throw firstErr;
+        }
+      }
+
       setChatMessages([
         ...updatedMessages,
         { role: "assistant", content: result.data.reply },
       ]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "채팅 중 오류 발생");
+      const code = (err as { code?: string }).code;
+      if (code === "deadline-exceeded" || code === "unavailable") {
+        setError("응답 시간이 초과되었습니다. 다시 시도해주세요.");
+      } else {
+        setError(err instanceof Error ? err.message : "채팅 중 오류 발생");
+      }
     } finally {
       setChatSending(false);
     }
   }
 
-  // 채팅 스크롤 자동 이동
+  // 채팅 스크롤 자동 이동 (컨테이너 내부에서만)
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = chatEndRef.current;
+    if (el?.parentElement) {
+      el.parentElement.scrollTop = el.parentElement.scrollHeight;
+    }
   }, [chatMessages]);
 
   function handleSelectTopic(

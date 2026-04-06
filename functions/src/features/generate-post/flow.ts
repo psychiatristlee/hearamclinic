@@ -385,13 +385,18 @@ export const generatePost = onCall(
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
     const rawMarkdown = await generateBlogText(ai, topic, outline, chatHistory);
 
-    // Claude로 교정
-    console.log("[generatePost] reviewing with Claude...");
-    const reviewedMarkdown = await reviewWithClaude(
-      anthropicApiKey.value(),
-      rawMarkdown,
-    );
-    console.log("[generatePost] Claude review complete");
+    // Claude로 교정 (실패 시 Gemini 결과 그대로 사용)
+    let reviewedMarkdown = rawMarkdown;
+    try {
+      console.log("[generatePost] reviewing with Claude...");
+      reviewedMarkdown = await reviewWithClaude(
+        anthropicApiKey.value(),
+        rawMarkdown,
+      );
+      console.log("[generatePost] Claude review complete");
+    } catch (err) {
+      console.error("[generatePost] Claude review failed, using raw:", err);
+    }
 
     // 외부 이미지 마크다운 강제 제거 (Gemini/Claude가 남긴 경우 대비)
     const cleanedMarkdown = reviewedMarkdown

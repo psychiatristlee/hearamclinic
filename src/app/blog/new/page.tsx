@@ -460,7 +460,8 @@ export default function NewPostPage() {
         GenerateResult
       >(
         functions,
-        "generatePost"
+        "generatePost",
+        { timeout: 300_000 }
       );
       const payload: {
         topic: string;

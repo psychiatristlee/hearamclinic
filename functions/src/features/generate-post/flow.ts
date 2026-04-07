@@ -3,13 +3,11 @@ import {defineSecret} from "firebase-functions/params";
 import {getStorage} from "firebase-admin/storage";
 import {getFirestore} from "firebase-admin/firestore";
 import {GoogleGenAI} from "@google/genai";
-import Anthropic from "@anthropic-ai/sdk";
 import {randomUUID} from "crypto";
 import {verifyEditorAuth, createGenkitInstance, uploadImage, makeDownloadUrl} from "../../shared";
 import {generateImage} from "../generate-image";
 
 const apiKey = defineSecret("GOOGLE_GENAI_API_KEY");
-const anthropicApiKey = defineSecret("ANTHROPIC_API_KEY");
 
 // WEB_IMAGE 플레이스홀더를 Google Search grounding으로 찾은 이미지 URL로 교체
 async function resolveWebImages(
@@ -294,77 +292,60 @@ ${historyContext}사용자: ${message}`,
   },
 );
 
-// Claude를 이용한 블로그 글 교정
-async function reviewWithClaude(
-  claudeApiKey: string,
+// Gemini를 이용한 존댓말 교정 및 문체 다듬기
+async function reviewWithGemini(
+  ai: GoogleGenAI,
   markdown: string,
 ): Promise<string> {
-  const claude = new Anthropic({apiKey: claudeApiKey});
-  const response = await claude.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 8192,
-    system: `당신은 한국어 블로그 글 교정 전문가입니다. 가장 중요한 임무는 모든 문장을 존댓말(합니다체)로 통일하는 것입니다.
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: `당신은 한국어 블로그 글 교정 전문가입니다.
 
-반말 → 존댓말 변환 규칙:
+아래 블로그 글을 교정해주세요. 교정된 마크다운만 출력하고, 다른 설명은 하지 마세요.
+
+[1단계 - 존댓말 변환 (최우선, 반드시 수행)]
+모든 문장의 끝(종결어미)을 확인하세요. 반말(해라체)이 하나라도 있으면 존댓말(합니다체)로 고치세요.
+
+변환 예시:
 - "~한다" → "~합니다", "~된다" → "~됩니다", "~이다" → "~입니다"
 - "~있다" → "~있습니다", "~없다" → "~없습니다"
 - "~했다" → "~했습니다", "~됐다" → "~됐습니다"
 - "~보였다" → "~보였습니다", "~나타났다" → "~나타났습니다"
 - "~낮았고" → "~낮았으며", "~높았고" → "~높았으며"
-- "~적다" → "~적습니다", "~크다" → "~큽니다", "~많다" → "~많습니다"
+- "~적다" → "~적습니다", "~크다" → "~큽니다"
 - "~않는다" → "~않습니다", "~아니다" → "~아닙니다"
-- "~였다" → "~였습니다", "~같다" → "~같습니다"
-- 문장 중간의 연결어미(~하며, ~하고, ~되어, ~인데 등)는 그대로 두되, 문장 끝 종결어미만 존댓말로 변환하세요.
+- "건 아니다" → "것은 아닙니다"
 
-출력에 반말 종결어미가 단 하나라도 남아있으면 실패입니다.`,
-    messages: [{
-      role: "user",
-      content: `아래 블로그 글을 다듬어주세요.
-
-[1단계 - 존댓말 변환 (최우선)]
-모든 문장의 종결어미를 확인하고 반말(해라체)을 존댓말(합니다체)로 변환하세요.
-예시:
-- "체중 증가 부담이 현저히 적다." → "체중 증가 부담이 현저히 적습니다."
-- "다르게 나타난다." → "다르게 나타납니다."
-- "일으키는 건 아니다." → "일으키는 것은 아닙니다."
-- "체중 감소를 보였다." → "체중 감소를 보였습니다."
+문장 중간 연결어미(~하며, ~하고, ~되어)는 그대로 두세요. 문장 끝만 고치세요.
 
 [2단계 - 문체 다듬기]
-- 간결하게: 불필요한 수식어, 중복 표현, 늘어지는 문장을 과감히 삭제
-- 분량 줄이기: 글이 너무 길면 각 섹션을 2~3문단으로 줄이세요
-- 광고 느낌 제거: 과장된 표현, 홍보성 어조 제거
-- 자연스럽게: 기계적이고 딱딱한 문장을 사람이 말하듯 자연스럽게
-- 의학적 정확성 유지
+- 불필요한 수식어, 중복 표현 삭제
+- 너무 길면 각 섹션 2~3문단으로 줄이기
+- 과장된 표현, 홍보성 어조 제거
+- 기계적인 문장을 자연스럽게
 
 [삭제 대상]
-- "안녕하세요", "전문의입니다" 등 자기소개/인사말
-- "전문의와 상담하세요", "전문가의 도움을 받으세요", "가까운 정신건강의학과를 방문하세요" 등 상담/방문 권유
-- "해람", 병원 이름, "저희 병원" 등 병원 관련 언급
-- "~하는 것이 중요합니다", "~해야 합니다" 같은 교과서적 마무리 반복
-- 외부 이미지 마크다운 (![...](...)) — 출처 표기 포함해서 모두 삭제
+- "안녕하세요", "전문의입니다" 등 인사말/자기소개
+- "전문의와 상담하세요", "전문가의 도움을 받으세요" 등 상담/방문 권유
+- "해람", "저희 병원" 등 병원 관련 언급
+- "~하는 것이 중요합니다" 같은 교과서적 반복 마무리
+- 외부 이미지 마크다운 (![...](...)) 및 출처 표기
 
-[반드시 지킬 것]
-- 마크다운 구조(h1, h2, 문단 구분) 그대로 유지
+[지킬 것]
+- 마크다운 구조(h1, h2, 문단) 유지
 - 소제목(h2) 변경 금지
-- 핵심 정보나 의미 변경 금지
-- 교정된 마크다운만 출력, 다른 설명 금지
+- 핵심 정보 변경 금지
 
 ${markdown}`,
-    }],
   });
 
-  const text = response.content
-    .filter((b): b is Anthropic.TextBlock => b.type === "text")
-    .map((b) => b.text)
-    .join("");
-
-  return text.trim();
+  return (response.text ?? "").trim();
 }
 
 // 텍스트만 생성 (이미지 없음)
 export const generatePost = onCall(
   {
-    secrets: [apiKey, anthropicApiKey],
+    secrets: [apiKey],
     timeoutSeconds: 300,
     memory: "1GiB",
     region: "asia-northeast3",
@@ -385,18 +366,10 @@ export const generatePost = onCall(
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
     const rawMarkdown = await generateBlogText(ai, topic, outline, chatHistory);
 
-    // Claude로 교정 (실패 시 Gemini 결과 그대로 사용)
-    let reviewedMarkdown = rawMarkdown;
-    try {
-      console.log("[generatePost] reviewing with Claude...");
-      reviewedMarkdown = await reviewWithClaude(
-        anthropicApiKey.value(),
-        rawMarkdown,
-      );
-      console.log("[generatePost] Claude review complete");
-    } catch (err) {
-      console.error("[generatePost] Claude review failed, using raw:", err);
-    }
+    // Gemini로 존댓말 교정 및 문체 다듬기
+    console.log("[generatePost] reviewing with Gemini...");
+    const reviewedMarkdown = await reviewWithGemini(ai, rawMarkdown);
+    console.log("[generatePost] Gemini review complete");
 
     // 외부 이미지 마크다운 강제 제거 (Gemini/Claude가 남긴 경우 대비)
     const cleanedMarkdown = reviewedMarkdown

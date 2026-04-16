@@ -21,6 +21,13 @@ import { forwardRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { floatingToolbarPlugin } from "./FloatingToolbar";
 
+// 취소선(~~...~~) 제거 및 물결표 범위(6~8 → 6-8) 변환
+function stripStrikethrough(md: string): string {
+  return md
+    .replace(/~~([^~]+)~~/g, "$1")
+    .replace(/(\d+)~(\d+)/g, "$1-$2");
+}
+
 // Escape <text> where text starts with non-ASCII (Korean etc.) — not valid HTML/JSX
 function escapeNonHtmlTags(md: string): string {
   return md.replace(/<(\/?)([^\x00-\x7F][^>]*)>/g, "&lt;$1$2&gt;");
@@ -37,7 +44,7 @@ interface MarkdownEditorProps {
 
 const MarkdownEditorBase = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
   ({ markdown, onChange }, ref) => {
-    const safeMarkdown = escapeNonHtmlTags(markdown);
+    const safeMarkdown = escapeNonHtmlTags(stripStrikethrough(markdown));
     const handleChange = useCallback(
       (value: string) => onChange(unescapeNonHtmlTags(value)),
       [onChange]

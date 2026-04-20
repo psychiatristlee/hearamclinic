@@ -7,7 +7,7 @@ import {randomUUID} from "crypto";
 import {verifyEditorAuth, createGenkitInstance, uploadImage, makeDownloadUrl} from "../../shared";
 import {generateImage} from "../generate-image";
 
-const apiKey = defineSecret("GOOGLE_GENAI_API_KEY");
+export const apiKey = defineSecret("GOOGLE_GENAI_API_KEY");
 
 // WEB_IMAGE 플레이스홀더를 Google Search grounding으로 찾은 이미지 URL로 교체
 async function resolveWebImages(
@@ -63,7 +63,7 @@ If no image found: {"url":"","source":"","license":""}`,
 }
 
 // 마크다운을 h2 섹션으로 분리
-function splitSections(markdown: string): string[] {
+export function splitSections(markdown: string): string[] {
   const lines = markdown.split("\n");
   const sections: string[] = [];
   let current = "";
@@ -83,18 +83,18 @@ function splitSections(markdown: string): string[] {
 }
 
 // 채팅 메시지 타입
-interface ChatMessage {
+export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
 
 // 블로그 텍스트 생성 (Google Search grounding 적용)
-interface TopicOutline {
+export interface TopicOutline {
   intro: string;
   sections: Array<{heading: string; summary: string}>;
 }
 
-async function generateBlogText(
+export async function generateBlogText(
   ai: GoogleGenAI,
   topic: string,
   outline?: TopicOutline,
@@ -294,7 +294,7 @@ ${historyContext}사용자: ${message}`,
 );
 
 // Gemini를 이용한 존댓말 교정 및 문체 다듬기
-async function reviewWithGemini(
+export async function reviewWithGemini(
   ai: GoogleGenAI,
   markdown: string,
 ): Promise<string> {

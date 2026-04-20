@@ -30,5 +30,11 @@ service cloud.firestore {
     match /drafts/{draftId} {
       allow read, write: if false;
     }
+
+    // adminConfig: Cloud Functions(admin SDK)로만 접근, 클라이언트 차단
+    // 관리자는 callable function(getAutoPublishConfig/updateAutoPublishConfig)을 통해서만 접근
+    match /adminConfig/{docId} {
+      allow read, write: if false;
+    }
   }
 }

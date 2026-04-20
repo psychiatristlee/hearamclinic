@@ -30,6 +30,18 @@ interface CategoryDoc {
   order: number;
 }
 
+interface AutoPublishConfig {
+  enabled: boolean;
+  publishHour: number;
+  defaultAuthor: string;
+  lastPublishedDate: string;
+  lastPublishedSlug: string;
+  lastPublishedTitle: string;
+  lastPublishedAt: number | null;
+  lastError: string;
+  lastErrorAt: number | null;
+}
+
 export default function AdminPage() {
   const { user, claims, loading } = useAuth();
   const router = useRouter();
@@ -46,6 +58,14 @@ export default function AdminPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [addingCategory, setAddingCategory] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // 자동 발행 관련 state
+  const [autoConfig, setAutoConfig] = useState<AutoPublishConfig | null>(null);
+  const [loadingAutoConfig, setLoadingAutoConfig] = useState(true);
+  const [savingAutoConfig, setSavingAutoConfig] = useState(false);
+  const [autoMessage, setAutoMessage] = useState("");
+  const [autoError, setAutoError] = useState("");
+  const [runningNow, setRunningNow] = useState(false);
 
   // 카테고리 불러오기
   useEffect(() => {
@@ -96,6 +116,76 @@ export default function AdminPage() {
       alert("카테고리 추가에 실패했습니다.");
     } finally {
       setAddingCategory(false);
+    }
+  }
+
+  // 자동 발행 설정 불러오기
+  useEffect(() => {
+    if (!claims.admin) {
+      setLoadingAutoConfig(false);
+      return;
+    }
+    async function fetchAutoConfig() {
+      try {
+        const fn = httpsCallable<unknown, AutoPublishConfig>(
+          functions,
+          "getAutoPublishConfig"
+        );
+        const result = await fn({});
+        setAutoConfig(result.data);
+      } catch (err) {
+        console.error("자동 발행 설정 불러오기 실패:", err);
+      } finally {
+        setLoadingAutoConfig(false);
+      }
+    }
+    fetchAutoConfig();
+  }, [claims.admin]);
+
+  async function handleSaveAutoConfig(updates: {
+    enabled?: boolean;
+    publishHour?: number;
+    defaultAuthor?: string;
+  }) {
+    setSavingAutoConfig(true);
+    setAutoMessage("");
+    setAutoError("");
+    try {
+      const fn = httpsCallable(functions, "updateAutoPublishConfig");
+      await fn(updates);
+      setAutoConfig((prev) => (prev ? { ...prev, ...updates } : prev));
+      setAutoMessage("설정이 저장되었습니다.");
+    } catch {
+      setAutoError("설정 저장에 실패했습니다.");
+    } finally {
+      setSavingAutoConfig(false);
+    }
+  }
+
+  async function handleRunNow() {
+    if (!confirm("지금 즉시 트렌드 기반 블로그 글을 생성하여 발행합니다. 진행하시겠습니까?")) return;
+    setRunningNow(true);
+    setAutoMessage("");
+    setAutoError("");
+    try {
+      const fn = httpsCallable<unknown, { ok: boolean; slug: string; title: string }>(
+        functions,
+        "runAutoPublishNow"
+      );
+      const result = await fn({});
+      setAutoMessage(`발행 완료: ${result.data.title}`);
+      // 재조회
+      const getFn = httpsCallable<unknown, AutoPublishConfig>(
+        functions,
+        "getAutoPublishConfig"
+      );
+      const refreshed = await getFn({});
+      setAutoConfig(refreshed.data);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "발행에 실패했습니다.";
+      setAutoError(message);
+    } finally {
+      setRunningNow(false);
     }
   }
 
@@ -243,6 +333,138 @@ export default function AdminPage() {
             {foundUser.customClaims?.admin && (
               <p className="mt-3 text-xs text-purple-600">관리자 계정</p>
             )}
+          </div>
+        )}
+      </section>
+
+      {/* ========== 블로그 자동 발행 ========== */}
+      <section>
+        <h2 className="text-2xl font-bold mb-6">블로그 자동 발행</h2>
+
+        {autoMessage && (
+          <p className="text-green-600 text-sm mb-4">{autoMessage}</p>
+        )}
+        {autoError && (
+          <p className="text-red-500 text-sm mb-4">{autoError}</p>
+        )}
+
+        {loadingAutoConfig ? (
+          <p className="text-gray-400 text-sm">불러오는 중...</p>
+        ) : !autoConfig ? (
+          <p className="text-gray-400 text-sm">설정을 불러올 수 없습니다.</p>
+        ) : (
+          <div className="border border-gray-200 rounded-lg p-6 space-y-5">
+            {/* 활성화 토글 */}
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-700">
+                  매일 자동 발행
+                </p>
+                <p className="text-xs text-gray-400">
+                  현재 트렌드를 반영한 블로그 글을 하루 1회 자동 생성 및 발행합니다.
+                </p>
+              </div>
+              <button
+                onClick={() =>
+                  handleSaveAutoConfig({ enabled: !autoConfig.enabled })
+                }
+                disabled={savingAutoConfig}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
+                  autoConfig.enabled
+                    ? "bg-green-100 text-green-700 hover:bg-green-200"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                } disabled:opacity-50`}
+              >
+                {autoConfig.enabled ? "활성화됨" : "비활성화됨"}
+              </button>
+            </div>
+
+            {/* 발행 시간 */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+              <div>
+                <p className="text-sm font-medium text-gray-700">발행 시간 (KST)</p>
+                <p className="text-xs text-gray-400">
+                  매일 선택한 시 정각에 발행됩니다.
+                </p>
+              </div>
+              <select
+                value={autoConfig.publishHour}
+                onChange={(e) =>
+                  handleSaveAutoConfig({
+                    publishHour: parseInt(e.target.value, 10),
+                  })
+                }
+                disabled={savingAutoConfig}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
+              >
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {String(i).padStart(2, "0")}:00
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 저자 이름 */}
+            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-700">저자 이름</p>
+                <p className="text-xs text-gray-400">
+                  자동 발행 글에 표시되는 저자 이름입니다.
+                </p>
+              </div>
+              <input
+                type="text"
+                defaultValue={autoConfig.defaultAuthor}
+                onBlur={(e) => {
+                  const value = e.target.value.trim();
+                  if (value && value !== autoConfig.defaultAuthor) {
+                    handleSaveAutoConfig({ defaultAuthor: value });
+                  }
+                }}
+                disabled={savingAutoConfig}
+                className="w-48 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 text-sm"
+              />
+            </div>
+
+            {/* 최근 발행 정보 */}
+            <div className="pt-4 border-t border-gray-200 space-y-1">
+              <p className="text-xs text-gray-500">
+                마지막 발행:{" "}
+                {autoConfig.lastPublishedAt
+                  ? new Date(autoConfig.lastPublishedAt).toLocaleString("ko-KR", {
+                      timeZone: "Asia/Seoul",
+                    })
+                  : "없음"}
+              </p>
+              {autoConfig.lastPublishedTitle && (
+                <p className="text-xs text-gray-500">
+                  마지막 글: {autoConfig.lastPublishedTitle}
+                </p>
+              )}
+              {autoConfig.lastError && (
+                <p className="text-xs text-red-500">
+                  최근 오류: {autoConfig.lastError}
+                </p>
+              )}
+            </div>
+
+            {/* 즉시 발행 */}
+            <div className="pt-4 border-t border-gray-200 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-700">즉시 발행</p>
+                <p className="text-xs text-gray-400">
+                  설정한 시간과 무관하게 지금 바로 1회 발행합니다. (약 3-5분 소요)
+                </p>
+              </div>
+              <button
+                onClick={handleRunNow}
+                disabled={runningNow || savingAutoConfig}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 transition text-sm"
+              >
+                {runningNow ? "발행 중..." : "지금 발행"}
+              </button>
+            </div>
           </div>
         )}
       </section>

@@ -34,3 +34,11 @@ export {getSearchKeywords} from "./features/search-keywords";
 
 // Sitemap
 export {generateSitemap, sitemap} from "./sitemap";
+
+// Auto-publish
+export {
+  autoPublishBlog,
+  getAutoPublishConfig,
+  updateAutoPublishConfig,
+  runAutoPublishNow,
+} from "./features/auto-publish";

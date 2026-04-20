@@ -19,11 +19,15 @@ const SYSTEM_USER_ID = "auto-publisher";
 
 interface AutoPublishConfig {
   enabled: boolean;
-  publishHour: number;
+  publishHours: number[];
+  // legacy 단일 필드 - fallback용
+  publishHour?: number;
   defaultAuthor: string;
   lastPublishedDate?: string;
+  publishedHoursToday?: number[];
   lastPublishedAt?: Timestamp;
   lastPublishedSlug?: string;
+  lastPublishedTitle?: string;
   lastError?: string;
   lastErrorAt?: Timestamp;
 }
@@ -66,9 +70,10 @@ function getKstNow(): {hour: number; dateStr: string} {
   return {hour, dateStr};
 }
 
-// 트렌드 기반 주제 1개 선정
+// 트렌드 기반 주제 1개 선정 (카테고리 반영)
 async function pickTrendingTopic(
   ai: GoogleGenAI,
+  category: string,
 ): Promise<SuggestedTopic> {
   const db = getFirestore();
   const recentPostsSnap = await db.collection("posts")
@@ -83,6 +88,10 @@ async function pickTrendingTopic(
     `\n\n중요: 다음 주제들은 이미 작성되었습니다. 동일하거나 유사한 주제는 절대 제외하고 완전히 다른 새로운 주제를 추천하세요:\n${existingTitles.map((t) => `- ${t}`).join("\n")}` :
     "";
 
+  const categoryClause = category ?
+    `\n\n★ 이번 글은 반드시 "${category}" 카테고리에 부합하는 주제여야 합니다. 제목, 인트로, 소제목, 본문 요약 모두 "${category}"와 직접 관련된 내용이어야 합니다. 다른 카테고리와 혼용하지 마세요.` :
+    "";
+
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: `당신은 정신건강의학과 전문의이자 블로그 운영자입니다.
@@ -94,6 +103,7 @@ async function pickTrendingTopic(
 - 최근 뉴스, SNS, 검색 트렌드에서 화제가 되는 정신건강 관련 주제
 - 일반인이 지금 궁금해할 만한 정신건강 정보
 - 정신건강의학과 전문의가 설명하면 도움이 될 주제
+${categoryClause}
 ${excludeClause}
 
 반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만 출력하세요:
@@ -109,6 +119,17 @@ ${excludeClause}
     throw new Error("주제 추천 결과를 파싱할 수 없습니다.");
   }
   return JSON.parse(jsonMatch[0]) as SuggestedTopic;
+}
+
+// 활성화된 카테고리 중 하나를 무작위로 선택
+async function pickRandomCategory(): Promise<string> {
+  const db = getFirestore();
+  const snap = await db.collection("categories").get();
+  const names = snap.docs
+    .map((d) => (d.data().name as string) || "")
+    .filter((n) => n.trim().length > 0);
+  if (names.length === 0) return "";
+  return names[Math.floor(Math.random() * names.length)];
 }
 
 // excerpt 생성
@@ -135,12 +156,19 @@ function toSlug(title: string): string {
 }
 
 // 자동 발행 실행 본체
-async function runAutoPublish(): Promise<{slug: string; title: string}> {
+async function runAutoPublish(): Promise<{
+  slug: string;
+  title: string;
+  category: string;
+}> {
   const db = getFirestore();
   const ai = new GoogleGenAI({apiKey: apiKey.value()});
 
+  const category = await pickRandomCategory();
+  logger.info("[autoPublish] 선택된 카테고리", {category});
+
   logger.info("[autoPublish] 트렌드 주제 선정 시작");
-  const topic = await pickTrendingTopic(ai);
+  const topic = await pickTrendingTopic(ai, category);
   logger.info("[autoPublish] 선정된 주제", {title: topic.title, reason: topic.reason});
 
   logger.info("[autoPublish] 본문 생성 시작");
@@ -219,21 +247,21 @@ async function runAutoPublish(): Promise<{slug: string; title: string}> {
   const configSnap = await db.doc(CONFIG_DOC_PATH).get();
   const author = (configSnap.data()?.defaultAuthor as string) || DEFAULT_AUTHOR;
 
-  logger.info("[autoPublish] Firestore 저장 시작", {slug, title});
+  logger.info("[autoPublish] Firestore 저장 시작", {slug, title, category});
   await db.collection("posts").doc(slug).set({
     title,
     slug,
     content: finalContent,
     excerpt: buildExcerpt(finalContent),
     date: FieldValue.serverTimestamp(),
-    categories: [],
+    categories: category ? [category] : [],
     featuredImage,
     author,
     autoPublished: true,
     updatedAt: FieldValue.serverTimestamp(),
   });
 
-  return {slug, title};
+  return {slug, title, category};
 }
 
 // 매시 정각(KST)에 실행 → 설정 확인 후 자동 발행
@@ -257,36 +285,48 @@ export const autoPublishBlog = onSchedule(
       return;
     }
 
-    const publishHour = typeof config.publishHour === "number" ?
-      config.publishHour :
-      9;
+    // publishHours 배열 우선, 없으면 legacy publishHour 사용
+    const publishHours = Array.isArray(config.publishHours) &&
+      config.publishHours.length > 0 ?
+      config.publishHours :
+      [typeof config.publishHour === "number" ? config.publishHour : 9];
+
     const {hour: kstHour, dateStr: todayStr} = getKstNow();
 
-    if (kstHour !== publishHour) {
+    if (!publishHours.includes(kstHour)) {
       logger.info("[autoPublish] 발행 시각 아님, 건너뜀", {
         kstHour,
-        publishHour,
+        publishHours,
       });
       return;
     }
 
-    if (config.lastPublishedDate === todayStr) {
-      logger.info("[autoPublish] 오늘 이미 발행됨, 건너뜀", {
-        date: todayStr,
+    // 오늘 해당 시각에 이미 발행했는지 확인
+    const publishedHoursToday = config.lastPublishedDate === todayStr &&
+      Array.isArray(config.publishedHoursToday) ?
+      config.publishedHoursToday :
+      [];
+
+    if (publishedHoursToday.includes(kstHour)) {
+      logger.info("[autoPublish] 이 시각에 이미 발행됨, 건너뜀", {
+        kstHour,
+        publishedHoursToday,
       });
       return;
     }
 
     try {
-      const {slug, title} = await runAutoPublish();
+      const {slug, title, category} = await runAutoPublish();
       await configRef.set({
         lastPublishedDate: todayStr,
+        publishedHoursToday: [...publishedHoursToday, kstHour],
         lastPublishedAt: FieldValue.serverTimestamp(),
         lastPublishedSlug: slug,
         lastPublishedTitle: title,
+        lastPublishedCategory: category,
         lastError: "",
       }, {merge: true});
-      logger.info("[autoPublish] 발행 완료", {slug, title});
+      logger.info("[autoPublish] 발행 완료", {slug, title, category});
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       logger.error("[autoPublish] 발행 실패", err);
@@ -320,15 +360,21 @@ export const getAutoPublishConfig = onCall(
     const db = getFirestore();
     const snap = await db.doc(CONFIG_DOC_PATH).get();
     const data = (snap.data() || {}) as Partial<AutoPublishConfig> & {
-      lastPublishedTitle?: string;
+      lastPublishedCategory?: string;
     };
+    const publishHours = Array.isArray(data.publishHours) &&
+      data.publishHours.length > 0 ?
+      data.publishHours :
+      [typeof data.publishHour === "number" ? data.publishHour : 9];
     return {
       enabled: data.enabled ?? false,
-      publishHour: data.publishHour ?? 9,
+      publishHours,
       defaultAuthor: data.defaultAuthor ?? DEFAULT_AUTHOR,
       lastPublishedDate: data.lastPublishedDate ?? "",
+      publishedHoursToday: data.publishedHoursToday ?? [],
       lastPublishedSlug: data.lastPublishedSlug ?? "",
       lastPublishedTitle: data.lastPublishedTitle ?? "",
+      lastPublishedCategory: data.lastPublishedCategory ?? "",
       lastPublishedAt: data.lastPublishedAt?.toMillis() ?? null,
       lastError: data.lastError ?? "",
       lastErrorAt: data.lastErrorAt?.toMillis() ?? null,
@@ -345,21 +391,34 @@ export const updateAutoPublishConfig = onCall(
     verifyAdminAuth(request);
 
     const enabled = request.data?.enabled;
-    const publishHour = request.data?.publishHour;
+    const publishHours = request.data?.publishHours;
     const defaultAuthor = request.data?.defaultAuthor;
 
     const updates: Record<string, unknown> = {};
     if (typeof enabled === "boolean") {
       updates.enabled = enabled;
     }
-    if (typeof publishHour === "number") {
-      if (publishHour < 0 || publishHour > 23) {
+    if (Array.isArray(publishHours)) {
+      if (publishHours.length === 0 || publishHours.length > 6) {
         throw new HttpsError(
           "invalid-argument",
-          "publishHour는 0에서 23 사이여야 합니다.",
+          "하루 발행 개수는 1에서 6 사이여야 합니다.",
         );
       }
-      updates.publishHour = Math.floor(publishHour);
+      const normalized: number[] = [];
+      for (const raw of publishHours) {
+        const n = Number(raw);
+        if (!Number.isFinite(n) || n < 0 || n > 23) {
+          throw new HttpsError(
+            "invalid-argument",
+            "각 발행 시간은 0에서 23 사이여야 합니다.",
+          );
+        }
+        const hour = Math.floor(n);
+        if (!normalized.includes(hour)) normalized.push(hour);
+      }
+      normalized.sort((a, b) => a - b);
+      updates.publishHours = normalized;
     }
     if (typeof defaultAuthor === "string" && defaultAuthor.trim()) {
       updates.defaultAuthor = defaultAuthor.trim();
@@ -387,15 +446,19 @@ export const runAutoPublishNow = onCall(
     try {
       const result = await runAutoPublish();
       const db = getFirestore();
-      const {dateStr: todayStr} = getKstNow();
       await db.doc(CONFIG_DOC_PATH).set({
-        lastPublishedDate: todayStr,
         lastPublishedAt: FieldValue.serverTimestamp(),
         lastPublishedSlug: result.slug,
         lastPublishedTitle: result.title,
+        lastPublishedCategory: result.category,
         lastError: "",
       }, {merge: true});
-      return {ok: true, slug: result.slug, title: result.title};
+      return {
+        ok: true,
+        slug: result.slug,
+        title: result.title,
+        category: result.category,
+      };
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       throw new HttpsError("internal", message);

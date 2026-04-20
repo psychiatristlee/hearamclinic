@@ -32,15 +32,19 @@ interface CategoryDoc {
 
 interface AutoPublishConfig {
   enabled: boolean;
-  publishHour: number;
+  publishHours: number[];
   defaultAuthor: string;
   lastPublishedDate: string;
+  publishedHoursToday: number[];
   lastPublishedSlug: string;
   lastPublishedTitle: string;
+  lastPublishedCategory: string;
   lastPublishedAt: number | null;
   lastError: string;
   lastErrorAt: number | null;
 }
+
+const DEFAULT_HOUR_SLOTS = [9, 14, 18, 21, 11, 16];
 
 export default function AdminPage() {
   const { user, claims, loading } = useAuth();
@@ -144,7 +148,7 @@ export default function AdminPage() {
 
   async function handleSaveAutoConfig(updates: {
     enabled?: boolean;
-    publishHour?: number;
+    publishHours?: number[];
     defaultAuthor?: string;
   }) {
     setSavingAutoConfig(true);
@@ -160,6 +164,33 @@ export default function AdminPage() {
     } finally {
       setSavingAutoConfig(false);
     }
+  }
+
+  function handleChangePostsPerDay(newCount: number) {
+    if (!autoConfig) return;
+    const current = autoConfig.publishHours || [];
+    let next: number[];
+    if (newCount > current.length) {
+      // 부족한 만큼 기본 슬롯에서 중복되지 않는 시간 추가
+      next = [...current];
+      for (const candidate of DEFAULT_HOUR_SLOTS) {
+        if (next.length >= newCount) break;
+        if (!next.includes(candidate)) next.push(candidate);
+      }
+    } else {
+      next = current.slice(0, newCount);
+    }
+    next.sort((a, b) => a - b);
+    handleSaveAutoConfig({ publishHours: next });
+  }
+
+  function handleChangeSlotHour(slotIndex: number, hour: number) {
+    if (!autoConfig) return;
+    const current = [...(autoConfig.publishHours || [])];
+    current[slotIndex] = hour;
+    // 중복 제거 후 정렬
+    const dedup = Array.from(new Set(current)).sort((a, b) => a - b);
+    handleSaveAutoConfig({ publishHours: dedup });
   }
 
   async function handleRunNow() {
@@ -379,30 +410,61 @@ export default function AdminPage() {
               </button>
             </div>
 
-            {/* 발행 시간 */}
+            {/* 하루 발행 개수 */}
             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
               <div>
-                <p className="text-sm font-medium text-gray-700">발행 시간 (KST)</p>
+                <p className="text-sm font-medium text-gray-700">하루 발행 개수</p>
                 <p className="text-xs text-gray-400">
-                  매일 선택한 시 정각에 발행됩니다.
+                  하루에 몇 개의 글을 자동 발행할지 선택합니다. (최대 6개)
                 </p>
               </div>
               <select
-                value={autoConfig.publishHour}
+                value={autoConfig.publishHours.length}
                 onChange={(e) =>
-                  handleSaveAutoConfig({
-                    publishHour: parseInt(e.target.value, 10),
-                  })
+                  handleChangePostsPerDay(parseInt(e.target.value, 10))
                 }
                 disabled={savingAutoConfig}
                 className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
               >
-                {Array.from({ length: 24 }, (_, i) => (
-                  <option key={i} value={i}>
-                    {String(i).padStart(2, "0")}:00
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>
+                    {n}개
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* 발행 시간 슬롯 */}
+            <div className="pt-4 border-t border-gray-200">
+              <div className="mb-3">
+                <p className="text-sm font-medium text-gray-700">발행 시간 (KST)</p>
+                <p className="text-xs text-gray-400">
+                  각 슬롯의 정각에 1개씩 발행됩니다. 카테고리는 매번 무작위로 선택됩니다.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {autoConfig.publishHours.map((hour, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500 w-10">
+                      슬롯 {idx + 1}
+                    </span>
+                    <select
+                      value={hour}
+                      onChange={(e) =>
+                        handleChangeSlotHour(idx, parseInt(e.target.value, 10))
+                      }
+                      disabled={savingAutoConfig}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 text-sm"
+                    >
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <option key={i} value={i}>
+                          {String(i).padStart(2, "0")}:00
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* 저자 이름 */}
@@ -440,6 +502,16 @@ export default function AdminPage() {
               {autoConfig.lastPublishedTitle && (
                 <p className="text-xs text-gray-500">
                   마지막 글: {autoConfig.lastPublishedTitle}
+                  {autoConfig.lastPublishedCategory &&
+                    ` · ${autoConfig.lastPublishedCategory}`}
+                </p>
+              )}
+              {autoConfig.publishedHoursToday.length > 0 && (
+                <p className="text-xs text-gray-500">
+                  오늘 발행 완료:{" "}
+                  {autoConfig.publishedHoursToday
+                    .map((h) => `${String(h).padStart(2, "0")}:00`)
+                    .join(", ")}
                 </p>
               )}
               {autoConfig.lastError && (

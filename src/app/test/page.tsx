@@ -29,6 +29,21 @@ const attentionTests = [
     title: "간섭선택 주의력 검사 (Flanker Test)",
     description: "간섭 자극을 무시하고 목표 자극에만 반응하여 주의력과 간섭 억제 능력을 측정합니다.",
   },
+  {
+    name: "n-back",
+    title: "N-back 검사 (2-back)",
+    description: "두 단계 전에 본 글자를 기억하며 매치 여부를 판단해 작업기억과 지속 주의력을 측정합니다.",
+  },
+  {
+    name: "digit-span",
+    title: "숫자 폭 검사 (Digit Span)",
+    description: "차례로 제시되는 숫자를 본 순서대로 회상하여 단기기억과 주의 지속 능력을 측정합니다.",
+  },
+  {
+    name: "trail-making",
+    title: "궤적 잇기 검사 (Trail Making Test)",
+    description: "흩어진 숫자를 1부터 15까지 순서대로 빠르게 연결해 시각적 주의와 처리 속도를 측정합니다.",
+  },
 ];
 
 export default function TestListPage() {

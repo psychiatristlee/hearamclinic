@@ -5,6 +5,9 @@ import StroopTest from "@/components/test/StroopTest";
 import SelectiveAttentionTest from "@/components/test/SelectiveAttentionTest";
 import SustainedInhibitionTest from "@/components/test/SustainedInhibitionTest";
 import InterferenceAttentionTest from "@/components/test/InterferenceAttentionTest";
+import NBackTest from "@/components/test/NBackTest";
+import DigitSpanTest from "@/components/test/DigitSpanTest";
+import TrailMakingTest from "@/components/test/TrailMakingTest";
 import Image from "next/image";
 import type { Metadata } from "next";
 
@@ -24,6 +27,18 @@ const attentionTestMeta: Record<string, { title: string; description: string }> 
   "interference-attention": {
     title: "간섭선택 주의력 검사 (Flanker Test)",
     description: "간섭선택 주의력 검사로 간섭 억제 능력을 측정해보세요.",
+  },
+  "n-back": {
+    title: "N-back 검사 (2-back)",
+    description: "N-back 검사로 작업기억과 지속 주의력을 측정해보세요.",
+  },
+  "digit-span": {
+    title: "숫자 폭 검사 (Digit Span)",
+    description: "숫자 폭 검사로 단기기억과 주의 지속 능력을 측정해보세요.",
+  },
+  "trail-making": {
+    title: "궤적 잇기 검사 (Trail Making Test)",
+    description: "궤적 잇기 검사로 시각적 주의력과 처리 속도를 측정해보세요.",
   },
 };
 
@@ -69,6 +84,9 @@ export default async function TestPage(props: TestPageProps) {
   if (name === "selective-attention") return <SelectiveAttentionTest />;
   if (name === "sustained-inhibition") return <SustainedInhibitionTest />;
   if (name === "interference-attention") return <InterferenceAttentionTest />;
+  if (name === "n-back") return <NBackTest />;
+  if (name === "digit-span") return <DigitSpanTest />;
+  if (name === "trail-making") return <TrailMakingTest />;
 
   // 설문 검사
   const questionnaire = questionnaires.find((q) => q.name === name);

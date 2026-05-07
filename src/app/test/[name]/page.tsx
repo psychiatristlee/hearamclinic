@@ -8,7 +8,6 @@ import InterferenceAttentionTest from "@/components/test/InterferenceAttentionTe
 import NBackTest from "@/components/test/NBackTest";
 import DigitSpanTest from "@/components/test/DigitSpanTest";
 import TrailMakingTest from "@/components/test/TrailMakingTest";
-import Big5Test from "@/components/test/Big5Test";
 import Image from "next/image";
 import type { Metadata } from "next";
 
@@ -40,10 +39,6 @@ const attentionTestMeta: Record<string, { title: string; description: string }> 
   "trail-making": {
     title: "궤적 잇기 검사 (Trail Making Test)",
     description: "궤적 잇기 검사로 시각적 주의력과 처리 속도를 측정해보세요.",
-  },
-  "big5": {
-    title: "Big 5 성격 검사",
-    description: "5가지 성격 차원으로 본인의 유형을 자세히 알아보세요. 32개 유형 중 당신은 어떤 사람일까요?",
   },
 };
 
@@ -92,7 +87,6 @@ export default async function TestPage(props: TestPageProps) {
   if (name === "n-back") return <NBackTest />;
   if (name === "digit-span") return <DigitSpanTest />;
   if (name === "trail-making") return <TrailMakingTest />;
-  if (name === "big5") return <Big5Test />;
 
   // 설문 검사
   const questionnaire = questionnaires.find((q) => q.name === name);

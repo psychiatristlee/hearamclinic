@@ -8,6 +8,11 @@ service firebase.storage {
       allow write: if request.auth != null &&
         (request.auth.token.admin == true || request.auth.token.editor == true);
     }
+    // 성격 검사 캐릭터 이미지는 누구나 읽기 가능
+    match /personality/{allPaths=**} {
+      allow read: if true;
+      allow write: if false; // 관리자 스크립트로만 업로드
+    }
     // 임시 이미지 (미리보기용) - 인증된 editor/admin만 읽기 가능
     match /temp/{allPaths=**} {
       allow read: if request.auth != null &&

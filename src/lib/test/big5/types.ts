@@ -49,6 +49,11 @@ export function buildCode(levels: Record<Big5Dimension, "H" | "L">): string {
   return `${levels.O}${levels.C}${levels.E}${levels.A}${levels.N}`;
 }
 
+// 캐릭터 이미지 URL (Firebase Storage 공개 객체)
+export function characterImageUrl(code: string): string {
+  return `https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fbig5%2F${code}.png?alt=media`;
+}
+
 export function levelToHL(level: Level): "H" | "L" {
   return level === "Low" ? "L" : "H";
 }

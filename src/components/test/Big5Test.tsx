@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import QUESTIONS, {
   Big5Dimension,
   DIMENSION_LABELS,
@@ -11,9 +13,12 @@ import {
   Level,
   TYPES,
   buildCode,
+  characterImageUrl,
   levelToHL,
 } from "@/lib/test/big5/types";
 import Big5RadarChart from "./Big5RadarChart";
+
+const VALID_CODE_RE = /^[HL]{5}$/;
 
 type Status = "ready" | "test" | "result";
 
@@ -31,9 +36,16 @@ function levelOf(percent: number): Level {
 }
 
 export default function Big5Test() {
-  const [status, setStatus] = useState<Status>("ready");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const sharedCodeFromUrl = searchParams?.get("result") ?? null;
+  const initialStatus: Status =
+    sharedCodeFromUrl && VALID_CODE_RE.test(sharedCodeFromUrl) ? "result" : "ready";
+
+  const [status, setStatus] = useState<Status>(initialStatus);
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [shareToast, setShareToast] = useState("");
 
   const totalPages = Math.ceil(QUESTIONS.length / QUESTIONS_PER_PAGE);
   const pageQuestions = QUESTIONS.slice(
@@ -78,6 +90,44 @@ export default function Big5Test() {
     setAnswers({});
   }
 
+  // URL로 들어온 공유 코드만 있는 경우의 결과 (점수 정보는 없음)
+  const sharedResult = useMemo(() => {
+    if (
+      status !== "result" ||
+      !sharedCodeFromUrl ||
+      !VALID_CODE_RE.test(sharedCodeFromUrl) ||
+      Object.keys(answers).length > 0
+    ) return null;
+    const code = sharedCodeFromUrl;
+    const type = TYPES[code];
+    if (!type) return null;
+    // 코드에서 H/L → 가짜 점수 (시각화용 75/25)
+    const scoreFor = (ch: string) => (ch === "H" ? 0.75 : 0.25);
+    const scores = {
+      O: scoreFor(code[0]),
+      C: scoreFor(code[1]),
+      E: scoreFor(code[2]),
+      A: scoreFor(code[3]),
+      N: scoreFor(code[4]),
+    };
+    const levelFor = (ch: string): Level => (ch === "H" ? "High" : "Low");
+    const levels = {
+      O: levelFor(code[0]),
+      C: levelFor(code[1]),
+      E: levelFor(code[2]),
+      A: levelFor(code[3]),
+      N: levelFor(code[4]),
+    };
+    const percents = {
+      O: Math.round(scores.O * 100),
+      C: Math.round(scores.C * 100),
+      E: Math.round(scores.E * 100),
+      A: Math.round(scores.A * 100),
+      N: Math.round(scores.N * 100),
+    };
+    return { scores, percents, levels, code, type, isShared: true };
+  }, [status, sharedCodeFromUrl, answers]);
+
   // 결과 계산: 차원별 점수 0~1 정규화
   const result = useMemo(() => {
     if (!allAnswered) return null;
@@ -111,8 +161,52 @@ export default function Big5Test() {
     };
     const code = buildCode(codeLevels);
     const type = TYPES[code];
-    return { scores, percents, levels, code, type };
+    return { scores, percents, levels, code, type, isShared: false };
   }, [allAnswered, answers]);
+
+  // 결과가 산출되면 URL에 코드를 동기화 (공유 가능)
+  useEffect(() => {
+    if (result && status === "result" && !sharedCodeFromUrl) {
+      router.replace(`/personality/big5?result=${result.code}`, { scroll: false });
+    }
+  }, [result, status, sharedCodeFromUrl, router]);
+
+  const displayResult = result || sharedResult;
+
+  async function handleShare() {
+    if (!displayResult) return;
+    const url = `${window.location.origin}/personality/big5?result=${displayResult.code}`;
+    const shareText = `Big 5 성격 검사 결과: ${displayResult.type?.name ?? displayResult.code}\n${displayResult.type?.tagline ?? ""}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${displayResult.type?.name ?? "Big 5"} - Big 5 성격 검사`,
+          text: shareText,
+          url,
+        });
+        return;
+      } catch {
+        // 사용자가 공유 취소하면 클립보드 폴백 안 함
+        return;
+      }
+    }
+
+    // Web Share API 없으면 클립보드 복사
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareToast("링크가 복사되었습니다");
+      setTimeout(() => setShareToast(""), 2500);
+    } catch {
+      setShareToast("복사에 실패했습니다. URL을 직접 복사해 주세요.");
+      setTimeout(() => setShareToast(""), 2500);
+    }
+  }
+
+  function handleStartFromShared() {
+    router.replace("/personality/big5", { scroll: false });
+    setStatus("ready");
+  }
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -222,39 +316,90 @@ export default function Big5Test() {
         </div>
       )}
 
-      {status === "result" && result && (
+      {status === "result" && displayResult && (
         <div>
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 mb-6">
-            <p className="text-sm text-purple-700 font-medium mb-1">
-              당신의 유형
-            </p>
-            <h1 className="text-3xl font-bold text-purple-900 mb-2">
-              {result.type?.name ?? result.code}
-            </h1>
-            <p className="text-base text-gray-700 mb-4">
-              {result.type?.tagline}
-            </p>
-            <p className="text-xs text-purple-600 font-mono">
-              유형 코드: {result.code}
-            </p>
+            <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start">
+              <div className="flex-shrink-0">
+                <div className="relative w-32 h-32 sm:w-36 sm:h-36 rounded-full overflow-hidden bg-white border-4 border-white shadow-lg">
+                  <Image
+                    src={characterImageUrl(displayResult.code)}
+                    alt={displayResult.type?.name ?? displayResult.code}
+                    fill
+                    sizes="144px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <p className="text-sm text-purple-700 font-medium mb-1">
+                  {displayResult.isShared ? "이 사람의 유형" : "당신의 유형"}
+                </p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-purple-900 mb-2">
+                  {displayResult.type?.name ?? displayResult.code}
+                </h1>
+                <p className="text-base text-gray-700 mb-3">
+                  {displayResult.type?.tagline}
+                </p>
+                <p className="text-xs text-purple-600 font-mono">
+                  유형 코드: {displayResult.code}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={handleShare}
+                className="flex-1 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-5.464-2.684m5.464 2.684a3 3 0 11-5.464-2.684m0 0L8.684 10.658m6.632 5.000l-6.632-3.158" />
+                </svg>
+                공유하기
+              </button>
+            </div>
+            {shareToast && (
+              <p className="mt-3 text-sm text-center text-purple-700">
+                {shareToast}
+              </p>
+            )}
           </div>
+
+          {displayResult.isShared && (
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6 text-sm text-blue-900">
+              공유받은 결과를 보고 계십니다. 본인의 결과를 확인하고 싶으시면{" "}
+              <button
+                onClick={handleStartFromShared}
+                className="underline font-medium hover:text-blue-700"
+              >
+                직접 검사를 진행
+              </button>
+              해 보세요.
+            </div>
+          )}
 
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
             <h2 className="text-lg font-bold text-purple-900 mb-4 text-center">
               성격 차원 프로필
             </h2>
             <div className="flex justify-center mb-2">
-              <Big5RadarChart scores={result.scores} />
+              <Big5RadarChart scores={displayResult.scores} />
             </div>
+            {displayResult.isShared && (
+              <p className="text-xs text-center text-gray-500 mt-2">
+                공유 결과는 H/L 패턴만 전달되어 점수가 개략 값으로 표시됩니다.
+              </p>
+            )}
           </div>
 
-          {result.type && (
+          {displayResult.type && (
             <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
               <h2 className="text-lg font-bold text-purple-900 mb-3">
                 유형 설명
               </h2>
               <p className="text-gray-700 leading-relaxed mb-5">
-                {result.type.summary}
+                {displayResult.type.summary}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -263,7 +408,7 @@ export default function Big5Test() {
                     강점
                   </h3>
                   <ul className="space-y-1 text-sm text-green-900">
-                    {result.type.strengths.map((s, i) => (
+                    {displayResult.type.strengths.map((s, i) => (
                       <li key={i}>• {s}</li>
                     ))}
                   </ul>
@@ -273,7 +418,7 @@ export default function Big5Test() {
                     유의할 점
                   </h3>
                   <ul className="space-y-1 text-sm text-amber-900">
-                    {result.type.challenges.map((c, i) => (
+                    {displayResult.type.challenges.map((c, i) => (
                       <li key={i}>• {c}</li>
                     ))}
                   </ul>
@@ -289,8 +434,8 @@ export default function Big5Test() {
             <div className="space-y-5">
               {(Object.keys(DIMENSION_LABELS) as Big5Dimension[]).map((d) => {
                 const label = DIMENSION_LABELS[d];
-                const percent = result.percents[d];
-                const level = result.levels[d];
+                const percent = displayResult.percents[d];
+                const level = displayResult.levels[d];
                 const text = DIMENSION_DESCRIPTIONS[d][level];
                 return (
                   <div key={d} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
@@ -328,9 +473,9 @@ export default function Big5Test() {
           <div className="flex gap-3">
             <button
               className="flex-1 px-6 py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
-              onClick={reset}
+              onClick={displayResult.isShared ? handleStartFromShared : reset}
             >
-              다시 검사하기
+              {displayResult.isShared ? "내 검사 시작하기" : "다시 검사하기"}
             </button>
           </div>
 

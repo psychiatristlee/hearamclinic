@@ -46,6 +46,14 @@ const attentionTests = [
   },
 ];
 
+const personalityTests = [
+  {
+    name: "big5",
+    title: "Big 5 성격 검사",
+    description: "개방성, 성실성, 외향성, 친화성, 정서 민감성의 5가지 차원으로 32개 유형 중 본인의 성격 유형을 알아봅니다.",
+  },
+];
+
 export default function TestListPage() {
   return (
     <div>
@@ -75,8 +83,27 @@ export default function TestListPage() {
 
       {/* 주의력 검사 */}
       <h2 className="text-xl font-bold text-gray-900 mb-4">주의력 검사</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
         {attentionTests.map((test) => (
+          <Link
+            key={test.name}
+            href={`/test/${test.name}`}
+            className="block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-purple-300 transition"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              {test.title}
+            </h3>
+            <p className="text-sm text-gray-600 line-clamp-2">
+              {test.description}
+            </p>
+          </Link>
+        ))}
+      </div>
+
+      {/* 성격 검사 */}
+      <h2 className="text-xl font-bold text-gray-900 mb-4">성격 검사</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {personalityTests.map((test) => (
           <Link
             key={test.name}
             href={`/test/${test.name}`}

@@ -14,6 +14,12 @@ const personalityTests = [
     description:
       "개방성, 성실성, 외향성, 친화성, 정서 민감성의 5가지 차원으로 32개 유형 중 본인의 성격 유형을 알아봅니다.",
   },
+  {
+    name: "enneagram",
+    title: "에니어그램 성격 검사",
+    description:
+      "9가지 유형으로 본인의 핵심 동기와 두려움을 살펴봅니다. 어떤 유형이 당신과 가장 닮았는지 알아보세요.",
+  },
 ];
 
 export default function PersonalityListPage() {

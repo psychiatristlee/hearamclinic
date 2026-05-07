@@ -1,5 +1,11 @@
 import Big5Test from "@/components/test/Big5Test";
+import EnneagramTest from "@/components/test/EnneagramTest";
 import { TYPES, characterImageUrl } from "@/lib/test/big5/types";
+import {
+  TYPES as ENNEA_TYPES,
+  characterImageUrl as enneaImageUrl,
+} from "@/lib/test/enneagram/types";
+import { EnneaType } from "@/lib/test/enneagram/questions";
 import type { Metadata } from "next";
 
 const personalityTestMeta: Record<
@@ -10,6 +16,11 @@ const personalityTestMeta: Record<
     title: "Big 5 성격 검사",
     description:
       "5가지 성격 차원으로 본인의 유형을 자세히 알아보세요. 32개 유형 중 당신은 어떤 사람일까요?",
+  },
+  enneagram: {
+    title: "에니어그램 성격 검사",
+    description:
+      "9가지 유형으로 본인의 핵심 동기와 두려움을 살펴보세요. 어떤 유형이 당신과 가장 닮았을까요?",
   },
 };
 
@@ -56,6 +67,33 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     }
   }
 
+  // 에니어그램 공유 결과
+  if (params.name === "enneagram" && searchParams.result && /^[1-9]$/.test(searchParams.result)) {
+    const num = parseInt(searchParams.result, 10) as EnneaType;
+    const t = ENNEA_TYPES[num];
+    if (t) {
+      const title = `${num}번. ${t.name} - 에니어그램`;
+      const description = `${t.tagline} · ${t.summary.slice(0, 120)}`;
+      const imageUrl = enneaImageUrl(num);
+      return {
+        title,
+        description,
+        openGraph: {
+          title,
+          description,
+          images: [{ url: imageUrl, width: 1024, height: 1024, alt: t.name }],
+          type: "article",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title,
+          description,
+          images: [imageUrl],
+        },
+      };
+    }
+  }
+
   if (meta) {
     return { title: meta.title, description: meta.description };
   }
@@ -65,6 +103,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 export default async function PersonalityPage(props: PageProps) {
   const params = await props.params;
   if (params.name === "big5") return <Big5Test />;
+  if (params.name === "enneagram") return <EnneagramTest />;
 
   return (
     <div className="text-center py-12">

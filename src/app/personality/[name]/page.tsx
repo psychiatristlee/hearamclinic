@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Big5Test from "@/components/test/Big5Test";
 import EnneagramTest from "@/components/test/EnneagramTest";
 import { TYPES, characterImageUrl } from "@/lib/test/big5/types";
@@ -100,10 +101,30 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   return { title: "성격 검사" };
 }
 
+function LoadingFallback() {
+  return (
+    <div className="text-center py-12">
+      <p className="text-gray-500">불러오는 중...</p>
+    </div>
+  );
+}
+
 export default async function PersonalityPage(props: PageProps) {
   const params = await props.params;
-  if (params.name === "big5") return <Big5Test />;
-  if (params.name === "enneagram") return <EnneagramTest />;
+  if (params.name === "big5") {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <Big5Test />
+      </Suspense>
+    );
+  }
+  if (params.name === "enneagram") {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <EnneagramTest />
+      </Suspense>
+    );
+  }
 
   return (
     <div className="text-center py-12">

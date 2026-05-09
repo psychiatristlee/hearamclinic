@@ -7,7 +7,8 @@ import { useAuth } from "@/lib/AuthContext";
 
 const menuItems = [
   { label: "🏥 해람정신과", href: "/clinic", external: false },
-  { label: "🔬 해람검사실", href: "/test", external: false },
+  { label: "📋 심리검사", href: "/test", external: false },
+  { label: "🧠 집중력 검사", href: "/attention", external: false },
   { label: "🌱 성격 검사", href: "/personality", external: false },
   { label: "📅 예약하기", href: "https://naver.me/Fy2FWU9A", external: true },
 ];

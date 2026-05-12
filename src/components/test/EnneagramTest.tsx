@@ -372,31 +372,46 @@ export default function EnneagramTest() {
 
                 <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
                   <h2 className="text-lg font-bold text-purple-900 mb-3">
-                    유형 설명
+                    유형 소개
                   </h2>
-                  <p className="text-gray-700 leading-relaxed mb-5">
+                  <p className="text-gray-700 leading-relaxed mb-4">
                     {type.summary}
                   </p>
+                  {type.description.split("\n\n").map((para, i) => (
+                    <p key={i} className="text-gray-700 leading-relaxed mb-3 last:mb-0">
+                      {para}
+                    </p>
+                  ))}
+                </div>
 
-                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-4">
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-bold text-purple-900 mb-4">
+                    핵심 동기와 두려움
+                  </h2>
+                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-3">
                     <h3 className="text-sm font-bold text-purple-800 mb-1">
                       핵심 동기
                     </h3>
-                    <p className="text-sm text-purple-900">{type.coreMotivation}</p>
+                    <p className="text-sm text-purple-900 leading-relaxed">{type.coreMotivation}</p>
                   </div>
-                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-5">
+                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
                     <h3 className="text-sm font-bold text-purple-800 mb-1">
                       핵심 두려움
                     </h3>
-                    <p className="text-sm text-purple-900">{type.coreFear}</p>
+                    <p className="text-sm text-purple-900 leading-relaxed">{type.coreFear}</p>
                   </div>
+                </div>
 
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-bold text-purple-900 mb-4">
+                    강점과 유의할 점
+                  </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="bg-green-50 border border-green-100 rounded-lg p-4">
                       <h3 className="text-sm font-bold text-green-800 mb-2">
                         강점
                       </h3>
-                      <ul className="space-y-1 text-sm text-green-900">
+                      <ul className="space-y-1 text-sm text-green-900 leading-relaxed">
                         {type.strengths.map((s, i) => (
                           <li key={i}>• {s}</li>
                         ))}
@@ -406,11 +421,59 @@ export default function EnneagramTest() {
                       <h3 className="text-sm font-bold text-amber-800 mb-2">
                         유의할 점
                       </h3>
-                      <ul className="space-y-1 text-sm text-amber-900">
+                      <ul className="space-y-1 text-sm text-amber-900 leading-relaxed">
                         {type.challenges.map((c, i) => (
                           <li key={i}>• {c}</li>
                         ))}
                       </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-bold text-purple-900 mb-4">
+                    스트레스와 안정의 결
+                  </h2>
+                  <div className="bg-rose-50 border border-rose-100 rounded-lg p-4 mb-3">
+                    <h3 className="text-sm font-bold text-rose-800 mb-1">
+                      스트레스 상황에서
+                    </h3>
+                    <p className="text-sm text-rose-900 leading-relaxed">
+                      {type.inStress}
+                    </p>
+                  </div>
+                  <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
+                    <h3 className="text-sm font-bold text-emerald-800 mb-1">
+                      안정·건강해질 때
+                    </h3>
+                    <p className="text-sm text-emerald-900 leading-relaxed">
+                      {type.inSecurity}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-bold text-purple-900 mb-4">
+                    더 자라기 위한 길
+                  </h2>
+                  <div className="space-y-4 text-sm text-gray-800 leading-relaxed">
+                    <div>
+                      <h3 className="text-sm font-bold text-purple-800 mb-1">
+                        성장의 방향
+                      </h3>
+                      <p>{type.growthPath}</p>
+                    </div>
+                    <div className="pt-3 border-t border-gray-100">
+                      <h3 className="text-sm font-bold text-purple-800 mb-1">
+                        관계 안에서
+                      </h3>
+                      <p>{type.relationships}</p>
+                    </div>
+                    <div className="pt-3 border-t border-gray-100">
+                      <h3 className="text-sm font-bold text-purple-800 mb-1">
+                        일과 환경
+                      </h3>
+                      <p>{type.workAndCareer}</p>
                     </div>
                   </div>
                 </div>

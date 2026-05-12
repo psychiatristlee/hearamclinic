@@ -180,29 +180,82 @@ export default function EnneagramTest() {
     <div className="mx-auto max-w-2xl">
       {status === "ready" && (
         <div>
-          <h1 className="text-3xl font-bold text-purple-900 mb-6">
-            에니어그램 성격 검사
-          </h1>
-          <div className="bg-purple-50 border border-purple-100 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">검사 안내</h3>
-            <p className="mb-3 font-medium text-gray-800">
-              에니어그램은 9가지 성격 유형으로 사람의 마음 속 깊은 동기와 두려움을 살펴보는 성격 분석 도구입니다.
-            </p>
-            <p className="text-sm mb-3 text-purple-700">
-              총 36문항이며, 각 문항마다 본인에게 가장 가까운 정도를 5점 척도로 선택하시면 됩니다.
-            </p>
-            <p className="text-sm mb-3 text-gray-700">
-              결과는 9개 유형 중 가장 가까운 주 유형, 양옆의 날개 유형, 그리고 9축 레이더 차트로 보고됩니다.
-            </p>
-            <p className="text-xs mb-4 text-gray-500">
-              본 검사는 자가 점검 도구이며 진단 목적으로 사용되지 않습니다. 결과는 응답 시점의 컨디션에 따라 달라질 수 있습니다.
-            </p>
-            <div className="flex justify-center">
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="relative aspect-[16/9] bg-purple-50">
+              <Image
+                src="https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fenneagram%2Fcover.png?alt=media"
+                alt="에니어그램 성격 검사"
+                fill
+                sizes="(max-width: 768px) 100vw, 672px"
+                className="object-cover"
+                priority
+                unoptimized
+              />
+            </div>
+            <div className="p-6 sm:p-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-purple-900 mb-2">
+                에니어그램 성격 검사
+              </h1>
+              <p className="text-gray-600 mb-6">
+                9가지 유형으로 본인의 마음 속 동기와 두려움을 만나보는 시간
+              </p>
+
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center">
+                  <p className="text-xs text-purple-600 font-medium mb-1">문항 수</p>
+                  <p className="text-lg font-bold text-purple-900">36문항</p>
+                </div>
+                <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center">
+                  <p className="text-xs text-purple-600 font-medium mb-1">소요 시간</p>
+                  <p className="text-lg font-bold text-purple-900">약 5분</p>
+                </div>
+                <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center">
+                  <p className="text-xs text-purple-600 font-medium mb-1">유형</p>
+                  <p className="text-lg font-bold text-purple-900">9가지</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">
+                    1
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">5점 척도로 답해주세요</p>
+                    <p className="text-xs text-gray-500">전혀 그렇지 않다부터 매우 그렇다까지</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">
+                    2
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">주 유형과 날개 유형 안내</p>
+                    <p className="text-xs text-gray-500">본인에게 가장 가까운 주 유형과 양옆 날개를 함께</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">
+                    3
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">9축 레이더 차트와 자세한 설명</p>
+                    <p className="text-xs text-gray-500">캐릭터 이미지, 핵심 동기, 강점, 성장의 방향까지</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mb-6">
+                <p className="text-xs text-amber-900 leading-relaxed">
+                  본 검사는 자가 점검 도구이며 진단 목적으로 사용되지 않습니다. 결과는 응답 시점의 컨디션에 따라 달라질 수 있습니다.
+                </p>
+              </div>
+
               <button
-                className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition"
+                className="w-full px-8 py-4 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-lg rounded-xl transition shadow-md hover:shadow-lg"
                 onClick={handleStart}
               >
-                검사 시작
+                검사 시작하기
               </button>
             </div>
           </div>

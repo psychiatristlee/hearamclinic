@@ -212,29 +212,82 @@ export default function Big5Test() {
     <div className="mx-auto max-w-2xl">
       {status === "ready" && (
         <div>
-          <h1 className="text-3xl font-bold text-purple-900 mb-6">
-            Big 5 성격 검사
-          </h1>
-          <div className="bg-purple-50 border border-purple-100 rounded-xl p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">검사 안내</h3>
-            <p className="mb-3 font-medium text-gray-800">
-              개방성, 성실성, 외향성, 친화성, 정서 민감성의 5가지 차원으로 본인의 성격 특성을 살펴봅니다.
-            </p>
-            <p className="text-sm mb-3 text-purple-700">
-              총 40문항이며, 각 문항마다 본인에게 가장 가까운 정도를 5점 척도로 선택하시면 됩니다.
-            </p>
-            <p className="text-sm mb-3 text-gray-700">
-              결과는 5차원의 레이더 차트와 32개 유형 중 하나의 성격 유형으로 보고됩니다. 각 차원과 유형의 의미를 함께 안내해 드립니다.
-            </p>
-            <p className="text-xs mb-4 text-gray-500">
-              본 검사는 자가 점검을 위한 도구이며 진단 목적으로 사용되지 않습니다. 결과는 응답 시점의 컨디션에 따라 달라질 수 있습니다.
-            </p>
-            <div className="flex justify-center">
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="relative aspect-[16/9] bg-purple-50">
+              <Image
+                src="https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fbig5%2Fcover.png?alt=media"
+                alt="Big 5 성격 검사"
+                fill
+                sizes="(max-width: 768px) 100vw, 672px"
+                className="object-cover"
+                priority
+                unoptimized
+              />
+            </div>
+            <div className="p-6 sm:p-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-purple-900 mb-2">
+                Big 5 성격 검사
+              </h1>
+              <p className="text-gray-600 mb-6">
+                5가지 차원으로 들여다보는 본인의 성격 프로필
+              </p>
+
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center">
+                  <p className="text-xs text-purple-600 font-medium mb-1">문항 수</p>
+                  <p className="text-lg font-bold text-purple-900">40문항</p>
+                </div>
+                <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center">
+                  <p className="text-xs text-purple-600 font-medium mb-1">소요 시간</p>
+                  <p className="text-lg font-bold text-purple-900">약 6분</p>
+                </div>
+                <div className="bg-purple-50 border border-purple-100 rounded-xl p-3 text-center">
+                  <p className="text-xs text-purple-600 font-medium mb-1">유형</p>
+                  <p className="text-lg font-bold text-purple-900">32가지</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">
+                    1
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">5점 척도로 답해주세요</p>
+                    <p className="text-xs text-gray-500">전혀 그렇지 않다부터 매우 그렇다까지</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">
+                    2
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">5가지 차원의 레이더 차트</p>
+                    <p className="text-xs text-gray-500">개방성, 성실성, 외향성, 친화성, 정서 민감성</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center text-xs font-bold">
+                    3
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">32개 유형 중 본인 유형 안내</p>
+                    <p className="text-xs text-gray-500">캐릭터 이미지, 강점, 차원별 해석까지</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mb-6">
+                <p className="text-xs text-amber-900 leading-relaxed">
+                  본 검사는 자가 점검을 위한 도구이며 진단 목적으로 사용되지 않습니다. 결과는 응답 시점의 컨디션에 따라 달라질 수 있습니다.
+                </p>
+              </div>
+
               <button
-                className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition"
+                className="w-full px-8 py-4 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold text-lg rounded-xl transition shadow-md hover:shadow-lg"
                 onClick={handleStart}
               >
-                검사 시작
+                검사 시작하기
               </button>
             </div>
           </div>

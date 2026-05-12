@@ -19,14 +19,17 @@ export default function Header() {
 
   return (
     <nav className="border-b border-purple-100 bg-white sticky top-0 z-50">
-      <div className="mx-auto max-w-4xl px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-purple-900">
+      <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-4">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg lg:text-xl font-bold text-purple-900 whitespace-nowrap"
+        >
           <Image src="/logo.png" alt="해람" width={36} height={36} className="rounded-lg" />
-          해람정신건강의학과
+          <span className="hidden sm:inline">해람정신건강의학과</span>
         </Link>
 
         {/* 데스크탑 메뉴 */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-5">
           {menuItems.map((item) =>
             item.external ? (
               <a
@@ -34,7 +37,7 @@ export default function Header() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-600 hover:text-purple-700 transition"
+                className="text-sm text-gray-600 hover:text-purple-700 transition whitespace-nowrap"
               >
                 {item.label}
               </a>
@@ -42,7 +45,7 @@ export default function Header() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="text-gray-600 hover:text-purple-700 transition"
+                className="text-sm text-gray-600 hover:text-purple-700 transition whitespace-nowrap"
               >
                 {item.label}
               </Link>
@@ -53,7 +56,7 @@ export default function Header() {
               {claims.admin && (
                 <Link
                   href="/admin"
-                  className="text-gray-600 hover:text-purple-700 transition"
+                  className="text-sm text-gray-600 hover:text-purple-700 transition whitespace-nowrap"
                 >
                   ⚙️ 관리
                 </Link>
@@ -62,13 +65,13 @@ export default function Header() {
                 <div className="flex items-center gap-3">
                   <Link
                     href="/profile"
-                    className="text-sm text-gray-600 hover:text-purple-700 transition"
+                    className="text-sm text-gray-600 hover:text-purple-700 transition whitespace-nowrap"
                   >
                     👤 프로필
                   </Link>
                   <button
                     onClick={signOut}
-                    className="text-sm text-gray-500 hover:text-purple-600 transition"
+                    className="text-sm text-gray-500 hover:text-purple-600 transition whitespace-nowrap"
                   >
                     👋 로그아웃
                   </button>
@@ -80,7 +83,7 @@ export default function Header() {
 
         {/* 모바일 햄버거 */}
         <button
-          className="md:hidden p-2"
+          className="lg:hidden p-2"
           onClick={() => setOpen(!open)}
           aria-label="메뉴"
         >
@@ -98,7 +101,7 @@ export default function Header() {
 
       {/* 모바일 메뉴 드롭다운 */}
       {open && (
-        <div className="md:hidden border-t border-purple-100 bg-white">
+        <div className="lg:hidden border-t border-purple-100 bg-white">
           <div className="px-4 py-2 space-y-1">
             {menuItems.map((item) =>
               item.external ? (

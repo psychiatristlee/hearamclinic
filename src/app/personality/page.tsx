@@ -25,6 +25,14 @@ const personalityTests = [
     image:
       "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fenneagram%2Fcover.png?alt=media",
   },
+  {
+    name: "attachment",
+    title: "애착 유형 검사",
+    description:
+      "관계 속에서 본인이 어떤 마음의 결로 움직이는지, 불안과 회피 두 차원으로 4개 유형을 살펴봅니다.",
+    image:
+      "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fattachment%2Fcover.png?alt=media",
+  },
 ];
 
 export default function PersonalityListPage() {

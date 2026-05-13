@@ -1,11 +1,17 @@
 import { Suspense } from "react";
 import Big5Test from "@/components/test/Big5Test";
 import EnneagramTest from "@/components/test/EnneagramTest";
+import AttachmentTest from "@/components/test/AttachmentTest";
 import { TYPES, characterImageUrl } from "@/lib/test/big5/types";
 import {
   TYPES as ENNEA_TYPES,
   characterImageUrl as enneaImageUrl,
 } from "@/lib/test/enneagram/types";
+import {
+  TYPES as ATTACH_TYPES,
+  characterImageUrl as attachImageUrl,
+  AttachmentTypeCode,
+} from "@/lib/test/attachment/types";
 import { EnneaType } from "@/lib/test/enneagram/questions";
 import type { Metadata } from "next";
 
@@ -22,6 +28,11 @@ const personalityTestMeta: Record<
     title: "에니어그램 성격 검사",
     description:
       "9가지 유형으로 본인의 핵심 동기와 두려움을 살펴보세요. 어떤 유형이 당신과 가장 닮았을까요?",
+  },
+  attachment: {
+    title: "애착 유형 검사",
+    description:
+      "관계 속에서 본인이 어떤 마음의 결로 움직이는지, 불안과 회피 두 차원으로 4개 유형을 살펴보세요.",
   },
 };
 
@@ -95,6 +106,37 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     }
   }
 
+  // 애착 유형 공유 결과
+  if (
+    params.name === "attachment" &&
+    searchParams.result &&
+    ["secure", "anxious", "avoidant", "disorganized"].includes(searchParams.result)
+  ) {
+    const code = searchParams.result as AttachmentTypeCode;
+    const t = ATTACH_TYPES[code];
+    if (t) {
+      const title = `${t.name} - 애착 유형 검사`;
+      const description = `${t.tagline} · ${t.summary.slice(0, 120)}`;
+      const imageUrl = attachImageUrl(code);
+      return {
+        title,
+        description,
+        openGraph: {
+          title,
+          description,
+          images: [{ url: imageUrl, width: 1024, height: 1024, alt: t.name }],
+          type: "article",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title,
+          description,
+          images: [imageUrl],
+        },
+      };
+    }
+  }
+
   if (meta) {
     return { title: meta.title, description: meta.description };
   }
@@ -122,6 +164,13 @@ export default async function PersonalityPage(props: PageProps) {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <EnneagramTest />
+      </Suspense>
+    );
+  }
+  if (params.name === "attachment") {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <AttachmentTest />
       </Suspense>
     );
   }

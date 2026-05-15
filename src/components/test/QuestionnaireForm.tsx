@@ -6,6 +6,7 @@ import QuestionItem from "./QuestionItem";
 import WarningModal from "./WarningModal";
 import { GroupedResult, Question, Questionnaire } from "@/lib/test/types";
 import { arrayToQueryString } from "@/lib/test/utils";
+import { saveTestResult } from "@/lib/test-history";
 
 interface QuestionnaireFormProps {
   questionnaire: Questionnaire;
@@ -54,6 +55,20 @@ export default function QuestionnaireForm({ questionnaire }: QuestionnaireFormPr
       const groupedResults = getGroupedResults(questions);
       const resultToQueryString: string = arrayToQueryString(groupedResults);
       const currentTimeStamp = new Date().getTime();
+
+      // 본인 검사 기록 저장 (로그인 시)
+      const totalSum = groupedResults.reduce((acc, g) => acc + g.sum, 0);
+      saveTestResult({
+        type: questionnaire.name,
+        category: "questionnaire",
+        displayTitle: questionnaire.title,
+        summary: `총점 ${totalSum}`,
+        result: {
+          groupedResults,
+          totalSum,
+        },
+      });
+
       router.push(
         "/test/result/" +
           questionnaire.name +

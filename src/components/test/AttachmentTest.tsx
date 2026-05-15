@@ -15,6 +15,7 @@ import {
   getTypeFromScores,
 } from "@/lib/test/attachment/types";
 import AttachmentScatterChart from "./AttachmentScatterChart";
+import { saveTestResult } from "@/lib/test-history";
 
 type Status = "ready" | "test" | "result";
 
@@ -134,6 +135,19 @@ export default function AttachmentTest() {
     if (result && status === "result" && !sharedCode) {
       router.replace(`/personality/attachment?result=${result.code}`, {
         scroll: false,
+      });
+      const t = TYPES[result.code];
+      saveTestResult({
+        type: "attachment",
+        category: "personality",
+        displayTitle: "애착 유형 검사",
+        summary: `${t.name} (불안 ${result.anxietyPercent} · 회피 ${result.avoidancePercent})`,
+        result: {
+          code: result.code,
+          anxietyPercent: result.anxietyPercent,
+          avoidancePercent: result.avoidancePercent,
+          typeName: t.name,
+        },
       });
     }
   }, [result, status, sharedCode, router]);

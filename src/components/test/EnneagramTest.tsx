@@ -10,6 +10,7 @@ import QUESTIONS, {
 } from "@/lib/test/enneagram/questions";
 import { TYPES, characterImageUrl } from "@/lib/test/enneagram/types";
 import EnneagramRadarChart from "./EnneagramRadarChart";
+import { saveTestResult } from "@/lib/test-history";
 
 type Status = "ready" | "test" | "result";
 
@@ -132,11 +133,24 @@ export default function EnneagramTest() {
     return { scores, percents, dominant, wing, isShared: true };
   }, [status, sharedTypeStr, answers]);
 
-  // URL 동기화
+  // URL 동기화 + Firestore 저장
   useEffect(() => {
     if (result && status === "result" && !sharedTypeStr) {
       router.replace(`/personality/enneagram?result=${result.dominant}`, {
         scroll: false,
+      });
+      const t = TYPES[result.dominant];
+      saveTestResult({
+        type: "enneagram",
+        category: "personality",
+        displayTitle: "에니어그램 성격 검사",
+        summary: `${result.dominant}번 ${t.name} · 날개 ${result.wing}`,
+        result: {
+          dominant: result.dominant,
+          wing: result.wing,
+          percents: result.percents,
+          typeName: t.name,
+        },
       });
     }
   }, [result, status, sharedTypeStr, router]);

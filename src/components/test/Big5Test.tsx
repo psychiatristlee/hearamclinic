@@ -17,6 +17,7 @@ import {
   levelToHL,
 } from "@/lib/test/big5/types";
 import Big5RadarChart from "./Big5RadarChart";
+import { saveTestResult } from "@/lib/test-history";
 
 const VALID_CODE_RE = /^[HL]{5}$/;
 
@@ -164,10 +165,22 @@ export default function Big5Test() {
     return { scores, percents, levels, code, type, isShared: false };
   }, [allAnswered, answers]);
 
-  // 결과가 산출되면 URL에 코드를 동기화 (공유 가능)
+  // 결과가 산출되면 URL에 코드를 동기화 + Firestore 저장
   useEffect(() => {
     if (result && status === "result" && !sharedCodeFromUrl) {
       router.replace(`/personality/big5?result=${result.code}`, { scroll: false });
+      const typeName = result.type?.name ?? result.code;
+      saveTestResult({
+        type: "big5",
+        category: "personality",
+        displayTitle: "Big 5 성격 검사",
+        summary: `${typeName} (${result.code})`,
+        result: {
+          code: result.code,
+          percents: result.percents,
+          typeName,
+        },
+      });
     }
   }, [result, status, sharedCodeFromUrl, router]);
 

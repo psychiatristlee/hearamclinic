@@ -24,6 +24,16 @@ service cloud.firestore {
     // users: 본인 문서만 읽기/쓰기
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // 검사 결과 히스토리 (본인만)
+      match /testResults/{resultId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // 데일리 트래킹 (기분/수면/스트레스 등)
+      match /dailyLogs/{dateKey} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     // drafts: Cloud Functions(admin SDK)로만 접근, 클라이언트 차단

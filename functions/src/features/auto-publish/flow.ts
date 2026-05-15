@@ -88,8 +88,12 @@ async function pickTrendingTopic(
     `\n\n중요: 다음 주제들은 이미 작성되었습니다. 동일하거나 유사한 주제는 절대 제외하고 완전히 다른 새로운 주제를 추천하세요:\n${existingTitles.map((t) => `- ${t}`).join("\n")}` :
     "";
 
+  const sleepHint = category === "수면" ?
+    `\n\n[수면 카테고리 가이드 — 다양성 확보]\n같은 주제(예: 수면위생 일반론)가 반복되지 않도록 아래 영역들 중에서 골라 다양하게 다루세요:\n- 불면증의 진단 기준과 종류, 만성 vs 일과성\n- 수면 단계(REM/NREM)와 각 단계의 기능\n- 수면 부족이 우울·불안·집중력에 미치는 영향\n- 일주기 리듬(circadian rhythm), 광 노출, 시간대 관리\n- 폐쇄성 수면무호흡증과 정신건강\n- 코로나·갱년기·산후 등 특정 시기 수면 변화\n- 수면제 종류별 차이와 안전한 사용\n- CBT-I(불면 인지행동치료) 기법\n- 멜라토닌과 빛 노출의 과학적 근거\n- 악몽 장애, 사건수면, 하지불안증후군\n- 청소년·노년기 수면 특성\n- 카페인·알코올·운동 타이밍이 수면에 미치는 영향\n- 수면 추적 기기와 데이터 해석\n- 시차증과 교대 근무 적응` :
+    "";
+
   const categoryClause = category ?
-    `\n\n★ 이번 글은 반드시 "${category}" 카테고리에 부합하는 주제여야 합니다. 제목, 인트로, 소제목, 본문 요약 모두 "${category}"와 직접 관련된 내용이어야 합니다. 다른 카테고리와 혼용하지 마세요.` :
+    `\n\n★ 이번 글은 반드시 "${category}" 카테고리에 부합하는 주제여야 합니다. 제목, 인트로, 소제목, 본문 요약 모두 "${category}"와 직접 관련된 내용이어야 합니다. 다른 카테고리와 혼용하지 마세요.${sleepHint}` :
     "";
 
   const response = await ai.models.generateContent({
@@ -121,15 +125,44 @@ ${excludeClause}
   return JSON.parse(jsonMatch[0]) as SuggestedTopic;
 }
 
-// 활성화된 카테고리 중 하나를 무작위로 선택
+// 활성화된 카테고리 중 하나를 선택. 최근 발행 빈도가 낮은 카테고리에 가중치 부여.
+// 수면 카테고리는 항상 최소 2배 가중치를 가져 꾸준히 노출됨.
 async function pickRandomCategory(): Promise<string> {
   const db = getFirestore();
-  const snap = await db.collection("categories").get();
-  const names = snap.docs
+  const [catSnap, recentSnap] = await Promise.all([
+    db.collection("categories").get(),
+    db
+      .collection("posts")
+      .orderBy("date", "desc")
+      .limit(20)
+      .select("categories")
+      .get(),
+  ]);
+  const names = catSnap.docs
     .map((d) => (d.data().name as string) || "")
     .filter((n) => n.trim().length > 0);
   if (names.length === 0) return "";
-  return names[Math.floor(Math.random() * names.length)];
+
+  // 최근 20개 글에서 각 카테고리 출현 빈도
+  const freq: Record<string, number> = {};
+  for (const n of names) freq[n] = 0;
+  for (const doc of recentSnap.docs) {
+    const cats = (doc.data().categories as string[]) || [];
+    for (const c of cats) {
+      if (freq[c] !== undefined) freq[c] += 1;
+    }
+  }
+
+  // 가중치: 적게 등장한 카테고리에 더 높은 가중치 (max-freq+1)
+  // 수면은 항상 +2 추가 가중치
+  const maxFreq = Math.max(...Object.values(freq), 0);
+  const weighted: string[] = [];
+  for (const n of names) {
+    let weight = maxFreq - freq[n] + 1;
+    if (n === "수면") weight += 2;
+    for (let i = 0; i < weight; i++) weighted.push(n);
+  }
+  return weighted[Math.floor(Math.random() * weighted.length)];
 }
 
 // excerpt 생성

@@ -13,7 +13,30 @@ export type CareToolType =
   | "breathing"
   | "thought-record"
   | "gratitude"
-  | "mindfulness";
+  | "mindfulness"
+  | "chat";
+
+export interface ChatMessage {
+  role: "user" | "model";
+  text: string;
+}
+
+export interface ChatResponse {
+  reply: string;
+  crisisDetected: boolean;
+}
+
+export async function callChat(
+  message: string,
+  history: ChatMessage[],
+): Promise<ChatResponse> {
+  const fn = httpsCallable<
+    { message: string; history: ChatMessage[] },
+    ChatResponse
+  >(functions, "chatWithCounselor");
+  const res = await fn({ message, history });
+  return res.data;
+}
 
 export interface CareUserContext {
   recentMood?: number;

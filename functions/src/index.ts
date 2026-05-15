@@ -49,4 +49,5 @@ export {
   generateThoughtRecord,
   generateGratitudePrompts,
   generateMindfulnessScript,
+  chatWithCounselor,
 } from "./features/care";

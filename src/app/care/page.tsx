@@ -9,6 +9,13 @@ export const metadata: Metadata = {
 
 const TOOLS = [
   {
+    slug: "counselor",
+    icon: "💬",
+    title: "해람 동행 챗봇",
+    description:
+      "CBT와 ACT의 결로 마음을 함께 살피는 대화형 자가 돌봄. 가벼운 마음의 정리부터 위기 상황 안내까지 함께합니다.",
+  },
+  {
     slug: "breathing",
     icon: "🌬",
     title: "호흡 가이드",

@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import CareTabsNav from "@/components/care/CareTabsNav";
 
 export const metadata: Metadata = {
   title: "마음 돌봄",
@@ -48,10 +49,11 @@ const TOOLS = [
 export default function CareIndexPage() {
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-purple-900 mb-2">마음 돌봄</h1>
-        <p className="text-gray-600">
-          매번 새로 만들어지는 자가 돌봄 도구들. 로그인하시면 오늘의 컨디션이 자연스럽게 반영됩니다.
+      <CareTabsNav />
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-purple-900 mb-1">마음 돌봄</h1>
+        <p className="text-sm text-gray-600">
+          탭을 눌러 원하는 도구를 바로 시작해 보세요. 로그인 시 오늘의 컨디션이 자연스럽게 반영됩니다.
         </p>
       </div>
 

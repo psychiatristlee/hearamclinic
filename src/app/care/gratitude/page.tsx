@@ -7,6 +7,7 @@ import {
   savePracticeSession,
   type GratitudeResult,
 } from "@/lib/care";
+import CareTabsNav from "@/components/care/CareTabsNav";
 
 export default function GratitudePage() {
   const [result, setResult] = useState<GratitudeResult | null>(null);
@@ -33,6 +34,7 @@ export default function GratitudePage() {
 
   return (
     <div className="max-w-2xl mx-auto">
+      <CareTabsNav />
       <h1 className="text-3xl font-bold text-purple-900 mb-2">🌿 감사 일기</h1>
       <p className="text-gray-600 mb-6">
         오늘에 어울리는 감사 프롬프트 3개를 매번 새로 만들어 드립니다.

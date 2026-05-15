@@ -10,6 +10,7 @@ const menuItems = [
   { label: "📋 심리검사", href: "/test", external: false },
   { label: "🧠 집중력 검사", href: "/attention", external: false },
   { label: "🌱 성격 검사", href: "/personality", external: false },
+  { label: "💜 마음 돌봄", href: "/care", external: false },
   { label: "📅 예약하기", href: "https://naver.me/Fy2FWU9A", external: true },
 ];
 

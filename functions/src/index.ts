@@ -42,3 +42,11 @@ export {
   updateAutoPublishConfig,
   runAutoPublishNow,
 } from "./features/auto-publish";
+
+// Care tools (AI 생성 자가 돌봄)
+export {
+  generateBreathingGuide,
+  generateThoughtRecord,
+  generateGratitudePrompts,
+  generateMindfulnessScript,
+} from "./features/care";

@@ -7,7 +7,6 @@ import {
   savePracticeSession,
   type BreathingResult,
 } from "@/lib/care";
-import CareTabsNav from "@/components/care/CareTabsNav";
 
 export default function BreathingPage() {
   const [result, setResult] = useState<BreathingResult | null>(null);
@@ -33,7 +32,6 @@ export default function BreathingPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <CareTabsNav />
       <h1 className="text-3xl font-bold text-purple-900 mb-2">🌬 호흡 가이드</h1>
       <p className="text-gray-600 mb-6">
         지금 본인의 컨디션에 맞춰 1-3분 호흡 가이드를 만들어 드립니다.

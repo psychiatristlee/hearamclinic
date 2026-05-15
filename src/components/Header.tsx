@@ -15,15 +15,25 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { label: "🏥 해람정신과", href: "/clinic", external: false, group: "main" },
-  { label: "📋 심리검사", href: "/test", external: false, group: "test" },
-  { label: "🧠 집중력 검사", href: "/attention", external: false, group: "test" },
-  { label: "🌱 성격 검사", href: "/personality", external: false, group: "test" },
-  { label: "💜 마음 돌봄", href: "/care", external: false, group: "care" },
-  { label: "📅 예약하기", href: "https://naver.me/Fy2FWU9A", external: true, group: "booking" },
+  { label: "🔬 검사", href: "/test", external: false, group: "test" },
+  { label: "💬 해람 동행", href: "/care/counselor", external: false, group: "care" },
+  { label: "🌬 호흡", href: "/care/breathing", external: false, group: "care" },
+  { label: "📝 CBT 사고", href: "/care/thought-record", external: false, group: "care" },
+  { label: "🌿 감사 일기", href: "/care/gratitude", external: false, group: "care" },
+  { label: "🧘 마음챙김", href: "/care/mindfulness", external: false, group: "care" },
+  { label: "📅 예약", href: "https://naver.me/Fy2FWU9A", external: true, group: "booking" },
 ];
 
 function isActivePath(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
+  // 검사 메뉴는 /test, /attention, /personality 모두 활성화
+  if (href === "/test") {
+    return (
+      pathname.startsWith("/test") ||
+      pathname.startsWith("/attention") ||
+      pathname.startsWith("/personality")
+    );
+  }
   return pathname === href || pathname.startsWith(href + "/");
 }
 
@@ -52,7 +62,7 @@ export default function Header() {
 
   return (
     <nav className="border-b border-purple-100 bg-white/90 backdrop-blur-sm sticky top-0 z-50">
-      <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
+      <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">
         <Link
           href="/"
           className="flex items-center gap-2 text-lg lg:text-xl font-bold text-purple-900 whitespace-nowrap"

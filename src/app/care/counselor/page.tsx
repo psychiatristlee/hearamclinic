@@ -6,7 +6,6 @@ import {
   savePracticeSession,
   type ChatMessage,
 } from "@/lib/care";
-import CareTabsNav from "@/components/care/CareTabsNav";
 
 const INTRO_MESSAGE: ChatMessage = {
   role: "model",
@@ -85,7 +84,6 @@ export default function CounselorPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <CareTabsNav />
       <div className="mb-4">
         <h1 className="text-2xl font-bold text-purple-900 mb-1">💬 해람 동행</h1>
         <p className="text-sm text-gray-600">

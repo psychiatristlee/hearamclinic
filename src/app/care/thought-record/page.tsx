@@ -7,7 +7,6 @@ import {
   savePracticeSession,
   type ThoughtRecordResult,
 } from "@/lib/care";
-import CareTabsNav from "@/components/care/CareTabsNav";
 
 export default function ThoughtRecordPage() {
   const [situation, setSituation] = useState("");
@@ -57,7 +56,6 @@ export default function ThoughtRecordPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <CareTabsNav />
       <h1 className="text-3xl font-bold text-purple-900 mb-2">📝 CBT 사고 기록</h1>
       <p className="text-gray-600 mb-6">
         마음에 떠오른 자동 사고를 입력하시면 인지 왜곡을 살피고 균형 잡힌 생각을 함께 정리해 드립니다.

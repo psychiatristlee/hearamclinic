@@ -1,37 +1,162 @@
 import { Metadata } from "next";
 import questionnaires from "@/lib/test/questionnaires";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "심리검사 목록",
+  title: "검사",
   description:
-    "무료 온라인 심리검사를 통해 자신의 상태를 확인해보세요. 우울증, 불안, ADHD, 양극성 장애, 알코올 사용 장애, 스트레스 등 다양한 심리검사를 제공합니다.",
+    "심리 설문, 집중력 검사, 성격 검사를 한 곳에서. 우울·불안·ADHD 자가 검사부터 Big 5·에니어그램·애착 유형까지 무료로 진행해보세요.",
 };
+
+const attentionTests = [
+  {
+    name: "stroop",
+    title: "스트룹 검사",
+    description: "글자 색깔과 의미가 다를 때 색깔을 빠르게 선택해 집중력과 반응속도를 측정합니다.",
+  },
+  {
+    name: "selective-attention",
+    title: "선택 주의력 검사",
+    description: "빠르게 변하는 자극 중에서 목표 대상만 정확히 선택하는 능력을 평가합니다.",
+  },
+  {
+    name: "sustained-inhibition",
+    title: "억제지속 주의력 (Go/No-Go)",
+    description: "반응할 자극과 억제할 자극을 구분해 주의력과 억제 능력을 측정합니다.",
+  },
+  {
+    name: "interference-attention",
+    title: "간섭선택 주의력 (Flanker)",
+    description: "간섭 자극을 무시하고 목표 자극에만 반응하는 능력을 측정합니다.",
+  },
+  {
+    name: "n-back",
+    title: "N-back (2-back)",
+    description: "두 단계 전 본 글자를 기억하며 작업기억과 지속 주의력을 측정합니다.",
+  },
+  {
+    name: "digit-span",
+    title: "숫자 폭 검사",
+    description: "차례로 제시되는 숫자를 순서대로 회상하여 단기기억을 측정합니다.",
+  },
+  {
+    name: "trail-making",
+    title: "궤적 잇기 검사",
+    description: "흩어진 숫자를 1부터 15까지 순서대로 연결해 시각적 주의력을 측정합니다.",
+  },
+];
+
+const personalityTests = [
+  {
+    name: "big5",
+    title: "Big 5 성격 검사",
+    description: "5가지 차원으로 32개 유형 중 본인의 성격 유형을 알아봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fbig5%2Fcover.png?alt=media",
+  },
+  {
+    name: "enneagram",
+    title: "에니어그램 성격 검사",
+    description: "9가지 유형으로 본인의 핵심 동기와 두려움을 살펴봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fenneagram%2Fcover.png?alt=media",
+  },
+  {
+    name: "attachment",
+    title: "애착 유형 검사",
+    description: "관계 속에서 본인의 마음 결을 불안·회피 두 축으로 4가지 유형으로 살펴봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fattachment%2Fcover.png?alt=media",
+  },
+];
 
 export default function TestListPage() {
   return (
     <div>
-      <h1 className="text-3xl font-bold text-purple-900 mb-2">심리검사</h1>
-      <p className="text-gray-600 mb-8">
-        무료 온라인 자가 검사로 본인의 마음 상태를 점검해보세요.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {questionnaires.map((questionnaire) => (
-          <Link
-            key={questionnaire.id}
-            href={`/test/${questionnaire.name}`}
-            className="block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-purple-300 transition"
-          >
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">
-              {questionnaire.title}
-            </h3>
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {questionnaire.description}
-            </p>
-          </Link>
-        ))}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-purple-900 mb-2">검사</h1>
+        <p className="text-gray-600">
+          마음 상태부터 집중력, 성격 유형까지 — 본인을 더 잘 알기 위한 자가 검사들
+        </p>
       </div>
+
+      {/* 심리 설문 */}
+      <section id="questionnaire" className="mb-12">
+        <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <span>📋</span> 심리 설문
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          우울·불안·ADHD·스트레스 등 마음의 상태를 점검하는 임상 설문
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {questionnaires.map((q) => (
+            <Link
+              key={q.id}
+              href={`/test/${q.name}`}
+              className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
+            >
+              <h3 className="font-semibold text-gray-900 mb-1">{q.title}</h3>
+              <p className="text-sm text-gray-600 line-clamp-2">{q.description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 집중력 검사 */}
+      <section id="attention" className="mb-12">
+        <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <span>🧠</span> 집중력 검사
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          주의력의 여러 측면을 인지 과제로 직접 측정
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {attentionTests.map((t) => (
+            <Link
+              key={t.name}
+              href={`/test/${t.name}`}
+              className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
+            >
+              <h3 className="font-semibold text-gray-900 mb-1">{t.title}</h3>
+              <p className="text-sm text-gray-600 line-clamp-2">{t.description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 성격 검사 */}
+      <section id="personality" className="mb-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <span>🌱</span> 성격 검사
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          본인의 성격 유형을 다양한 방식으로 살펴보기
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {personalityTests.map((t) => (
+            <Link
+              key={t.name}
+              href={`/personality/${t.name}`}
+              className="group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
+            >
+              <div className="relative aspect-[16/9] bg-purple-50">
+                <Image
+                  src={t.image}
+                  alt={t.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  unoptimized
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-purple-700 transition">
+                  {t.title}
+                </h3>
+                <p className="text-sm text-gray-600">{t.description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

@@ -7,7 +7,6 @@ import {
   savePracticeSession,
   type MindfulnessResult,
 } from "@/lib/care";
-import CareTabsNav from "@/components/care/CareTabsNav";
 
 const FOCUS_OPTIONS = [
   "지금 이 순간으로 돌아오기",
@@ -51,7 +50,6 @@ export default function MindfulnessPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <CareTabsNav />
       <h1 className="text-3xl font-bold text-purple-900 mb-2">🧘 마음챙김 명상</h1>
       <p className="text-gray-600 mb-6">
         원하는 시간과 초점을 알려주시면 따라 읽을 수 있는 명상 스크립트를 만들어 드립니다.

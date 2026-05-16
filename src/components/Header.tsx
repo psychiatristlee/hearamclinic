@@ -18,7 +18,7 @@ const menuItems: MenuItem[] = [
   { label: "🔬 검사", href: "/test", external: false, group: "test" },
   { label: "💬 해람 동행", href: "/care/counselor", external: false, group: "care" },
   { label: "🌬 호흡", href: "/care/breathing", external: false, group: "care" },
-  { label: "📝 CBT 사고", href: "/care/thought-record", external: false, group: "care" },
+  { label: "📝 사고 기록", href: "/care/thought-record", external: false, group: "care" },
   { label: "🌿 감사 일기", href: "/care/gratitude", external: false, group: "care" },
   { label: "🧘 마음챙김", href: "/care/mindfulness", external: false, group: "care" },
   { label: "📅 예약", href: "https://naver.me/Fy2FWU9A", external: true, group: "booking" },

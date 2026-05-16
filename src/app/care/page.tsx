@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "마음 돌봄",
   description:
-    "AI가 당신의 컨디션에 맞춰 만드는 호흡, CBT 사고 정리, 감사 일기, 마음챙김 명상 가이드, 그리고 CBT+ACT 챗봇.",
+    "AI가 당신의 컨디션에 맞춰 만드는 호흡, 사고 기록, 감사 일기, 마음챙김 명상 가이드, 그리고 CBT+ACT 챗봇.",
 };
 
 const TOOLS = [
@@ -23,7 +23,7 @@ const TOOLS = [
   {
     slug: "thought-record",
     icon: "📝",
-    title: "CBT 사고 기록",
+    title: "사고 기록",
     description: "자동 사고의 인지 왜곡을 살피고 균형 잡힌 생각을 함께 정리합니다.",
   },
   {

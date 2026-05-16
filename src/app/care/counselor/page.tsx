@@ -105,8 +105,8 @@ export default function CounselorPage() {
       )}
 
       <div
-        className="bg-white border border-gray-200 rounded-2xl flex flex-col"
-        style={{ height: "calc(100dvh - 180px)", minHeight: "400px" }}
+        className="bg-white border border-gray-200 rounded-2xl flex flex-col overflow-hidden"
+        style={{ height: "calc(100svh - 180px)", minHeight: "400px" }}
       >
         {/* 메시지 영역 */}
         <div
@@ -143,16 +143,16 @@ export default function CounselorPage() {
         </div>
 
         {/* 입력 영역 */}
-        <div className="border-t border-gray-200 p-3">
-          <div className="flex gap-2">
+        <div className="border-t border-gray-200 p-3 flex-shrink-0">
+          <div className="flex gap-2 items-end">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="마음에 떠오르는 이야기를 적어 주세요 (Enter로 전송, Shift+Enter로 줄바꿈)"
+              placeholder="마음에 떠오르는 이야기를 적어 주세요"
               rows={2}
               disabled={loading}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm resize-none disabled:bg-gray-50"
+              className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm resize-none disabled:bg-gray-50"
             />
             <button
               onClick={handleSend}

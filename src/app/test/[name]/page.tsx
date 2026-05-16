@@ -8,6 +8,7 @@ import InterferenceAttentionTest from "@/components/test/InterferenceAttentionTe
 import NBackTest from "@/components/test/NBackTest";
 import DigitSpanTest from "@/components/test/DigitSpanTest";
 import TrailMakingTest from "@/components/test/TrailMakingTest";
+import RequireAuth from "@/components/auth/RequireAuth";
 import Image from "next/image";
 import type { Metadata } from "next";
 
@@ -75,11 +76,7 @@ export async function generateMetadata(props: TestPageProps): Promise<Metadata> 
   return { title: "심리검사" };
 }
 
-export default async function TestPage(props: TestPageProps) {
-  const params = await props.params;
-  const name = params.name;
-
-  // 주의력 검사
+function pickTestComponent(name: string) {
   if (name === "stroop") return <StroopTest />;
   if (name === "selective-attention") return <SelectiveAttentionTest />;
   if (name === "sustained-inhibition") return <SustainedInhibitionTest />;
@@ -87,6 +84,21 @@ export default async function TestPage(props: TestPageProps) {
   if (name === "n-back") return <NBackTest />;
   if (name === "digit-span") return <DigitSpanTest />;
   if (name === "trail-making") return <TrailMakingTest />;
+  return null;
+}
+
+export default async function TestPage(props: TestPageProps) {
+  const params = await props.params;
+  const name = params.name;
+
+  const attentionEl = pickTestComponent(name);
+  if (attentionEl) {
+    return (
+      <RequireAuth message="검사 결과를 본인 계정에 기록하기 위해 로그인이 필요합니다.">
+        {attentionEl}
+      </RequireAuth>
+    );
+  }
 
   // 설문 검사
   const questionnaire = questionnaires.find((q) => q.name === name);
@@ -98,7 +110,11 @@ export default async function TestPage(props: TestPageProps) {
     );
   }
 
-  return <QuestionnaireView questionnaire={questionnaire} />;
+  return (
+    <RequireAuth message="검사 결과를 본인 계정에 기록하기 위해 로그인이 필요합니다.">
+      <QuestionnaireView questionnaire={questionnaire} />
+    </RequireAuth>
+  );
 }
 
 function QuestionnaireView({ questionnaire }: { questionnaire: QuestionnaireType }) {

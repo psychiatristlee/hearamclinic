@@ -84,30 +84,26 @@ export default function CounselorPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-purple-900 mb-1">💬 해람 동행</h1>
-        <p className="text-sm text-gray-600">
-          CBT와 ACT의 결로 마음을 함께 살피는 자가 돌봄 챗봇
+      <div className="mb-3 flex items-baseline gap-3">
+        <h1 className="text-xl font-bold text-purple-900">💬 해람 동행</h1>
+        <p className="text-xs text-gray-500 hidden sm:block">
+          CBT·ACT 결의 자가 돌봄 챗봇
         </p>
       </div>
 
       {crisisVisible && (
-        <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 mb-4">
-          <h3 className="text-sm font-bold text-red-900 mb-2">
-            지금 도움이 필요하실 수 있어요
-          </h3>
-          <ul className="text-sm text-red-900 space-y-1">
-            <li>• 자살예방상담전화 <strong>1393</strong> (24시간)</li>
-            <li>• 정신건강 위기 상담전화 <strong>1577-0199</strong> (24시간)</li>
-            <li>• 응급 시 <strong>119</strong></li>
-          </ul>
-          <p className="text-xs text-red-700 mt-2">
-            저는 의료 전문가가 아닙니다. 위 전화는 훈련받은 분들이 함께해 주십니다.
+        <div className="bg-red-50 border-2 border-red-300 rounded-xl p-3 mb-3 text-xs">
+          <p className="font-bold text-red-900 mb-1">지금 도움이 필요하실 수 있어요</p>
+          <p className="text-red-900">
+            자살예방 <strong>1393</strong> · 위기상담 <strong>1577-0199</strong> · 응급 <strong>119</strong>
           </p>
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-2xl flex flex-col" style={{ minHeight: "60vh" }}>
+      <div
+        className="bg-white border border-gray-200 rounded-2xl flex flex-col"
+        style={{ height: "calc(100dvh - 180px)", minHeight: "400px" }}
+      >
         {/* 메시지 영역 */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.map((msg, i) => (

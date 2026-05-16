@@ -18,10 +18,14 @@ export default function CounselorPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [crisisVisible, setCrisisVisible] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    // 메시지 영역 내부에서만 스크롤 (window 스크롤 방지)
+    const el = messagesContainerRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [messages, loading]);
 
   async function handleSend() {
@@ -105,7 +109,10 @@ export default function CounselorPage() {
         style={{ height: "calc(100dvh - 180px)", minHeight: "400px" }}
       >
         {/* 메시지 영역 */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <div
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto overscroll-contain p-4 space-y-3"
+        >
           {messages.map((msg, i) => (
             <div
               key={i}
@@ -133,7 +140,6 @@ export default function CounselorPage() {
               </div>
             </div>
           )}
-          <div ref={scrollRef} />
         </div>
 
         {/* 입력 영역 */}

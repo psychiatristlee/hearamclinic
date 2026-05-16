@@ -4,21 +4,21 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "마음 돌봄",
   description:
-    "AI가 당신의 컨디션에 맞춰 만드는 호흡, 사고 기록, 감사 일기, 마음챙김 명상 가이드, 그리고 CBT+ACT 챗봇.",
+    "인지행동치료 챗봇, 명상 가이드, 사고 기록, 감사 일기 — 자가 돌봄을 위한 다양한 도구.",
 };
 
 const TOOLS = [
   {
     slug: "counselor",
     icon: "💬",
-    title: "해람 동행 챗봇",
-    description: "CBT와 ACT의 결로 마음을 함께 살피는 대화형 자가 돌봄.",
+    title: "인지행동치료",
+    description: "CBT와 ACT의 결로 마음을 함께 살피는 대화형 자가 돌봄 챗봇.",
   },
   {
     slug: "breathing",
-    icon: "🌬",
-    title: "호흡 가이드",
-    description: "지금 컨디션에 맞춰 1-3분 호흡 가이드를 생성합니다.",
+    icon: "🧘",
+    title: "명상",
+    description: "상황에 맞는 호흡과 명상 기법 6가지 중에서 골라 따라해 보세요.",
   },
   {
     slug: "thought-record",
@@ -32,12 +32,6 @@ const TOOLS = [
     title: "감사 일기",
     description: "오늘에 어울리는 감사 프롬프트 3개를 매번 새로 만들어 드립니다.",
   },
-  {
-    slug: "mindfulness",
-    icon: "🧘",
-    title: "마음챙김 명상",
-    description: "원하는 시간과 초점에 맞춰 명상 스크립트를 만들어 드립니다.",
-  },
 ];
 
 export default function CareIndexPage() {
@@ -46,7 +40,7 @@ export default function CareIndexPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-purple-900 mb-2">마음 돌봄</h1>
         <p className="text-gray-600">
-          매번 새로 만들어지는 자가 돌봄 도구들. 로그인하시면 오늘의 컨디션이 자연스럽게 반영됩니다.
+          자가 돌봄을 위한 다양한 도구들. 로그인하시면 오늘의 컨디션이 자연스럽게 반영됩니다.
         </p>
       </div>
 

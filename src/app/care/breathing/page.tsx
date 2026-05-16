@@ -94,9 +94,9 @@ export default function BreathingPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold text-purple-900 mb-2">🌬 호흡 가이드</h1>
+      <h1 className="text-3xl font-bold text-purple-900 mb-2">🧘 명상</h1>
       <p className="text-gray-600 mb-6">
-        상황에 맞는 호흡 기법을 골라 1분 안팎으로 따라해 보세요.
+        상황에 맞는 호흡과 명상 기법을 골라 1분 안팎으로 따라해 보세요.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

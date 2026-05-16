@@ -85,7 +85,7 @@ export default function CounselorPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="mb-3 flex items-baseline gap-3">
-        <h1 className="text-xl font-bold text-purple-900">💬 해람 동행</h1>
+        <h1 className="text-xl font-bold text-purple-900">💬 인지행동치료</h1>
         <p className="text-xs text-gray-500 hidden sm:block">
           CBT·ACT 결의 자가 돌봄 챗봇
         </p>

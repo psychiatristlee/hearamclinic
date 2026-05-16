@@ -11,6 +11,7 @@ import QUESTIONS, {
 import { TYPES, characterImageUrl } from "@/lib/test/enneagram/types";
 import EnneagramRadarChart from "./EnneagramRadarChart";
 import { saveTestResult } from "@/lib/test-history";
+import ResultInsights from "./ResultInsights";
 
 type Status = "ready" | "test" | "result";
 
@@ -544,6 +545,32 @@ export default function EnneagramTest() {
                     </div>
                   </div>
                 </div>
+
+                {!displayResult.isShared && (
+                  <ResultInsights
+                    testType="enneagram"
+                    currentResult={{ percents: displayResult.percents }}
+                    metrics={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => ({
+                      metricKey: `dim_${num}`,
+                      label: `${num}번 ${TYPES[num as 1].name}`,
+                      color: [
+                        "rgb(147 51 234)",
+                        "rgb(236 72 153)",
+                        "rgb(244 63 94)",
+                        "rgb(245 158 11)",
+                        "rgb(234 179 8)",
+                        "rgb(16 185 129)",
+                        "rgb(20 184 166)",
+                        "rgb(59 130 246)",
+                        "rgb(99 102 241)",
+                      ][num - 1],
+                      extract: (r) => (r.percents as Record<string, number>)?.[String(num)],
+                      unit: "점",
+                      yMin: 0,
+                      yMax: 100,
+                    }))}
+                  />
+                )}
 
                 <div className="flex gap-3">
                   <button

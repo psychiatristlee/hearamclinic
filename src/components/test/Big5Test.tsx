@@ -18,6 +18,7 @@ import {
 } from "@/lib/test/big5/types";
 import Big5RadarChart from "./Big5RadarChart";
 import { saveTestResult } from "@/lib/test-history";
+import ResultInsights from "./ResultInsights";
 
 const VALID_CODE_RE = /^[HL]{5}$/;
 
@@ -491,6 +492,20 @@ export default function Big5Test() {
                 </div>
               </div>
             </div>
+          )}
+
+          {!displayResult.isShared && (
+            <ResultInsights
+              testType="big5"
+              currentResult={{ percents: displayResult.percents }}
+              metrics={[
+                { metricKey: "dim_O", label: "개방성 (O)", color: "rgb(147 51 234)", extract: (r) => (r.percents as Record<string, number>)?.O, unit: "점", yMin: 0, yMax: 100 },
+                { metricKey: "dim_C", label: "성실성 (C)", color: "rgb(59 130 246)", extract: (r) => (r.percents as Record<string, number>)?.C, unit: "점", yMin: 0, yMax: 100 },
+                { metricKey: "dim_E", label: "외향성 (E)", color: "rgb(16 185 129)", extract: (r) => (r.percents as Record<string, number>)?.E, unit: "점", yMin: 0, yMax: 100 },
+                { metricKey: "dim_A", label: "친화성 (A)", color: "rgb(245 158 11)", extract: (r) => (r.percents as Record<string, number>)?.A, unit: "점", yMin: 0, yMax: 100 },
+                { metricKey: "dim_N", label: "정서 민감성 (N)", color: "rgb(244 63 94)", extract: (r) => (r.percents as Record<string, number>)?.N, unit: "점", yMin: 0, yMax: 100 },
+              ]}
+            />
           )}
 
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">

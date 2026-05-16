@@ -51,3 +51,6 @@ export {
   generateMindfulnessScript,
   chatWithCounselor,
 } from "./features/care";
+
+// Test stats aggregation
+export {onTestResultCreated} from "./features/test-stats";

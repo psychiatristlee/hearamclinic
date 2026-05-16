@@ -3,6 +3,7 @@
 import { CutOff, Questionnaire } from "@/lib/test/types";
 import Image from "next/image";
 import GradientCircleChart from "./GradientCircleChart";
+import ResultInsights from "./ResultInsights";
 import { useState, useEffect } from "react";
 
 interface QuestionnaireResultProps {
@@ -121,6 +122,26 @@ export default function QuestionnaireResult({
             }
           })}
         </ul>
+
+        {!isLoading && groups.length > 0 && (
+          <ResultInsights
+            testType={questionnaire.name}
+            currentResult={{
+              totalSum: groups.reduce((acc, g) => acc + Number(g.value), 0),
+            }}
+            metrics={[
+              {
+                metricKey: "total",
+                label: "총점",
+                color: "rgb(147 51 234)",
+                extract: (r) => r.totalSum as number | undefined,
+                unit: "점",
+                lowerIsBetter: true, // 임상 설문은 점수 낮을수록 상위(건강)
+              },
+            ]}
+            title="내 기록과 다른 사람들의 점수 분포"
+          />
+        )}
       </div>
     </div>
   );

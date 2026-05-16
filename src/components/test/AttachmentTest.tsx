@@ -16,6 +16,7 @@ import {
 } from "@/lib/test/attachment/types";
 import AttachmentScatterChart from "./AttachmentScatterChart";
 import { saveTestResult } from "@/lib/test-history";
+import ResultInsights from "./ResultInsights";
 
 type Status = "ready" | "test" | "result";
 
@@ -488,6 +489,36 @@ export default function AttachmentTest() {
                   <h2 className="text-lg font-bold text-purple-900 mb-3">더 자라기 위한 길</h2>
                   <p className="text-sm text-gray-800 leading-relaxed">{t.growthPath}</p>
                 </div>
+
+                {!displayResult.isShared && (
+                  <ResultInsights
+                    testType="attachment"
+                    currentResult={{
+                      anxietyPercent: displayResult.anxietyPercent,
+                      avoidancePercent: displayResult.avoidancePercent,
+                    }}
+                    metrics={[
+                      {
+                        metricKey: "anxiety",
+                        label: "불안 점수",
+                        color: "rgb(244 63 94)",
+                        extract: (r) => r.anxietyPercent as number | undefined,
+                        unit: "점",
+                        yMin: 0,
+                        yMax: 100,
+                      },
+                      {
+                        metricKey: "avoidance",
+                        label: "회피 점수",
+                        color: "rgb(59 130 246)",
+                        extract: (r) => r.avoidancePercent as number | undefined,
+                        unit: "점",
+                        yMin: 0,
+                        yMax: 100,
+                      },
+                    ]}
+                  />
+                )}
 
                 <div className="flex gap-3">
                   <button

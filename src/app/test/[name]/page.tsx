@@ -8,7 +8,6 @@ import InterferenceAttentionTest from "@/components/test/InterferenceAttentionTe
 import NBackTest from "@/components/test/NBackTest";
 import DigitSpanTest from "@/components/test/DigitSpanTest";
 import TrailMakingTest from "@/components/test/TrailMakingTest";
-import RequireAuth from "@/components/auth/RequireAuth";
 import Image from "next/image";
 import type { Metadata } from "next";
 
@@ -92,13 +91,7 @@ export default async function TestPage(props: TestPageProps) {
   const name = params.name;
 
   const attentionEl = pickTestComponent(name);
-  if (attentionEl) {
-    return (
-      <RequireAuth message="검사 결과를 본인 계정에 기록하기 위해 로그인이 필요합니다.">
-        {attentionEl}
-      </RequireAuth>
-    );
-  }
+  if (attentionEl) return attentionEl;
 
   // 설문 검사
   const questionnaire = questionnaires.find((q) => q.name === name);
@@ -110,11 +103,7 @@ export default async function TestPage(props: TestPageProps) {
     );
   }
 
-  return (
-    <RequireAuth message="검사 결과를 본인 계정에 기록하기 위해 로그인이 필요합니다.">
-      <QuestionnaireView questionnaire={questionnaire} />
-    </RequireAuth>
-  );
+  return <QuestionnaireView questionnaire={questionnaire} />;
 }
 
 function QuestionnaireView({ questionnaire }: { questionnaire: QuestionnaireType }) {

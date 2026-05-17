@@ -12,6 +12,7 @@ import { TYPES, characterImageUrl } from "@/lib/test/enneagram/types";
 import EnneagramRadarChart from "./EnneagramRadarChart";
 import { saveTestResult } from "@/lib/test-history";
 import ResultInsights from "./ResultInsights";
+import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 
 type Status = "ready" | "test" | "result";
 
@@ -357,6 +358,7 @@ export default function EnneagramTest() {
             const wing = TYPES[displayResult.wing];
             return (
               <>
+                {!displayResult.isShared && <SaveLoginPrompt />}
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 mb-6">
                   <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start">
                     <div className="flex-shrink-0">

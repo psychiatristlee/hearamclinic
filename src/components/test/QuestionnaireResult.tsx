@@ -4,6 +4,7 @@ import { CutOff, Questionnaire } from "@/lib/test/types";
 import Image from "next/image";
 import GradientCircleChart from "./GradientCircleChart";
 import ResultInsights from "./ResultInsights";
+import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import { useState, useEffect } from "react";
 
 interface QuestionnaireResultProps {
@@ -88,6 +89,7 @@ export default function QuestionnaireResult({
         <h1 className="text-2xl font-bold text-purple-900 mb-4">
           {questionnaire.title} 결과
         </h1>
+        {!isLoading && groups.length > 0 && <SaveLoginPrompt />}
         <ul className="divide-y divide-gray-200">
           {questionnaire?.groups.map((group, index) => {
             if (!isLoading) {

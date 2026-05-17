@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import Big5Test from "@/components/test/Big5Test";
 import EnneagramTest from "@/components/test/EnneagramTest";
 import AttachmentTest from "@/components/test/AttachmentTest";
-import RequireAuth from "@/components/auth/RequireAuth";
 import { TYPES, characterImageUrl } from "@/lib/test/big5/types";
 import {
   TYPES as ENNEA_TYPES,
@@ -154,42 +153,26 @@ function LoadingFallback() {
 
 export default async function PersonalityPage(props: PageProps) {
   const params = await props.params;
-  const searchParams = await props.searchParams;
-  // 공유된 결과 보기는 로그인 없이도 가능 (?result=...)
-  const isSharedView =
-    searchParams.result &&
-    (VALID_CODE_RE.test(searchParams.result) ||
-      /^[1-9]$/.test(searchParams.result) ||
-      ["secure", "anxious", "avoidant", "disorganized"].includes(searchParams.result));
-
-  function withAuth(child: React.ReactNode) {
-    if (isSharedView) return child;
-    return (
-      <RequireAuth message="검사 결과를 본인 계정에 안전하게 기록하기 위해 로그인이 필요합니다.">
-        {child}
-      </RequireAuth>
-    );
-  }
 
   if (params.name === "big5") {
-    return withAuth(
+    return (
       <Suspense fallback={<LoadingFallback />}>
         <Big5Test />
-      </Suspense>,
+      </Suspense>
     );
   }
   if (params.name === "enneagram") {
-    return withAuth(
+    return (
       <Suspense fallback={<LoadingFallback />}>
         <EnneagramTest />
-      </Suspense>,
+      </Suspense>
     );
   }
   if (params.name === "attachment") {
-    return withAuth(
+    return (
       <Suspense fallback={<LoadingFallback />}>
         <AttachmentTest />
-      </Suspense>,
+      </Suspense>
     );
   }
 

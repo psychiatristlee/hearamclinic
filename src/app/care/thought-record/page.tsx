@@ -125,6 +125,51 @@ export default function ThoughtRecordPage() {
     });
   }
 
+  function formatTime(d: Date): string {
+    return d.toLocaleTimeString("ko-KR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  function dayGroupLabel(d: Date): string {
+    const now = new Date();
+    const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+    if (sameDay(d, now)) return "오늘";
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    if (sameDay(d, yesterday)) return "어제";
+    const diffDays = Math.floor(
+      (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24),
+    );
+    if (diffDays < 7) return `${diffDays}일 전`;
+    return d.toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      weekday: "short",
+    });
+  }
+
+  /** sessions를 날짜별로 그룹핑 (이미 시간 역순 정렬됨 전제) */
+  function groupByDay(items: ThoughtRecordSession[]): Array<{
+    key: string;
+    label: string;
+    items: ThoughtRecordSession[];
+  }> {
+    const groups: Array<{ key: string; label: string; items: ThoughtRecordSession[] }> = [];
+    for (const s of items) {
+      const key = s.createdAt.toDateString();
+      const last = groups[groups.length - 1];
+      if (last && last.key === key) {
+        last.items.push(s);
+      } else {
+        groups.push({ key, label: dayGroupLabel(s.createdAt), items: [s] });
+      }
+    }
+    return groups;
+  }
+
   return (
     <div className="max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold text-purple-900 mb-2">📝 사고 기록</h1>
@@ -166,28 +211,62 @@ export default function ThoughtRecordPage() {
                 </p>
               </div>
             ) : (
-              <ul className="space-y-2">
-                {sessions.map((s) => (
-                  <li key={s.id}>
-                    <button
-                      onClick={() => handleViewSession(s)}
-                      className="w-full text-left p-3 border border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-sm transition"
-                    >
-                      <div className="flex items-baseline justify-between mb-1.5">
-                        <span className="text-xs text-purple-600 font-medium">
-                          {formatDate(s.createdAt)}
-                        </span>
+              <div className="relative pl-6">
+                {/* 세로 타임라인 라인 */}
+                <div className="absolute left-[7px] top-2 bottom-2 w-px bg-purple-200" />
+
+                {groupByDay(sessions).map((group) => (
+                  <div key={group.key} className="mb-5 last:mb-0">
+                    {/* 날짜 헤더 */}
+                    <div className="relative -ml-6 mb-3">
+                      <div className="inline-block px-3 py-1 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full">
+                        {group.label}
                       </div>
-                      <p className="text-sm font-medium text-gray-800 line-clamp-1 mb-1">
-                        {s.input.situation}
-                      </p>
-                      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                        💭 {s.input.automaticThought}
-                      </p>
-                    </button>
-                  </li>
+                    </div>
+
+                    <ul className="space-y-3">
+                      {group.items.map((s) => (
+                        <li key={s.id} className="relative">
+                          {/* 점 마커 */}
+                          <div className="absolute -left-[1.31rem] top-3 w-3 h-3 rounded-full bg-purple-500 border-2 border-white shadow" />
+
+                          <button
+                            onClick={() => handleViewSession(s)}
+                            className="w-full text-left p-3 bg-white border border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md transition"
+                          >
+                            <p className="text-[11px] text-gray-400 mb-1.5">
+                              {formatTime(s.createdAt)}
+                            </p>
+
+                            <div className="space-y-1.5">
+                              <div className="flex gap-1.5 items-start">
+                                <span className="text-xs text-purple-700 font-semibold flex-shrink-0 w-10">상황</span>
+                                <p className="text-xs text-gray-700 line-clamp-1 flex-1">
+                                  {s.input.situation}
+                                </p>
+                              </div>
+                              <div className="flex gap-1.5 items-start">
+                                <span className="text-xs text-purple-700 font-semibold flex-shrink-0 w-10">사고</span>
+                                <p className="text-xs text-gray-700 line-clamp-2 flex-1">
+                                  {s.input.automaticThought}
+                                </p>
+                              </div>
+                              {s.output?.balancedThought && (
+                                <div className="flex gap-1.5 items-start pt-1.5 border-t border-gray-100">
+                                  <span className="text-xs text-emerald-700 font-semibold flex-shrink-0 w-10">균형</span>
+                                  <p className="text-xs text-emerald-800 line-clamp-2 flex-1 italic">
+                                    {s.output.balancedThought}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 ))}
-              </ul>
+              </div>
             )}
           </div>
 

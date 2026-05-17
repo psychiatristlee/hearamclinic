@@ -10,6 +10,7 @@ import {
   type ThoughtRecordResult,
   type PracticeSessionRecord,
 } from "@/lib/care";
+import RequireAuth from "@/components/auth/RequireAuth";
 
 
 interface ThoughtRecordInput {
@@ -26,6 +27,14 @@ type ThoughtRecordSession = PracticeSessionRecord<
 type View = "list" | "form" | "result" | "detail";
 
 export default function ThoughtRecordPage() {
+  return (
+    <RequireAuth message="사고 기록을 본인 계정에 안전하게 보관하고 과거 기록을 볼 수 있도록 로그인이 필요합니다.">
+      <ThoughtRecordContent />
+    </RequireAuth>
+  );
+}
+
+function ThoughtRecordContent() {
   const [view, setView] = useState<View>("list");
   const [sessions, setSessions] = useState<ThoughtRecordSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);

@@ -6,6 +6,7 @@ import {
   savePracticeSession,
   type ChatMessage,
 } from "@/lib/care";
+import RequireAuth from "@/components/auth/RequireAuth";
 
 const INTRO_MESSAGE: ChatMessage = {
   role: "model",
@@ -14,6 +15,14 @@ const INTRO_MESSAGE: ChatMessage = {
 };
 
 export default function CounselorPage() {
+  return (
+    <RequireAuth message="대화 기록을 안전하게 저장하고 이어가기 위해 로그인이 필요합니다.">
+      <CounselorChat />
+    </RequireAuth>
+  );
+}
+
+function CounselorChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([INTRO_MESSAGE]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);

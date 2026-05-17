@@ -7,8 +7,17 @@ import {
   savePracticeSession,
   type GratitudeResult,
 } from "@/lib/care";
+import RequireAuth from "@/components/auth/RequireAuth";
 
 export default function GratitudePage() {
+  return (
+    <RequireAuth message="감사 일기 기록을 안전하게 보관하기 위해 로그인이 필요합니다.">
+      <GratitudeContent />
+    </RequireAuth>
+  );
+}
+
+function GratitudeContent() {
   const [result, setResult] = useState<GratitudeResult | null>(null);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(false);

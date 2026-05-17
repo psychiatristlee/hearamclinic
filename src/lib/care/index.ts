@@ -4,6 +4,12 @@ import {
   addDoc,
   collection,
   Timestamp,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  type DocumentData,
 } from "firebase/firestore";
 import { db, auth, functions } from "@/lib/firebase";
 import { httpsCallable } from "firebase/functions";
@@ -82,6 +88,45 @@ export async function savePracticeSession(
   } catch (err) {
     console.error("[savePracticeSession] 실패:", err);
     return { saved: false };
+  }
+}
+
+export interface PracticeSessionRecord<TInput = unknown, TOutput = unknown> {
+  id: string;
+  type: CareToolType;
+  input: TInput;
+  output: TOutput;
+  createdAt: Date;
+}
+
+export async function listPracticeSessions<TInput = unknown, TOutput = unknown>(
+  type: CareToolType,
+  max = 30,
+): Promise<PracticeSessionRecord<TInput, TOutput>[]> {
+  const user = auth.currentUser;
+  if (!user) return [];
+  try {
+    const ref = collection(db, "users", user.uid, "practiceSessions");
+    const q = query(
+      ref,
+      where("type", "==", type),
+      orderBy("createdAt", "desc"),
+      limit(max),
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => {
+      const data = d.data() as DocumentData;
+      return {
+        id: d.id,
+        type: data.type as CareToolType,
+        input: data.input as TInput,
+        output: data.output as TOutput,
+        createdAt: (data.createdAt as Timestamp).toDate(),
+      };
+    });
+  } catch (err) {
+    console.error("[listPracticeSessions] 실패:", err);
+    return [];
   }
 }
 

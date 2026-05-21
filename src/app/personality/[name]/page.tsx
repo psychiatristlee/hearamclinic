@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import Big5Test from "@/components/test/Big5Test";
 import EnneagramTest from "@/components/test/EnneagramTest";
 import AttachmentTest from "@/components/test/AttachmentTest";
+import DiscTest from "@/components/test/DiscTest";
 import { TYPES, characterImageUrl } from "@/lib/test/big5/types";
 import {
   TYPES as ENNEA_TYPES,
@@ -33,6 +34,11 @@ const personalityTestMeta: Record<
     title: "애착 유형 검사",
     description:
       "관계 속에서 본인이 어떤 마음의 결로 움직이는지, 불안과 회피 두 차원으로 4개 유형을 살펴보세요.",
+  },
+  disc: {
+    title: "DISC 행동 유형 검사",
+    description:
+      "주도·사교·안정·신중의 4가지 행동 양식으로 본인의 행동 패턴과 관계 스타일을 살펴봅니다.",
   },
 };
 
@@ -172,6 +178,13 @@ export default async function PersonalityPage(props: PageProps) {
     return (
       <Suspense fallback={<LoadingFallback />}>
         <AttachmentTest />
+      </Suspense>
+    );
+  }
+  if (params.name === "disc") {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <DiscTest />
       </Suspense>
     );
   }

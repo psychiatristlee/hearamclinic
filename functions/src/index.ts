@@ -54,3 +54,6 @@ export {
 
 // Test stats aggregation
 export {onTestResultCreated} from "./features/test-stats";
+
+// Personality 통합 보고서
+export {generatePersonalityReport} from "./features/personality-report";

@@ -20,6 +20,7 @@ import Big5RadarChart from "./Big5RadarChart";
 import { saveTestResult } from "@/lib/test-history";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
+import GuidedNextButton from "./GuidedNextButton";
 
 const VALID_CODE_RE = /^[HL]{5}$/;
 
@@ -386,6 +387,7 @@ export default function Big5Test() {
 
       {status === "result" && displayResult && (
         <div>
+          {!displayResult.isShared && <GuidedNextButton currentType="big5" />}
           {!displayResult.isShared && <SaveLoginPrompt />}
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 mb-6">
             <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start">

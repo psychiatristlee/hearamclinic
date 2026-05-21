@@ -2,10 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { httpsCallable } from "firebase/functions";
 import { functions, auth } from "@/lib/firebase";
 import { listUserTestResults, type TestResultRecord } from "@/lib/test-history";
 import RequireAuth from "@/components/auth/RequireAuth";
+import {
+  getNextGuidedTest,
+  guidedPath,
+} from "@/lib/test/personality-guide";
 
 interface ReportPayload {
   headline: string;
@@ -43,11 +48,13 @@ export default function PersonalityReportPage() {
 }
 
 function ReportContent() {
+  const router = useRouter();
   const [latestByType, setLatestByType] = useState<Record<string, TestResultRecord>>({});
   const [loadingResults, setLoadingResults] = useState(true);
   const [report, setReport] = useState<ReportPayload | null>(null);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [startingGuided, setStartingGuided] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -70,6 +77,17 @@ function ReportContent() {
 
   const completedCount = Object.keys(latestByType).length;
   const allCompleted = completedCount === CATALOG.length;
+
+  async function handleStartGuided() {
+    setStartingGuided(true);
+    const next = await getNextGuidedTest();
+    if (next) {
+      router.push(guidedPath(next.path));
+    } else {
+      // 이미 모두 완료 - 그냥 보고서 생성으로 진행
+      setStartingGuided(false);
+    }
+  }
 
   async function handleGenerate() {
     setGenerating(true);
@@ -243,13 +261,23 @@ function ReportContent() {
           {error && <p className="text-red-500 text-sm mt-3 text-center">{error}</p>}
         </>
       ) : (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
-          <p className="text-sm text-amber-900 font-medium mb-1">
-            {CATALOG.length - completedCount}개 검사가 더 필요합니다
-          </p>
-          <p className="text-xs text-amber-700">
-            모든 검사를 마치시면 통합 보고서를 생성하실 수 있습니다.
-          </p>
+        <div className="space-y-3">
+          <button
+            onClick={handleStartGuided}
+            disabled={startingGuided}
+            className="w-full px-6 py-4 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-lg rounded-xl shadow-md transition"
+          >
+            {startingGuided
+              ? "다음 검사로 이동 중..."
+              : completedCount === 0
+                ? "🚀 4개 검사 순차 시작하기"
+                : `▶ 남은 ${CATALOG.length - completedCount}개 검사 이어서 진행하기`}
+          </button>
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+            <p className="text-xs text-amber-800 leading-relaxed">
+              "순차 시작"을 누르시면 검사를 자동으로 안내해 드립니다. 각 검사가 끝날 때마다 다음 검사 버튼이 보이고, 모두 마치시면 보고서 화면으로 돌아옵니다.
+            </p>
+          </div>
         </div>
       )}
     </div>

@@ -3,9 +3,42 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "성격 검사",
+  title: "무료 성격 검사 모음 | Big 5·에니어그램·애착·DISC 4종 + AI 종합 보고서",
   description:
-    "Big 5, 에니어그램, 애착, DISC 4가지 성격 검사와 종합 보고서. 다양한 시각으로 본인을 알아보세요.",
+    "정신건강의학과에서 만든 무료 성격 검사 4종(Big 5·에니어그램·애착 유형·DISC)과 4가지 결과를 통합한 AI 종합 성격 보고서를 한 곳에서. 가입 없이 바로 검사 가능, 결과 저장은 로그인 시 가능.",
+  keywords: [
+    "성격 검사",
+    "무료 성격 검사",
+    "성격 유형 검사",
+    "성격 테스트",
+    "심리 검사",
+    "Big 5 검사",
+    "빅5 성격 검사",
+    "5요인 성격 검사",
+    "에니어그램 검사",
+    "에니어그램 9가지 유형",
+    "애착 유형 검사",
+    "성인 애착 유형",
+    "DISC 검사",
+    "DISC 행동 유형",
+    "MBTI 대안",
+    "성격 진단",
+    "정신건강 자가 검사",
+  ],
+  alternates: { canonical: "https://hearam.kr/personality" },
+  openGraph: {
+    title: "무료 성격 검사 4종 + AI 종합 보고서 | 해람정신건강의학과",
+    description:
+      "Big 5·에니어그램·애착·DISC 무료 성격 검사 한 곳에서. 4가지를 모두 마치면 AI가 통합 보고서를 만들어 드립니다.",
+    url: "https://hearam.kr/personality",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "무료 성격 검사 4종 + AI 종합 보고서",
+    description:
+      "Big 5·에니어그램·애착·DISC 무료 성격 검사 한 곳에서.",
+  },
 };
 
 const personalityTests = [
@@ -35,13 +68,34 @@ const personalityTests = [
   },
 ];
 
+const ITEM_LIST_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: "무료 성격 검사 4종",
+  description:
+    "Big 5·에니어그램·애착 유형·DISC 4가지 성격 검사와 AI 종합 보고서",
+  itemListElement: personalityTests.map((t, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: t.title,
+    url: `https://hearam.kr/personality/${t.name}`,
+    description: t.description,
+  })),
+};
+
 export default function PersonalityListPage() {
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ITEM_LIST_JSONLD) }}
+      />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-purple-900 mb-2">성격 검사</h1>
+        <h1 className="text-3xl font-bold text-purple-900 mb-2">
+          무료 성격 검사 모음 — Big 5·에니어그램·애착·DISC
+        </h1>
         <p className="text-gray-600">
-          본인을 다양한 결로 살펴보고, 모든 검사를 마치면 통합 보고서까지 받아 보세요.
+          정신건강의학과에서 만든 4가지 무료 성격 검사를 한 곳에서 진행하시고, 마지막엔 AI 종합 보고서까지 받아 보세요.
         </p>
       </div>
 

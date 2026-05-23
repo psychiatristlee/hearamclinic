@@ -18,27 +18,31 @@ import type { Metadata } from "next";
 
 const personalityTestMeta: Record<
   string,
-  { title: string; description: string }
+  { title: string; description: string; keywords: string[] }
 > = {
   big5: {
-    title: "Big 5 성격 검사",
+    title: "무료 Big 5 성격 검사 (5요인) — 32유형 진단 + 캐릭터",
     description:
-      "5가지 성격 차원으로 본인의 유형을 자세히 알아보세요. 32개 유형 중 당신은 어떤 사람일까요?",
+      "정신건강의학과에서 제공하는 무료 Big 5(빅5) 성격 검사. 개방성·성실성·외향성·친화성·정서 민감성 5가지 차원으로 32유형 중 본인 유형을 진단하고 캐릭터와 함께 자세히 안내합니다.",
+    keywords: ["Big 5 검사", "빅5 성격 검사", "5요인 성격 검사", "무료 성격 검사", "성격 유형 검사", "OCEAN 검사"],
   },
   enneagram: {
-    title: "에니어그램 성격 검사",
+    title: "무료 에니어그램 검사 — 9가지 유형 + 날개 분석",
     description:
-      "9가지 유형으로 본인의 핵심 동기와 두려움을 살펴보세요. 어떤 유형이 당신과 가장 닮았을까요?",
+      "무료 에니어그램 성격 검사. 9가지 유형으로 본인의 핵심 동기와 두려움을 살펴보고, 양옆의 날개 유형까지 분석해 드립니다. 캐릭터 이미지와 자세한 해석 포함.",
+    keywords: ["에니어그램 검사", "에니어그램 9가지 유형", "에니어그램 날개", "무료 에니어그램", "성격 유형 검사"],
   },
   attachment: {
-    title: "애착 유형 검사",
+    title: "무료 성인 애착 유형 검사 — 안정·헌신·자립·양가 4유형",
     description:
-      "관계 속에서 본인이 어떤 마음의 결로 움직이는지, 불안과 회피 두 차원으로 4개 유형을 살펴보세요.",
+      "관계 속에서 본인의 마음 결을 살펴보는 무료 성인 애착 유형 검사. 불안과 회피 두 차원으로 안정·헌신·자립·양가 4유형을 진단하고 사분면 차트로 위치를 확인합니다.",
+    keywords: ["애착 유형 검사", "성인 애착 유형", "애착 유형 테스트", "무료 애착 검사", "안정형 불안형 회피형"],
   },
   disc: {
-    title: "DISC 행동 유형 검사",
+    title: "무료 DISC 성격 검사 — 주도·사교·안정·신중 4유형",
     description:
-      "주도·사교·안정·신중의 4가지 행동 양식으로 본인의 행동 패턴과 관계 스타일을 살펴봅니다.",
+      "정신건강의학과에서 제공하는 무료 DISC 행동 유형 검사. 주도(D)·사교(I)·안정(S)·신중(C) 4가지 행동 양식으로 본인의 패턴과 강점·관계·업무 환경 적합도를 분석합니다.",
+    keywords: ["DISC 검사", "DISC 행동 유형", "DISC 무료 검사", "DISC 성격 검사", "행동 유형 검사", "직장 성격 검사"],
   },
 };
 
@@ -144,7 +148,24 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 
   if (meta) {
-    return { title: meta.title, description: meta.description };
+    const canonical = `https://hearam.kr/personality/${params.name}`;
+    return {
+      title: meta.title,
+      description: meta.description,
+      keywords: meta.keywords,
+      alternates: { canonical },
+      openGraph: {
+        title: meta.title,
+        description: meta.description,
+        url: canonical,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: meta.title,
+        description: meta.description,
+      },
+    };
   }
   return { title: "성격 검사" };
 }
@@ -157,35 +178,74 @@ function LoadingFallback() {
   );
 }
 
+function quizJsonLd(name: string) {
+  const meta = personalityTestMeta[name];
+  if (!meta) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Quiz",
+    name: meta.title,
+    description: meta.description,
+    url: `https://hearam.kr/personality/${name}`,
+    provider: {
+      "@type": "MedicalOrganization",
+      name: "해람정신건강의학과",
+      url: "https://hearam.kr",
+    },
+    educationalLevel: "general",
+    inLanguage: "ko",
+    isAccessibleForFree: true,
+  };
+}
+
 export default async function PersonalityPage(props: PageProps) {
   const params = await props.params;
+  const ld = quizJsonLd(params.name);
+  const schemaScript = ld ? (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+    />
+  ) : null;
 
   if (params.name === "big5") {
     return (
-      <Suspense fallback={<LoadingFallback />}>
-        <Big5Test />
-      </Suspense>
+      <>
+        {schemaScript}
+        <Suspense fallback={<LoadingFallback />}>
+          <Big5Test />
+        </Suspense>
+      </>
     );
   }
   if (params.name === "enneagram") {
     return (
-      <Suspense fallback={<LoadingFallback />}>
-        <EnneagramTest />
-      </Suspense>
+      <>
+        {schemaScript}
+        <Suspense fallback={<LoadingFallback />}>
+          <EnneagramTest />
+        </Suspense>
+      </>
     );
   }
   if (params.name === "attachment") {
     return (
-      <Suspense fallback={<LoadingFallback />}>
-        <AttachmentTest />
-      </Suspense>
+      <>
+        {schemaScript}
+        <Suspense fallback={<LoadingFallback />}>
+          <AttachmentTest />
+        </Suspense>
+      </>
     );
   }
   if (params.name === "disc") {
     return (
-      <Suspense fallback={<LoadingFallback />}>
-        <DiscTest />
-      </Suspense>
+      <>
+        {schemaScript}
+        <Suspense fallback={<LoadingFallback />}>
+          <DiscTest />
+        </Suspense>
+      </>
     );
   }
 

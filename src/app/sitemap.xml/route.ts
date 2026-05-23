@@ -11,10 +11,22 @@ const attentionTests = [
   "selective-attention",
   "sustained-inhibition",
   "interference-attention",
+  "n-back",
+  "digit-span",
+  "trail-making",
+];
+
+const personalityTests = ["big5", "enneagram", "attachment", "disc"];
+
+const careTools = [
+  "counselor",
+  "breathing",
+  "thought-record",
+  "gratitude",
 ];
 
 // 검사 페이지 최초 배포일 (내용이 변경되면 이 날짜를 업데이트)
-const TEST_LAST_MODIFIED = "2026-03-12";
+const TEST_LAST_MODIFIED = "2026-05-23";
 
 function buildTestUrls(): string {
   let urls = `  <url>
@@ -41,6 +53,62 @@ function buildTestUrls(): string {
     <lastmod>${TEST_LAST_MODIFIED}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>`;
+  }
+
+  // 집중력 검사 인덱스
+  urls += `
+  <url>
+    <loc>${BASE_URL}/attention</loc>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+
+  // 성격 검사 인덱스
+  urls += `
+  <url>
+    <loc>${BASE_URL}/personality</loc>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>`;
+
+  // 성격 검사 개별
+  for (const name of personalityTests) {
+    urls += `
+  <url>
+    <loc>${BASE_URL}/personality/${name}</loc>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>`;
+  }
+
+  // 종합 성격 보고서
+  urls += `
+  <url>
+    <loc>${BASE_URL}/personality/report</loc>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>`;
+
+  // 마음 돌봄 도구들
+  urls += `
+  <url>
+    <loc>${BASE_URL}/care</loc>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`;
+  for (const name of careTools) {
+    urls += `
+  <url>
+    <loc>${BASE_URL}/care/${name}</loc>
+    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>`;
   }
 

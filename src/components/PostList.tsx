@@ -32,6 +32,7 @@ export interface PostSummary {
   dateSeconds: number;
   categories: string[];
   featuredImage: string;
+  viewCount?: number;
 }
 
 export default function PostList({ posts }: { posts: PostSummary[] }) {
@@ -137,13 +138,26 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
                   <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                     {post.title}
                   </h2>
-                  <p className="text-sm text-gray-500 mb-2">
-                    {new Date(post.dateSeconds * 1000).toLocaleDateString(
-                      "ko-KR"
-                    )}
+                  <p className="text-sm text-gray-500 mb-2 flex flex-wrap items-center gap-x-2">
+                    <span>
+                      {new Date(post.dateSeconds * 1000).toLocaleDateString(
+                        "ko-KR"
+                      )}
+                    </span>
                     {post.categories.length > 0 && (
-                      <span className="ml-2 text-gray-400">
+                      <span className="text-gray-400">
                         {post.categories.join(", ")}
+                      </span>
+                    )}
+                    {typeof post.viewCount === "number" && post.viewCount > 0 && (
+                      <span className="text-gray-400 inline-flex items-center gap-0.5">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {post.viewCount >= 10000
+                          ? `${(post.viewCount / 10000).toFixed(post.viewCount / 10000 < 10 ? 1 : 0)}만`
+                          : post.viewCount.toLocaleString("ko-KR")}
                       </span>
                     )}
                   </p>

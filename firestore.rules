@@ -9,9 +9,20 @@ service cloud.firestore {
     }
 
     // posts: 공개 읽기, editor/admin만 쓰기
+    // 예외: 누구나 viewCount만 +1 증가 가능 (조회수 카운터)
     match /posts/{postId} {
       allow read: if true;
-      allow create, update: if isEditor();
+      allow create: if isEditor();
+      allow update: if isEditor()
+        || (
+          // viewCount 필드만 변경되고, 값이 정확히 +1 증가하는 경우만 허용
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['viewCount'])
+          && request.resource.data.viewCount is int
+          && (
+            (resource.data.viewCount is int && request.resource.data.viewCount == resource.data.viewCount + 1)
+            || (!('viewCount' in resource.data) && request.resource.data.viewCount == 1)
+          )
+        );
       allow delete: if isEditor();
     }
 

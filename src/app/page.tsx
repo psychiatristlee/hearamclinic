@@ -19,6 +19,7 @@ async function getPosts(): Promise<PostSummary[]> {
       dateSeconds: data.date?.seconds ?? 0,
       categories: data.categories ?? [],
       featuredImage: data.featuredImage ?? "",
+      viewCount: typeof data.viewCount === "number" ? data.viewCount : 0,
     };
   });
 }

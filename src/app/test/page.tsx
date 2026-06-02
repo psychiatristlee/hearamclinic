@@ -66,6 +66,12 @@ const personalityTests = [
     description: "관계 속에서 본인의 마음 결을 불안·회피 두 축으로 4가지 유형으로 살펴봅니다.",
     image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fattachment%2Fcover.png?alt=media",
   },
+  {
+    name: "disc",
+    title: "DISC 행동 유형 검사",
+    description: "주도·사교·안정·신중 4가지 행동 양식으로 본인의 패턴과 관계 스타일을 살펴봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fdisc%2Fcover.png?alt=media",
+  },
 ];
 
 export default function TestListPage() {

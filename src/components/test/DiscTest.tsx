@@ -8,6 +8,7 @@ import QUESTIONS, {
   LIKERT_LABELS,
 } from "@/lib/test/disc/questions";
 import { TYPES, characterImageUrl, coverImageUrl } from "@/lib/test/disc/types";
+import { COMBINATION_PROFILES, COMMUNICATION_GUIDE } from "@/lib/test/disc/extended";
 import DiscRadarChart from "./DiscRadarChart";
 import { saveTestResult } from "@/lib/test-history";
 import ResultInsights from "./ResultInsights";
@@ -251,6 +252,47 @@ export default function DiscTest() {
                 <div className="pt-3 border-t border-gray-100"><h3 className="text-sm font-bold text-purple-800 mb-1">성장의 방향</h3><p>{t.growthPath}</p></div>
               </div>
             </div>
+
+            {/* 확장: 주 유형 × 보조 유형 조합 */}
+            {(() => {
+              const combo = COMBINATION_PROFILES[`${displayResult.dominant}${displayResult.secondary}`];
+              if (!combo) return null;
+              return (
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-bold text-purple-900 mb-1">주 유형 × 보조 유형 조합</h2>
+                  <p className="text-xs text-gray-500 mb-4">{displayResult.dominant} + {displayResult.secondary} 조합으로 본 당신의 결</p>
+                  <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
+                    <h3 className="text-sm font-bold text-purple-800 mb-1.5">{combo.label}</h3>
+                    <p className="text-sm text-purple-900 leading-relaxed">{combo.description}</p>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* 확장: 다른 유형과 소통하는 법 */}
+            {(() => {
+              const guide = COMMUNICATION_GUIDE[displayResult.dominant];
+              if (!guide) return null;
+              const rows = [
+                { code: "D", label: "주도형(D)과 소통할 때", text: guide.withD },
+                { code: "I", label: "사교형(I)과 소통할 때", text: guide.withI },
+                { code: "S", label: "안정형(S)과 소통할 때", text: guide.withS },
+                { code: "C", label: "신중형(C)과 소통할 때", text: guide.withC },
+              ];
+              return (
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-bold text-purple-900 mb-4">다른 유형과 소통하는 법</h2>
+                  <div className="space-y-3 text-sm text-gray-800 leading-relaxed">
+                    {rows.map((r) => (
+                      <div key={r.code} className="pt-3 first:pt-0 border-t first:border-t-0 border-gray-100">
+                        <h3 className="text-sm font-bold text-purple-800 mb-1">{r.label}</h3>
+                        <p>{r.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {!displayResult.isShared && (
               <ResultInsights

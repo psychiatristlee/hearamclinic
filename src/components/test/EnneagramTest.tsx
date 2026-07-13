@@ -9,6 +9,11 @@ import QUESTIONS, {
   WINGS,
 } from "@/lib/test/enneagram/questions";
 import { TYPES, characterImageUrl } from "@/lib/test/enneagram/types";
+import {
+  GROWTH_ARROWS,
+  WING_PROFILES,
+  INSTINCTUAL_VARIANTS,
+} from "@/lib/test/enneagram/extended";
 import EnneagramRadarChart from "./EnneagramRadarChart";
 import { saveTestResult } from "@/lib/test-history";
 import ResultInsights from "./ResultInsights";
@@ -521,6 +526,84 @@ export default function EnneagramTest() {
                     <p className="text-sm text-emerald-900 leading-relaxed">
                       {type.inSecurity}
                     </p>
+                  </div>
+                </div>
+
+                {/* 확장: 통합/분열 성장 화살표 */}
+                {(() => {
+                  const arrow = GROWTH_ARROWS[displayResult.dominant];
+                  if (!arrow) return null;
+                  const intType = TYPES[arrow.integration];
+                  const disType = TYPES[arrow.disintegration];
+                  return (
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                      <h2 className="text-lg font-bold text-purple-900 mb-1">
+                        성장과 스트레스의 방향
+                      </h2>
+                      <p className="text-xs text-gray-500 mb-4">
+                        에니어그램은 유형마다 마음이 향하는 두 방향이 있습니다
+                      </p>
+                      <div className="flex items-center justify-center gap-3 mb-4 text-center">
+                        <div className="flex-1 bg-rose-50 border border-rose-100 rounded-lg py-2">
+                          <p className="text-xs text-rose-500">스트레스 시</p>
+                          <p className="text-lg font-bold text-rose-700">{arrow.disintegration}번 {disType.name}</p>
+                        </div>
+                        <div className="text-2xl font-bold text-purple-300">{displayResult.dominant}</div>
+                        <div className="flex-1 bg-emerald-50 border border-emerald-100 rounded-lg py-2">
+                          <p className="text-xs text-emerald-500">성장 시</p>
+                          <p className="text-lg font-bold text-emerald-700">{arrow.integration}번 {intType.name}</p>
+                        </div>
+                      </div>
+                      <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-4 mb-3">
+                        <h3 className="text-sm font-bold text-emerald-800 mb-1">성장의 방향 ({arrow.integration}번으로)</h3>
+                        <p className="text-sm text-emerald-900 leading-relaxed">{arrow.integrationDesc}</p>
+                      </div>
+                      <div className="bg-rose-50 border border-rose-100 rounded-lg p-4">
+                        <h3 className="text-sm font-bold text-rose-800 mb-1">스트레스의 방향 ({arrow.disintegration}번으로)</h3>
+                        <p className="text-sm text-rose-900 leading-relaxed">{arrow.disintegrationDesc}</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* 확장: 날개 조합 */}
+                {(() => {
+                  const wingKey = `${displayResult.dominant}w${displayResult.wing}`;
+                  const wingProfile = WING_PROFILES[wingKey];
+                  if (!wingProfile) return null;
+                  return (
+                    <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                      <h2 className="text-lg font-bold text-purple-900 mb-1">
+                        나의 날개 유형
+                      </h2>
+                      <p className="text-xs text-gray-500 mb-4">
+                        같은 유형이라도 양옆 날개에 따라 결이 달라집니다
+                      </p>
+                      <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
+                        <h3 className="text-sm font-bold text-purple-800 mb-1.5">{wingProfile.label}</h3>
+                        <p className="text-sm text-purple-900 leading-relaxed">{wingProfile.description}</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* 확장: 본능적 하위유형 소개 */}
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <h2 className="text-lg font-bold text-purple-900 mb-1">
+                    세 가지 본능 결
+                  </h2>
+                  <p className="text-xs text-gray-500 mb-4">
+                    같은 유형 안에서도 어떤 본능이 강한지에 따라 삶의 무게중심이 달라집니다. 어느 결이 가장 나와 가까운지 살펴보세요
+                  </p>
+                  <div className="space-y-3">
+                    {INSTINCTUAL_VARIANTS.map((v) => (
+                      <div key={v.key} className="bg-gray-50 border border-gray-100 rounded-lg p-4">
+                        <h3 className="text-sm font-bold text-gray-800 mb-1">
+                          <span className="mr-1.5">{v.emoji}</span>{v.name}
+                        </h3>
+                        <p className="text-sm text-gray-700 leading-relaxed">{v.description}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

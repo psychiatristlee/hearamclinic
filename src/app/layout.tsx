@@ -121,7 +121,7 @@ export default function RootLayout({
                 <div className="mt-4 p-4 text-sm text-gray-600">
                   <p className="font-medium text-gray-900 mb-2">위치 안내</p>
                   <p>📍 서울특별시 마포구 양화로 178 4층, 7층</p>
-                  <p>📞 02-498-2024</p>
+                  <p>📞 0507-1352-8189</p>
                 </div>
               </div>
             </div>

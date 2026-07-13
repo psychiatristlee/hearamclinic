@@ -26,7 +26,7 @@ const clinicJsonLd = {
   description:
     "서울 마포구 홍대입구역 정신건강의학과 - 우울증, 불안장애, ADHD, 불면증, 공황장애 등 정신건강 전문 진료",
   url: "https://hearam.kr/clinic",
-  telephone: "02-498-2024",
+  telephone: "0507-1352-8189",
   address: {
     "@type": "PostalAddress",
     streetAddress: "양화로 178 4층, 7층",

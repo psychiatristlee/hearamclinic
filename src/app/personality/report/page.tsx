@@ -37,6 +37,7 @@ const CATALOG: TestCatalogItem[] = [
   { type: "enneagram", displayTitle: "에니어그램", href: "/personality/enneagram", emoji: "🌐" },
   { type: "attachment", displayTitle: "애착 유형", href: "/personality/attachment", emoji: "💞" },
   { type: "disc", displayTitle: "DISC 행동 유형", href: "/personality/disc", emoji: "🎯" },
+  { type: "riasec", displayTitle: "직업흥미 검사 (RIASEC)", href: "/personality/riasec", emoji: "🧭" },
 ];
 
 export default function PersonalityReportPage() {
@@ -201,7 +202,7 @@ function ReportContent() {
         <div className="text-5xl mb-3">📊</div>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">종합 성격 보고서</h1>
         <p className="text-sm text-purple-50 leading-relaxed">
-          4가지 성격 검사 결과를 AI가 통합 분석하여 한 사람의 다면적 프로필로 정리해 드립니다.
+          5가지 검사(성격 4종+직업흥미) 결과를 AI가 통합 분석하여 한 사람의 다면적 프로필로 정리해 드립니다.
           각 검사가 서로 보완·일치되는 지점을 찾아 본인을 더 깊이 이해하실 수 있습니다.
         </p>
       </div>
@@ -270,7 +271,7 @@ function ReportContent() {
             {startingGuided
               ? "다음 검사로 이동 중..."
               : completedCount === 0
-                ? "🚀 4개 검사 순차 시작하기"
+                ? "🚀 5개 검사 순차 시작하기"
                 : `▶ 남은 ${CATALOG.length - completedCount}개 검사 이어서 진행하기`}
           </button>
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">

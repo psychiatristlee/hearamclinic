@@ -10,7 +10,7 @@ import {
 } from "@/lib/test/personality-guide";
 
 interface Props {
-  currentType: "big5" | "enneagram" | "attachment" | "disc";
+  currentType: "big5" | "enneagram" | "attachment" | "disc" | "riasec";
 }
 
 /**

@@ -72,6 +72,12 @@ const personalityTests = [
     description: "주도·사교·안정·신중 4가지 행동 양식으로 본인의 패턴과 관계 스타일을 살펴봅니다.",
     image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fdisc%2Fcover.png?alt=media",
   },
+  {
+    name: "riasec",
+    title: "직업흥미 검사 (RIASEC)",
+    description: "홀랜드 6유형으로 나에게 맞는 직업과 진로 방향을 살펴봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Friasec%2Fcover.png?alt=media",
+  },
 ];
 
 export default function TestListPage() {
@@ -136,6 +142,23 @@ export default function TestListPage() {
         <p className="text-sm text-gray-500 mb-4">
           본인의 성격 유형을 다양한 방식으로 살펴보기
         </p>
+
+        {/* 종합 성격 보고서 진입 카드 */}
+        <Link
+          href="/personality/report"
+          className="group block mb-5 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+        >
+          <div className="p-5 flex items-center gap-4">
+            <div className="text-4xl flex-shrink-0">📊</div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold mb-0.5">AI 종합 성격 보고서</h3>
+              <p className="text-sm text-purple-100 leading-relaxed">
+                5가지 검사(성격 4종 + 직업흥미)를 마치면 AI가 통합 분석해 한 장의 프로필로 정리해 드려요.
+              </p>
+            </div>
+            <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
+          </div>
+        </Link>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {personalityTests.map((t) => (
             <Link

@@ -9,6 +9,7 @@ export const PERSONALITY_TEST_ORDER = [
   { type: "enneagram", path: "/personality/enneagram", title: "에니어그램", emoji: "🌐" },
   { type: "attachment", path: "/personality/attachment", title: "애착 유형", emoji: "💞" },
   { type: "disc", path: "/personality/disc", title: "DISC 행동 유형", emoji: "🎯" },
+  { type: "riasec", path: "/personality/riasec", title: "직업흥미 검사 (RIASEC)", emoji: "🧭" },
 ] as const;
 
 export const TOTAL_TESTS = PERSONALITY_TEST_ORDER.length;

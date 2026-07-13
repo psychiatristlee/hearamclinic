@@ -27,15 +27,15 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://hearam.kr/personality" },
   openGraph: {
-    title: "무료 성격 검사 4종 + AI 종합 보고서 | 해람정신건강의학과",
+    title: "무료 성격·직업흥미 검사 5종 + AI 종합 보고서 | 해람정신건강의학과",
     description:
-      "Big 5·에니어그램·애착·DISC 무료 성격 검사 한 곳에서. 4가지를 모두 마치면 AI가 통합 보고서를 만들어 드립니다.",
+      "Big 5·에니어그램·애착·DISC·직업흥미(RIASEC) 무료 검사 한 곳에서. 모두 마치면 AI가 통합 보고서를 만들어 드립니다.",
     url: "https://hearam.kr/personality",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "무료 성격 검사 4종 + AI 종합 보고서",
+    title: "무료 성격·직업흥미 검사 5종 + AI 종합 보고서",
     description:
       "Big 5·에니어그램·애착·DISC 무료 성격 검사 한 곳에서.",
   },
@@ -77,9 +77,9 @@ const personalityTests = [
 const ITEM_LIST_JSONLD = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "무료 성격 검사 4종",
+  name: "무료 성격·직업흥미 검사 5종",
   description:
-    "Big 5·에니어그램·애착 유형·DISC 4가지 성격 검사와 AI 종합 보고서",
+    "Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC 5가지 검사와 AI 종합 보고서",
   itemListElement: personalityTests.map((t, i) => ({
     "@type": "ListItem",
     position: i + 1,
@@ -101,7 +101,7 @@ export default function PersonalityListPage() {
           무료 성격·직업흥미 검사 — Big 5·에니어그램·애착·DISC·RIASEC
         </h1>
         <p className="text-gray-600">
-          정신건강의학과에서 만든 4가지 무료 성격 검사를 한 곳에서 진행하시고, 마지막엔 AI 종합 보고서까지 받아 보세요.
+          정신건강의학과에서 만든 성격·직업흥미 무료 검사 5종을 한 곳에서 진행하시고, 마지막엔 AI 종합 보고서까지 받아 보세요.
         </p>
       </div>
 
@@ -115,7 +115,7 @@ export default function PersonalityListPage() {
           <div className="flex-1">
             <h3 className="text-xl font-bold mb-1">종합 성격 보고서</h3>
             <p className="text-sm text-purple-100 leading-relaxed">
-              4가지 검사 결과를 AI가 통합 분석하여 한 사람의 다면적 프로필로 정리해 드립니다.
+              성격 4종과 직업흥미(RIASEC)까지 5가지 검사 결과를 AI가 통합 분석하여 한 사람의 다면적 프로필로 정리해 드립니다.
             </p>
           </div>
           <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>

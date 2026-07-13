@@ -68,6 +68,23 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
 
   return (
     <div>
+      {/* 종합 성격 보고서 진입 배너 */}
+      <Link
+        href="/personality/report"
+        className="group block mb-8 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+      >
+        <div className="p-5 flex items-center gap-4">
+          <div className="text-4xl flex-shrink-0">📊</div>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-lg font-bold mb-0.5">AI 종합 성격 보고서</h2>
+            <p className="text-sm text-purple-100 leading-relaxed">
+              Big 5·에니어그램·애착·DISC·직업흥미 5가지 검사를 AI가 통합 분석해 나만의 프로필로 정리해 드려요.
+            </p>
+          </div>
+          <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
+        </div>
+      </Link>
+
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">블로그</h1>
         {(claims.admin || claims.editor) && (

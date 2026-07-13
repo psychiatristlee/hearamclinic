@@ -3,6 +3,7 @@ import Big5Test from "@/components/test/Big5Test";
 import EnneagramTest from "@/components/test/EnneagramTest";
 import AttachmentTest from "@/components/test/AttachmentTest";
 import DiscTest from "@/components/test/DiscTest";
+import RiasecTest from "@/components/test/RiasecTest";
 import { TYPES, characterImageUrl } from "@/lib/test/big5/types";
 import {
   TYPES as ENNEA_TYPES,
@@ -43,6 +44,12 @@ const personalityTestMeta: Record<
     description:
       "정신건강의학과에서 제공하는 무료 DISC 행동 유형 검사. 주도(D)·사교(I)·안정(S)·신중(C) 4가지 행동 양식으로 본인의 패턴과 강점·관계·업무 환경 적합도를 분석합니다.",
     keywords: ["DISC 검사", "DISC 행동 유형", "DISC 무료 검사", "DISC 성격 검사", "행동 유형 검사", "직장 성격 검사"],
+  },
+  riasec: {
+    title: "무료 직업흥미 검사 (RIASEC) — 홀랜드 6유형 진로적성",
+    description:
+      "정신건강의학과에서 제공하는 무료 직업흥미 검사. 홀랜드(Holland) RIASEC 6유형(현실·탐구·예술·사회·진취·관습)으로 나에게 맞는 직업과 진로 방향, 잘 맞는 일 환경을 분석합니다.",
+    keywords: ["직업흥미검사", "홀랜드 검사", "RIASEC 검사", "진로적성검사", "무료 직업검사", "진로 검사", "적성 검사"],
   },
 };
 
@@ -244,6 +251,16 @@ export default async function PersonalityPage(props: PageProps) {
         {schemaScript}
         <Suspense fallback={<LoadingFallback />}>
           <DiscTest />
+        </Suspense>
+      </>
+    );
+  }
+  if (params.name === "riasec") {
+    return (
+      <>
+        {schemaScript}
+        <Suspense fallback={<LoadingFallback />}>
+          <RiasecTest />
         </Suspense>
       </>
     );

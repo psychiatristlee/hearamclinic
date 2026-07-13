@@ -16,7 +16,7 @@ const attentionTests = [
   "trail-making",
 ];
 
-const personalityTests = ["big5", "enneagram", "attachment", "disc"];
+const personalityTests = ["big5", "enneagram", "attachment", "disc", "riasec"];
 
 const careTools = [
   "counselor",

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import NaverMap from "@/components/NaverMap";
+import FeedbackWidget from "@/components/feedback/FeedbackWidget";
 import { AuthProvider } from "@/lib/AuthContext";
 import "./globals.css";
 
@@ -132,6 +133,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        <FeedbackWidget />
         </AuthProvider>
       </body>
     </html>

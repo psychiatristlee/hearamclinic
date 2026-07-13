@@ -3,9 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "무료 성격 검사 모음 | Big 5·에니어그램·애착·DISC 4종 + AI 종합 보고서",
+  title: "무료 성격·직업흥미 검사 모음 | Big 5·에니어그램·애착·DISC·RIASEC + AI 종합 보고서",
   description:
-    "정신건강의학과에서 만든 무료 성격 검사 4종(Big 5·에니어그램·애착 유형·DISC)과 4가지 결과를 통합한 AI 종합 성격 보고서를 한 곳에서. 가입 없이 바로 검사 가능, 결과 저장은 로그인 시 가능.",
+    "정신건강의학과에서 만든 무료 성격·직업흥미 검사(Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC)와 AI 종합 성격 보고서를 한 곳에서. 가입 없이 바로 검사 가능, 결과 저장은 로그인 시 가능.",
   keywords: [
     "성격 검사",
     "무료 성격 검사",
@@ -66,6 +66,12 @@ const personalityTests = [
     description: "주도·사교·안정·신중 4가지 행동 양식으로 본인의 패턴을 알아봅니다.",
     image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fdisc%2Fcover.png?alt=media",
   },
+  {
+    name: "riasec",
+    title: "직업흥미 검사 (RIASEC)",
+    description: "홀랜드 6유형으로 나에게 맞는 직업과 진로 방향을 살펴봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Friasec%2Fcover.png?alt=media",
+  },
 ];
 
 const ITEM_LIST_JSONLD = {
@@ -92,7 +98,7 @@ export default function PersonalityListPage() {
       />
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-purple-900 mb-2">
-          무료 성격 검사 모음 — Big 5·에니어그램·애착·DISC
+          무료 성격·직업흥미 검사 — Big 5·에니어그램·애착·DISC·RIASEC
         </h1>
         <p className="text-gray-600">
           정신건강의학과에서 만든 4가지 무료 성격 검사를 한 곳에서 진행하시고, 마지막엔 AI 종합 보고서까지 받아 보세요.

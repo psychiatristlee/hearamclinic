@@ -3,6 +3,9 @@
 import { doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+// 순수 포맷 함수는 서버/클라 공용 모듈에서 재export (하위 호환)
+export { formatViewCount } from "./format";
+
 const SESSION_KEY_PREFIX = "viewed-post-";
 
 /**
@@ -30,10 +33,3 @@ export async function incrementBlogViewIfNew(slug: string): Promise<void> {
   }
 }
 
-/** 조회수 표시 포맷 — 1000 단위 콤마, 만 이상은 "1.2만" */
-export function formatViewCount(n: number | undefined | null): string {
-  if (!n || n < 0) return "0";
-  if (n < 10000) return n.toLocaleString("ko-KR");
-  const man = n / 10000;
-  return `${man.toFixed(man < 10 ? 1 : 0)}만`;
-}

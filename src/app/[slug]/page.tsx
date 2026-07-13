@@ -8,7 +8,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import EditLink from "@/components/EditLink";
 import ViewTracker from "@/components/blog/ViewTracker";
-import { formatViewCount } from "@/lib/blog-views";
+import { formatViewCount } from "@/lib/blog-views/format";
 
 export const revalidate = 60;
 

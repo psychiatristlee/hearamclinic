@@ -135,6 +135,7 @@ export default function DiscTest() {
             </div>
             <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mb-6">
               <p className="text-xs text-amber-900 leading-relaxed">본 검사는 자가 점검 도구이며 진단 목적으로 사용되지 않습니다.</p>
+              <p className="text-xs text-amber-800 leading-relaxed mt-1.5">마스턴(W. M. Marston)의 DISC 행동유형 이론에 기반하여 해람정신건강의학과가 자체 개발한 무료 검사이며, Everything DiSC® 등 특정 상용 검사(Wiley 등)와는 무관합니다.</p>
             </div>
             <button className="w-full px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg rounded-xl shadow-md transition" onClick={handleStart}>검사 시작하기</button>
           </div>
@@ -270,6 +271,7 @@ export default function DiscTest() {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-4 text-center">본 결과는 자가 점검 도구이며, 의학적 진단을 대체하지 않습니다.</p>
+            <p className="text-[11px] text-gray-400 mt-1.5 text-center leading-relaxed">마스턴(W. M. Marston)의 DISC 행동유형 이론에 기반한 해람정신건강의학과 자체 개발 무료 검사이며, Everything DiSC® 등 특정 상용 검사(Wiley 등)와는 무관합니다.</p>
           </div>
         );
       })()}

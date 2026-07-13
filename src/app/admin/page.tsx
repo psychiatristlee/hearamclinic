@@ -15,6 +15,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db, functions } from "@/lib/firebase";
+import FeedbackAdminSection from "@/components/admin/FeedbackAdminSection";
 
 interface UserInfo {
   uid: string;
@@ -591,6 +592,9 @@ export default function AdminPage() {
           </div>
         )}
       </section>
+
+      {/* ========== 피드백 관리 ========== */}
+      <FeedbackAdminSection />
     </div>
   );
 }

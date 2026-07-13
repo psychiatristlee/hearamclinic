@@ -57,3 +57,6 @@ export {onTestResultCreated} from "./features/test-stats";
 
 // Personality 통합 보고서
 export {generatePersonalityReport} from "./features/personality-report";
+
+// 피드백 관리 (admin 전용)
+export {listFeedback, updateFeedbackStatus} from "./features/feedback-admin";

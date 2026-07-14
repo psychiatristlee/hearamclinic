@@ -3,9 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "무료 성격·직업흥미 검사 모음 | Big 5·에니어그램·애착·DISC·RIASEC + AI 종합 보고서",
+  title: "무료 성격·심리 검사 모음 | Big 5·에니어그램·애착·DISC·RIASEC·심리도식 + AI 종합 보고서",
   description:
-    "정신건강의학과에서 만든 무료 성격·직업흥미 검사(Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC)와 AI 종합 성격 보고서를 한 곳에서. 가입 없이 바로 검사 가능, 결과 저장은 로그인 시 가능.",
+    "정신건강의학과에서 만든 무료 성격·심리 검사(Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC·심리도식)와 AI 종합 성격 보고서를 한 곳에서. 가입 없이 바로 검사 가능, 결과 저장은 로그인 시 가능.",
   keywords: [
     "성격 검사",
     "무료 성격 검사",
@@ -21,6 +21,9 @@ export const metadata: Metadata = {
     "성인 애착 유형",
     "DISC 검사",
     "DISC 행동 유형",
+    "심리도식 검사",
+    "스키마 검사",
+    "초기부적응도식",
     "MBTI 대안",
     "성격 진단",
     "정신건강 자가 검사",
@@ -72,14 +75,20 @@ const personalityTests = [
     description: "홀랜드 6유형으로 나에게 맞는 직업과 진로 방향을 살펴봅니다.",
     image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Friasec%2Fcover.png?alt=media",
   },
+  {
+    name: "schema",
+    title: "심리도식 검사",
+    description: "어린 시절에 만들어져 지금도 반복되는 마음의 무늬를 18도식·5영역으로 살펴봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fschema%2Fcover.png?alt=media",
+  },
 ];
 
 const ITEM_LIST_JSONLD = {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  name: "무료 성격·직업흥미 검사 5종",
+  name: "무료 성격·심리 검사 6종",
   description:
-    "Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC 5가지 검사와 AI 종합 보고서",
+    "Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC·심리도식 6가지 검사와 AI 종합 보고서",
   itemListElement: personalityTests.map((t, i) => ({
     "@type": "ListItem",
     position: i + 1,
@@ -98,10 +107,10 @@ export default function PersonalityListPage() {
       />
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-purple-900 mb-2">
-          무료 성격·직업흥미 검사 — Big 5·에니어그램·애착·DISC·RIASEC
+          무료 성격·심리 검사 — Big 5·에니어그램·애착·DISC·RIASEC·심리도식
         </h1>
         <p className="text-gray-600">
-          정신건강의학과에서 만든 성격·직업흥미 무료 검사 5종을 한 곳에서 진행하시고, 마지막엔 AI 종합 보고서까지 받아 보세요.
+          정신건강의학과에서 만든 성격·심리 무료 검사 6종을 한 곳에서 진행하시고, 성격 검사는 AI 종합 보고서까지 받아 보세요.
         </p>
       </div>
 

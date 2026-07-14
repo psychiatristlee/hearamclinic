@@ -78,6 +78,12 @@ const personalityTests = [
     description: "홀랜드 6유형으로 나에게 맞는 직업과 진로 방향을 살펴봅니다.",
     image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Friasec%2Fcover.png?alt=media",
   },
+  {
+    name: "schema",
+    title: "심리도식 검사",
+    description: "어린 시절에 만들어져 지금도 반복되는 마음의 무늬를 18도식·5영역으로 살펴봅니다.",
+    image: "https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fschema%2Fcover.png?alt=media",
+  },
 ];
 
 export default function TestListPage() {

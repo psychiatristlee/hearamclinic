@@ -4,6 +4,12 @@ import EnneagramTest from "@/components/test/EnneagramTest";
 import AttachmentTest from "@/components/test/AttachmentTest";
 import DiscTest from "@/components/test/DiscTest";
 import RiasecTest from "@/components/test/RiasecTest";
+import SchemaTest from "@/components/test/SchemaTest";
+import {
+  DOMAINS as SCHEMA_DOMAINS,
+  domainImageUrl as schemaDomainImageUrl,
+} from "@/lib/test/schema/types";
+import type { SchemaDomain } from "@/lib/test/schema/questions";
 import { TYPES, characterImageUrl } from "@/lib/test/big5/types";
 import {
   TYPES as ENNEA_TYPES,
@@ -50,6 +56,12 @@ const personalityTestMeta: Record<
     description:
       "정신건강의학과에서 제공하는 무료 직업흥미 검사. 홀랜드(Holland) RIASEC 6유형(현실·탐구·예술·사회·진취·관습)으로 나에게 맞는 직업과 진로 방향, 잘 맞는 일 환경을 분석합니다.",
     keywords: ["직업흥미검사", "홀랜드 검사", "RIASEC 검사", "진로적성검사", "무료 직업검사", "진로 검사", "적성 검사"],
+  },
+  schema: {
+    title: "무료 심리도식 검사 — 18가지 도식·5영역으로 마음의 무늬 읽기",
+    description:
+      "어린 시절에 만들어져 지금도 되풀이되는 마음의 무늬(심리도식)를 살펴보는 무료 심리도식 검사. 제프리 영의 심리도식치료 이론에 기반해 18가지 초기부적응도식과 5개 도식영역으로 나를 부드럽게 이해합니다. YSQ 등 상용 검사와 무관한 자체 개발 무료 검사.",
+    keywords: ["심리도식 검사", "스키마 검사", "초기부적응도식", "심리도식치료", "스키마 테라피", "어린시절 상처", "무의식 패턴 검사", "무료 심리검사", "성격 상처 검사"],
   },
 };
 
@@ -142,6 +154,37 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
           title,
           description,
           images: [{ url: imageUrl, width: 1024, height: 1024, alt: t.name }],
+          type: "article",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title,
+          description,
+          images: [imageUrl],
+        },
+      };
+    }
+  }
+
+  // 심리도식 공유 결과 (대표 영역 DR/IA/IL/OD/OI)
+  if (
+    params.name === "schema" &&
+    searchParams.result &&
+    ["DR", "IA", "IL", "OD", "OI"].includes(searchParams.result)
+  ) {
+    const code = searchParams.result as SchemaDomain;
+    const d = SCHEMA_DOMAINS[code];
+    if (d) {
+      const title = `${d.name} - 심리도식 검사`;
+      const description = `${d.tagline}`;
+      const imageUrl = schemaDomainImageUrl(code);
+      return {
+        title,
+        description,
+        openGraph: {
+          title,
+          description,
+          images: [{ url: imageUrl, width: 1024, height: 1024, alt: d.name }],
           type: "article",
         },
         twitter: {
@@ -261,6 +304,16 @@ export default async function PersonalityPage(props: PageProps) {
         {schemaScript}
         <Suspense fallback={<LoadingFallback />}>
           <RiasecTest />
+        </Suspense>
+      </>
+    );
+  }
+  if (params.name === "schema") {
+    return (
+      <>
+        {schemaScript}
+        <Suspense fallback={<LoadingFallback />}>
+          <SchemaTest />
         </Suspense>
       </>
     );

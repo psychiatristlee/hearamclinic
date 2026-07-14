@@ -71,7 +71,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
       {/* 종합 성격 보고서 진입 배너 */}
       <Link
         href="/personality/report"
-        className="group block mb-8 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+        className="group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
       >
         <div className="p-5 flex items-center gap-4">
           <div className="text-4xl flex-shrink-0">📊</div>
@@ -82,6 +82,34 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
             </p>
           </div>
           <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
+        </div>
+      </Link>
+
+      {/* 심리도식 검사 진입 카드 (신규) */}
+      <Link
+        href="/personality/schema"
+        className="group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
+      >
+        <div className="flex items-stretch">
+          <div className="relative w-32 sm:w-44 flex-shrink-0 bg-purple-50">
+            <Image
+              src="https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fschema%2Fcover.png?alt=media"
+              alt="심리도식 검사"
+              fill
+              sizes="(max-width: 640px) 128px, 176px"
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              unoptimized
+            />
+          </div>
+          <div className="p-4 sm:p-5 flex-1 min-w-0 flex flex-col justify-center">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">NEW</span>
+              <h2 className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition">심리도식 검사</h2>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              어린 시절에 만들어져 지금도 반복되는 마음의 무늬를 18가지 도식·5개 영역으로 부드럽게 살펴보는 무료 심리검사예요.
+            </p>
+          </div>
         </div>
       </Link>
 

@@ -17,6 +17,7 @@ import {
 } from "@/lib/test/schema/types";
 import SchemaProfileChart from "./SchemaProfileChart";
 import { saveTestResult } from "@/lib/test-history";
+import { useAuth } from "@/lib/AuthContext";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 
@@ -37,6 +38,7 @@ interface DisplayResult {
 export default function SchemaTest() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useAuth();
   const sharedCode = searchParams?.get("result") ?? null;
   const initialStatus: Status = isValidDomain(sharedCode) ? "result" : "ready";
 
@@ -106,9 +108,10 @@ export default function SchemaTest() {
   // 완료 시 결과 저장. 공유 링크(?result=)는 공유 버튼이 직접 URL을 만들므로
   // 브라우저 URL은 건드리지 않는다 → 재검사 시에도 매번 저장되고,
   // 본인 결과 URL이 '공유받은 결과'로 오인되는 문제도 생기지 않는다.
+  // user 의존: 결과 화면에서 로그인하면(제자리 팝업) 그 즉시 이 결과가 저장된다.
   const lastSavedRef = useRef<DisplayResult | null>(null);
   useEffect(() => {
-    if (!result || status !== "result") return;
+    if (!result || status !== "result" || !user) return;
     if (lastSavedRef.current === result) return; // 동일 결과 중복 저장 방지
     lastSavedRef.current = result;
     const dom = DOMAINS[result.dominant];
@@ -126,7 +129,7 @@ export default function SchemaTest() {
         schemaScores: result.schemaScores,
       },
     });
-  }, [result, status]);
+  }, [result, status, user]);
 
   const displayResult = result || sharedResult;
 

@@ -15,6 +15,7 @@ import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
 import FullBatteryNudge from "./FullBatteryNudge";
+import ShareUnlockGate from "./ShareUnlockGate";
 
 type Status = "ready" | "test" | "result";
 const QUESTIONS_PER_PAGE = 9;
@@ -32,6 +33,8 @@ export default function RiasecTest() {
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [shareToast, setShareToast] = useState("");
+  // 공유하면 심화 결과가 열린다(share-to-unlock)
+  const [unlocked, setUnlocked] = useState(false);
 
   const totalPages = Math.ceil(QUESTIONS.length / QUESTIONS_PER_PAGE);
   const pageQuestions = QUESTIONS.slice(page * QUESTIONS_PER_PAGE, (page + 1) * QUESTIONS_PER_PAGE);
@@ -89,7 +92,7 @@ export default function RiasecTest() {
 
   useEffect(() => {
     if (result && status === "result" && !sharedCode) {
-      router.replace(`/personality/riasec?result=${result.dominant}`, { scroll: false });
+      // 공유 링크는 공유 버튼이 직접 생성하므로 브라우저 URL은 건드리지 않는다
       const t = TYPES[result.dominant];
       saveTestResult({
         type: "riasec",
@@ -112,6 +115,7 @@ export default function RiasecTest() {
 
   async function handleShare() {
     if (!displayResult) return;
+    setUnlocked(true); // 공유 시 심화 결과 열기
     const url = `${window.location.origin}/personality/riasec?result=${displayResult.dominant}`;
     const t = TYPES[displayResult.dominant];
     const shareText = `직업흥미 검사(RIASEC) 결과: ${t.name}\n${t.tagline}`;
@@ -187,6 +191,7 @@ export default function RiasecTest() {
         const t = TYPES[displayResult.dominant];
         const sec = TYPES[displayResult.secondary];
         const ter = TYPES[displayResult.tertiary];
+        const showDeep = displayResult.isShared || unlocked;
         return (
           <div>
             {!displayResult.isShared && <GuidedNextButton currentType="riasec" />}
@@ -210,9 +215,11 @@ export default function RiasecTest() {
                   )}
                 </div>
               </div>
-              <div className="mt-5">
-                <button onClick={handleShare} className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2">공유하기</button>
-              </div>
+              {showDeep && (
+                <div className="mt-5">
+                  <button onClick={handleShare} className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2">공유하기</button>
+                </div>
+              )}
               {shareToast && <p className="mt-3 text-sm text-center text-purple-700">{shareToast}</p>}
             </div>
 
@@ -222,6 +229,16 @@ export default function RiasecTest() {
                 <button onClick={handleStartFromShared} className="underline font-medium">직접 검사를 진행</button>해 보세요.
               </div>
             )}
+
+            {/* 요약 (간단 결과) */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+              <p className="text-gray-700 leading-relaxed">{t.summary}</p>
+            </div>
+
+            {!showDeep && <ShareUnlockGate onUnlock={handleShare} />}
+
+            {showDeep && (
+              <>
 
             <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
               <h2 className="text-lg font-bold text-purple-900 mb-4 text-center">여섯 가지 흥미 프로필</h2>
@@ -280,6 +297,9 @@ export default function RiasecTest() {
                   yMax: 100,
                 }))}
               />
+            )}
+
+              </>
             )}
 
             {!displayResult.isShared && <FullBatteryNudge />}

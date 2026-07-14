@@ -20,6 +20,7 @@ import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
 import FullBatteryNudge from "./FullBatteryNudge";
+import ShareUnlockGate from "./ShareUnlockGate";
 
 type Status = "ready" | "test" | "result";
 
@@ -44,6 +45,8 @@ export default function AttachmentTest() {
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [shareToast, setShareToast] = useState("");
+  // 공유하면 심화 결과가 열린다(share-to-unlock)
+  const [unlocked, setUnlocked] = useState(false);
 
   const totalPages = Math.ceil(QUESTIONS.length / QUESTIONS_PER_PAGE);
   const pageQuestions = QUESTIONS.slice(
@@ -137,9 +140,7 @@ export default function AttachmentTest() {
 
   useEffect(() => {
     if (result && status === "result" && !sharedCode) {
-      router.replace(`/personality/attachment?result=${result.code}`, {
-        scroll: false,
-      });
+      // 공유 링크는 공유 버튼이 직접 생성하므로 브라우저 URL은 건드리지 않는다
       const t = TYPES[result.code];
       saveTestResult({
         type: "attachment",
@@ -160,6 +161,7 @@ export default function AttachmentTest() {
 
   async function handleShare() {
     if (!displayResult) return;
+    setUnlocked(true); // 공유 시 심화 결과 열기
     const url = `${window.location.origin}/personality/attachment?result=${displayResult.code}`;
     const t = TYPES[displayResult.code];
     const shareText = `애착 유형 검사 결과: ${t.name}\n${t.tagline}`;
@@ -347,6 +349,7 @@ export default function AttachmentTest() {
         <div>
           {(() => {
             const t = TYPES[displayResult.code];
+            const showDeep = displayResult.isShared || unlocked;
             return (
               <>
                 {!displayResult.isShared && <GuidedNextButton currentType="attachment" />}
@@ -379,17 +382,19 @@ export default function AttachmentTest() {
                     </div>
                   </div>
 
-                  <div className="mt-5">
-                    <button
-                      onClick={handleShare}
-                      className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-5.464-2.684m5.464 2.684a3 3 0 11-5.464-2.684m0 0L8.684 10.658m6.632 5.000l-6.632-3.158" />
-                      </svg>
-                      공유하기
-                    </button>
-                  </div>
+                  {showDeep && (
+                    <div className="mt-5">
+                      <button
+                        onClick={handleShare}
+                        className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition flex items-center justify-center gap-2"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 10-5.464-2.684m5.464 2.684a3 3 0 11-5.464-2.684m0 0L8.684 10.658m6.632 5.000l-6.632-3.158" />
+                        </svg>
+                        공유하기
+                      </button>
+                    </div>
+                  )}
                   {shareToast && (
                     <p className="mt-3 text-sm text-center text-purple-700">{shareToast}</p>
                   )}
@@ -407,6 +412,16 @@ export default function AttachmentTest() {
                     해 보세요.
                   </div>
                 )}
+
+                {/* 요약 (간단 결과) */}
+                <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+                  <p className="text-gray-700 leading-relaxed">{t.summary}</p>
+                </div>
+
+                {!showDeep && <ShareUnlockGate onUnlock={handleShare} />}
+
+                {showDeep && (
+                  <>
 
                 <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
                   <h2 className="text-lg font-bold text-purple-900 mb-4 text-center">
@@ -523,6 +538,9 @@ export default function AttachmentTest() {
                       },
                     ]}
                   />
+                )}
+
+                  </>
                 )}
 
                 {!displayResult.isShared && <FullBatteryNudge />}

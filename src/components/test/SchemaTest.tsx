@@ -21,6 +21,7 @@ import { useAuth } from "@/lib/AuthContext";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import FullBatteryNudge from "./FullBatteryNudge";
+import ShareUnlockGate from "./ShareUnlockGate";
 
 type Status = "ready" | "test" | "result";
 const QUESTIONS_PER_PAGE = 9;
@@ -47,6 +48,8 @@ export default function SchemaTest() {
   const [page, setPage] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [shareToast, setShareToast] = useState("");
+  // 공유하면 심화 결과가 열린다(share-to-unlock)
+  const [unlocked, setUnlocked] = useState(false);
 
   const totalPages = Math.ceil(QUESTIONS.length / QUESTIONS_PER_PAGE);
   const pageQuestions = QUESTIONS.slice(page * QUESTIONS_PER_PAGE, (page + 1) * QUESTIONS_PER_PAGE);
@@ -136,6 +139,7 @@ export default function SchemaTest() {
 
   async function handleShare() {
     if (!displayResult) return;
+    setUnlocked(true); // 공유 시 심화 결과 열기
     const url = `${window.location.origin}/personality/schema?result=${displayResult.dominant}`;
     const dom = DOMAINS[displayResult.dominant];
     const shareText = `심리도식 검사 결과: 대표 영역 '${dom.name}'\n${dom.tagline}`;
@@ -220,6 +224,7 @@ export default function SchemaTest() {
       {status === "result" && displayResult && (() => {
         const dom = DOMAINS[displayResult.dominant];
         const topSchemas = displayResult.topSchemaIds.map((id) => ({ schema: SCHEMAS[id], score: displayResult.schemaScores[id] }));
+        const showDeep = displayResult.isShared || unlocked;
         return (
           <div>
             {!displayResult.isShared && <SaveLoginPrompt />}
@@ -239,9 +244,11 @@ export default function SchemaTest() {
                   <p className="text-base text-gray-700 leading-relaxed">{dom.tagline}</p>
                 </div>
               </div>
-              <div className="mt-5">
-                <button onClick={handleShare} className="w-full px-4 py-2 bg-white/70 hover:bg-white text-gray-800 font-medium rounded-lg transition border border-gray-200">결과 공유하기</button>
-              </div>
+              {showDeep && (
+                <div className="mt-5">
+                  <button onClick={handleShare} className="w-full px-4 py-2 bg-white/70 hover:bg-white text-gray-800 font-medium rounded-lg transition border border-gray-200">결과 공유하기</button>
+                </div>
+              )}
               {shareToast && <p className="mt-3 text-sm text-center text-gray-700">{shareToast}</p>}
             </div>
 
@@ -251,6 +258,16 @@ export default function SchemaTest() {
                 <button onClick={handleStartFromShared} className="underline font-medium">직접 검사를 진행</button>해 보세요.
               </div>
             )}
+
+            {/* 요약 (간단 결과) */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
+              <p className="text-gray-700 leading-relaxed">{dom.summary}</p>
+            </div>
+
+            {!showDeep && <ShareUnlockGate onUnlock={handleShare} />}
+
+            {showDeep && (
+              <>
 
             {/* 5개 도식영역 강도 */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
@@ -290,7 +307,6 @@ export default function SchemaTest() {
             {/* 대표 영역 깊이 읽기 */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
               <h2 className="text-lg font-bold text-purple-900 mb-3">{dom.name} 영역 깊이 읽기</h2>
-              <p className="text-gray-700 leading-relaxed mb-4">{dom.summary}</p>
               <div className="space-y-4 text-sm text-gray-800 leading-relaxed">
                 <div><h3 className="text-sm font-bold text-purple-800 mb-1">이 결은 어떻게 만들어질까</h3><p>{dom.rootExperience}</p></div>
                 <div className="pt-3 border-t border-gray-100"><h3 className="text-sm font-bold text-purple-800 mb-1">삶과 관계에서 나타나는 모습</h3><p>{dom.innerPattern}</p></div>
@@ -352,6 +368,9 @@ export default function SchemaTest() {
                   yMax: 100,
                 }))}
               />
+            )}
+
+              </>
             )}
 
             {!displayResult.isShared && (

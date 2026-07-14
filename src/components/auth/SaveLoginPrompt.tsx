@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/lib/AuthContext";
+import { useAuth, KAKAO_LOGIN_ENABLED } from "@/lib/AuthContext";
 
 /**
  * 비로그인 사용자에게 "결과를 저장하려면 로그인" 유인 카드.
@@ -17,16 +17,16 @@ export default function SaveLoginPrompt({
   message?: string;
   onSignedIn?: () => void;
 }) {
-  const { user, loading, signInWithGoogle } = useAuth();
+  const { user, loading, signInWithGoogle, signInWithKakao } = useAuth();
   const [busy, setBusy] = useState(false);
 
   // 로그인 여부 확정 전, 또는 이미 로그인 상태면 숨김
   if (loading || user) return null;
 
-  async function handleLogin() {
+  async function handleLogin(provider: () => Promise<void>) {
     setBusy(true);
     try {
-      await signInWithGoogle();
+      await provider();
       onSignedIn?.();
     } catch {
       // 팝업 취소 등은 조용히 무시
@@ -60,13 +60,35 @@ export default function SaveLoginPrompt({
         </li>
       </ul>
 
-      <button
-        onClick={handleLogin}
-        disabled={busy}
-        className="block w-full text-center px-4 py-2.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white text-sm font-semibold rounded-lg transition"
-      >
-        {busy ? "로그인 중..." : "Google로 로그인하고 저장하기"}
-      </button>
+      <div className="space-y-2">
+        {KAKAO_LOGIN_ENABLED && (
+          <button
+            onClick={() => handleLogin(signInWithKakao)}
+            disabled={busy}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FEE500] hover:brightness-95 disabled:opacity-60 text-[#191600] text-sm font-semibold rounded-lg transition"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M12 3C6.9 3 3 6.2 3 10.2c0 2.6 1.8 4.9 4.4 6.2-.2.7-.7 2.5-.8 2.9 0 0 0 .3.2.4.1.1.4 0 .4 0 .5-.1 2.8-1.8 3.6-2.4.5.1 1 .1 1.5.1 5.1 0 9-3.2 9-7.2S17.1 3 12 3z" />
+            </svg>
+            {busy ? "로그인 중..." : "카카오로 로그인하고 저장하기"}
+          </button>
+        )}
+        <button
+          onClick={() => handleLogin(signInWithGoogle)}
+          disabled={busy}
+          className={`w-full text-center px-4 py-2.5 disabled:opacity-60 text-sm font-semibold rounded-lg transition ${
+            KAKAO_LOGIN_ENABLED
+              ? "bg-white border border-amber-300 hover:bg-amber-100 text-amber-900"
+              : "bg-amber-600 hover:bg-amber-700 text-white"
+          }`}
+        >
+          {busy
+            ? "로그인 중..."
+            : KAKAO_LOGIN_ENABLED
+              ? "Google로 로그인"
+              : "Google로 로그인하고 저장하기"}
+        </button>
+      </div>
       <p className="text-[11px] text-amber-700/80 text-center mt-2">
         가입 절차 없이 3초면 시작해요 · 지금 보던 결과 그대로 저장돼요
       </p>

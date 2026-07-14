@@ -33,6 +33,9 @@ interface Props {
   currentResult: Record<string, unknown>;
   metrics: MetricDef[];
   title?: string;
+  /** 타인과의 백분위 비교 카드 노출 여부 (기본 true). 임상적으로 타인 비교가
+   * 부적절한 검사(예: 심리도식)는 false로 두어 개인 추세만 보여준다. */
+  showComparison?: boolean;
 }
 
 interface PointSeries {
@@ -45,6 +48,7 @@ export default function ResultInsights({
   currentResult,
   metrics,
   title = "내 기록과 다른 사람들과의 비교",
+  showComparison = true,
 }: Props) {
   const [user, setUser] = useState(() => auth.currentUser);
   const [loading, setLoading] = useState(true);
@@ -123,21 +127,23 @@ export default function ResultInsights({
       <h2 className="text-lg font-bold text-purple-900 mb-4">{title}</h2>
 
       {/* 비교 카드 */}
-      <div className="space-y-3 mb-5">
-        {comparisons.map((c) => (
-          <PercentileDisplay
-            key={c.metric.metricKey}
-            label={c.metric.label}
-            userValue={c.userValue}
-            comparison={c.comp}
-            unit={c.metric.unit}
-            lowerIsBetter={c.metric.lowerIsBetter}
-          />
-        ))}
-      </div>
+      {showComparison && (
+        <div className="space-y-3 mb-5">
+          {comparisons.map((c) => (
+            <PercentileDisplay
+              key={c.metric.metricKey}
+              label={c.metric.label}
+              userValue={c.userValue}
+              comparison={c.comp}
+              unit={c.metric.unit}
+              lowerIsBetter={c.metric.lowerIsBetter}
+            />
+          ))}
+        </div>
+      )}
 
       {/* 추세 그래프 */}
-      <div className="border-t border-gray-100 pt-4">
+      <div className={showComparison ? "border-t border-gray-100 pt-4" : ""}>
         <h3 className="text-sm font-semibold text-purple-900 mb-3">
           내 과거 점수 추세
         </h3>

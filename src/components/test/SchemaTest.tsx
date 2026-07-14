@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import QUESTIONS, {
@@ -103,26 +103,30 @@ export default function SchemaTest() {
     return { domainScores, schemaScores, dominant: sharedCode, topSchemaIds, isShared: true };
   }, [status, sharedCode, answers]);
 
+  // 완료 시 결과 저장. 공유 링크(?result=)는 공유 버튼이 직접 URL을 만들므로
+  // 브라우저 URL은 건드리지 않는다 → 재검사 시에도 매번 저장되고,
+  // 본인 결과 URL이 '공유받은 결과'로 오인되는 문제도 생기지 않는다.
+  const lastSavedRef = useRef<DisplayResult | null>(null);
   useEffect(() => {
-    if (result && status === "result" && !sharedCode) {
-      router.replace(`/personality/schema?result=${result.dominant}`, { scroll: false });
-      const dom = DOMAINS[result.dominant];
-      const topName = SCHEMAS[result.topSchemaIds[0]]?.name ?? "";
-      saveTestResult({
-        type: "schema",
-        category: "personality",
-        displayTitle: "심리도식 검사",
-        summary: `${dom.name} · ${topName}`,
-        result: {
-          dominant: result.dominant,
-          domainName: dom.name,
-          domainScores: result.domainScores,
-          topSchemaIds: result.topSchemaIds,
-          schemaScores: result.schemaScores,
-        },
-      });
-    }
-  }, [result, status, sharedCode, router]);
+    if (!result || status !== "result") return;
+    if (lastSavedRef.current === result) return; // 동일 결과 중복 저장 방지
+    lastSavedRef.current = result;
+    const dom = DOMAINS[result.dominant];
+    const topName = SCHEMAS[result.topSchemaIds[0]]?.name ?? "";
+    saveTestResult({
+      type: "schema",
+      category: "personality",
+      displayTitle: "심리도식 검사",
+      summary: `${dom.name} · ${topName}`,
+      result: {
+        dominant: result.dominant,
+        domainName: dom.name,
+        domainScores: result.domainScores,
+        topSchemaIds: result.topSchemaIds,
+        schemaScores: result.schemaScores,
+      },
+    });
+  }, [result, status]);
 
   const displayResult = result || sharedResult;
 
@@ -159,10 +163,13 @@ export default function SchemaTest() {
               <p className="text-xs text-rose-900 leading-relaxed">
                 이 검사는 어린 시절의 상처와 마음의 패턴을 다룹니다. 문항을 마주하는 동안 마음이 많이 힘들어지신다면 잠시 멈추셔도 괜찮으며, 필요하시다면 전문가와의 상담을 권해 드립니다.
               </p>
+              <p className="text-xs text-rose-800 leading-relaxed mt-1.5">
+                지금 많이 힘드시다면 <b>정신건강 상담전화 1577-0199</b>, <b>자살예방 상담전화 109</b>(24시간)로 언제든 도움을 받으실 수 있습니다.
+              </p>
             </div>
             <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 mb-6">
               <p className="text-xs text-amber-900 leading-relaxed">본 검사는 자가 이해를 돕는 참고 도구이며 의학적 진단이 아닙니다.</p>
-              <p className="text-xs text-amber-800 leading-relaxed mt-1.5">제프리 영(J. Young)이 정립한 심리도식치료 이론의 공개된 개념을 참고해 해람정신건강의학과가 자체 개발한 무료 검사이며, YSQ 등 특정 상용·공인 검사와는 무관합니다.</p>
+              <p className="text-xs text-amber-800 leading-relaxed mt-1.5">제프리 영(J. Young)이 정립한 심리도식치료 이론의 공개된 개념을 참고해 해람정신건강의학과가 자체 개발한 무료 검사이며, 특정 상용·공인 검사와는 무관하고 그 문항을 사용하지 않습니다.</p>
             </div>
             <button className="w-full px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg rounded-xl shadow-md transition" onClick={handleStart}>검사 시작하기</button>
           </div>
@@ -328,6 +335,8 @@ export default function SchemaTest() {
             {!displayResult.isShared && (
               <ResultInsights
                 testType="schema"
+                title="내 도식 점수의 변화"
+                showComparison={false}
                 currentResult={{ domainScores: displayResult.domainScores }}
                 metrics={DOMAIN_ORDER.map((code) => ({
                   metricKey: `dom_${code}`,
@@ -347,7 +356,8 @@ export default function SchemaTest() {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-4 text-center">본 결과는 자가 이해를 돕는 참고 도구이며, 의학적 진단을 대체하지 않습니다. 마음이 힘드시다면 전문가와의 상담을 권해 드립니다.</p>
-            <p className="text-[11px] text-gray-400 mt-1.5 text-center leading-relaxed">제프리 영(J. Young)의 심리도식치료 이론에 기반한 해람정신건강의학과 자체 개발 무료 검사이며, YSQ 등 특정 상용·공인 검사와는 무관합니다.</p>
+            <p className="text-xs text-gray-500 mt-1 text-center">지금 많이 힘드시다면 정신건강 상담전화 1577-0199 · 자살예방 상담전화 109(24시간)로 도움을 받으실 수 있습니다.</p>
+            <p className="text-[11px] text-gray-400 mt-1.5 text-center leading-relaxed">제프리 영(J. Young)의 심리도식치료 이론에 기반한 해람정신건강의학과 자체 개발 무료 검사이며, 특정 상용·공인 검사와는 무관합니다.</p>
           </div>
         );
       })()}

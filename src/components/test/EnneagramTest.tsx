@@ -19,6 +19,7 @@ import { saveTestResult } from "@/lib/test-history";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
+import FullBatteryNudge from "./FullBatteryNudge";
 
 type Status = "ready" | "test" | "result";
 
@@ -658,6 +659,8 @@ export default function EnneagramTest() {
                     }))}
                   />
                 )}
+
+                {!displayResult.isShared && <FullBatteryNudge />}
 
                 <div className="flex gap-3">
                   <button

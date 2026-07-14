@@ -14,6 +14,7 @@ import { saveTestResult } from "@/lib/test-history";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
+import FullBatteryNudge from "./FullBatteryNudge";
 
 type Status = "ready" | "test" | "result";
 const QUESTIONS_PER_PAGE = 9;
@@ -280,6 +281,8 @@ export default function RiasecTest() {
                 }))}
               />
             )}
+
+            {!displayResult.isShared && <FullBatteryNudge />}
 
             <div className="flex gap-3">
               <button className="flex-1 px-6 py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition" onClick={displayResult.isShared ? handleStartFromShared : reset}>

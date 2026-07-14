@@ -20,6 +20,7 @@ import { saveTestResult } from "@/lib/test-history";
 import { useAuth } from "@/lib/AuthContext";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
+import FullBatteryNudge from "./FullBatteryNudge";
 
 type Status = "ready" | "test" | "result";
 const QUESTIONS_PER_PAGE = 9;
@@ -350,6 +351,16 @@ export default function SchemaTest() {
                   yMin: 0,
                   yMax: 100,
                 }))}
+              />
+            )}
+
+            {!displayResult.isShared && (
+              <FullBatteryNudge
+                href="/personality"
+                emoji="🧭"
+                title="다른 마음의 결도 살펴볼까요?"
+                desc="에니어그램·DISC·애착 유형 등 다른 성격 검사로 나를 더 입체적으로 만나 보세요. 성격 5종을 마치면 AI 종합 보고서도 받을 수 있어요."
+                cta="다른 검사 보러 가기"
               />
             )}
 

@@ -21,6 +21,7 @@ import { saveTestResult } from "@/lib/test-history";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
+import FullBatteryNudge from "./FullBatteryNudge";
 
 const VALID_CODE_RE = /^[HL]{5}$/;
 
@@ -554,6 +555,8 @@ export default function Big5Test() {
               })}
             </div>
           </div>
+
+          {!displayResult.isShared && <FullBatteryNudge />}
 
           <div className="flex gap-3">
             <button

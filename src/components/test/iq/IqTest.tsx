@@ -11,8 +11,9 @@ import { fetchTestStats, getMetric } from "@/lib/test-stats";
 import { useAuth } from "@/lib/AuthContext";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import ResultInsights from "../ResultInsights";
+import ShareUnlockGate from "../ShareUnlockGate";
 
-type Phase = "ready" | "verbal" | "number" | "matrix" | "memory" | "speed" | "result";
+type Phase = "ready" | "verbal" | "number" | "matrix" | "memory" | "speed" | "result" | "shared";
 
 const SECTION_TIME: Record<string, number> = { verbal: 300, number: 420, matrix: 420 };
 const SECTION_INFO: Array<{ key: Phase; name: string; desc: string; count: string; time: string }> = [
@@ -66,6 +67,18 @@ interface IqScores {
 export default function IqTest() {
   const { user } = useAuth();
   const [phase, setPhase] = useState<Phase>("ready");
+  // 공유하면 심화 결과(IQ 환산·프로필·비교)가 열린다(share-to-unlock)
+  const [unlocked, setUnlocked] = useState(false);
+  const [shareToast, setShareToast] = useState("");
+  // 공유 링크(?result=점수)로 들어온 경우 — 상대의 점수 열람 뷰
+  const [sharedScore, setSharedScore] = useState<number | null>(null);
+  useEffect(() => {
+    const m = window.location.search.match(/[?&]result=(\d{1,3})/);
+    if (m) {
+      const v = parseInt(m[1], 10);
+      if (v >= 0 && v <= 100) { setSharedScore(v); setPhase("shared"); }
+    }
+  }, []);
 
   // 선다형 답안
   const [verbalAns, setVerbalAns] = useState<Record<number, number>>({});
@@ -172,7 +185,7 @@ export default function IqTest() {
   // ── 규준(표준화) 기반 IQ ──
   const [norm, setNorm] = useState<{ n: number; mean: number; sd: number } | null>(null);
   useEffect(() => {
-    if (phase !== "result") return;
+    if (phase !== "result" && phase !== "shared") return;
     fetchTestStats("iq").then((st) => {
       const m = getMetric(st, "score");
       if (m && m.count > 0) {
@@ -206,10 +219,30 @@ export default function IqTest() {
   }, [scores, user]);
 
   const reset = () => {
+    // 공유 파라미터가 남아 있으면 제거 (공유뷰 재진입 방지)
+    if (window.location.search.includes("result=")) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+    setSharedScore(null); setUnlocked(false);
     setPhase("ready"); setVerbalAns({}); setNumberAns({}); setMatrixAns({});
     setMaxF(3); setMaxB(2); setMemMode("forward"); setMemState("intro"); setMemIdx(0);
     savedRef.current = false; setNorm(null);
   };
+
+  const iqFromNorm = useCallback((score: number): number | null => {
+    if (!norm || norm.n < 5) return null;
+    return Math.max(55, Math.min(145, Math.round(100 + 15 * ((score - norm.mean) / norm.sd))));
+  }, [norm]);
+
+  async function handleShare() {
+    if (!scores) return;
+    setUnlocked(true); // 공유 시 심화 결과 열기
+    const url = `${window.location.origin}/test/iq?result=${scores.composite}`;
+    const text = `종합 인지능력 검사 결과: ${scores.composite}점 (100점 만점)\n나의 인지능력을 5개 영역으로 측정해 보세요.`;
+    if (navigator.share) { try { await navigator.share({ title: "종합 인지능력 검사", text, url }); return; } catch { return; } }
+    try { await navigator.clipboard.writeText(url); setShareToast("링크가 복사되었습니다"); setTimeout(() => setShareToast(""), 2500); }
+    catch { setShareToast("복사 실패"); setTimeout(() => setShareToast(""), 2500); }
+  }
 
   const fmtTime = (s: number) => `${Math.floor(Math.max(0, s) / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
 
@@ -390,23 +423,63 @@ export default function IqTest() {
         </div>
       )}
 
+      {phase === "shared" && sharedScore !== null && (
+        <div className="mt-4">
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-2xl p-6 mb-6 text-center">
+            <p className="text-sm text-purple-700 font-medium mb-1">이 사람의 종합 인지 점수</p>
+            <p className="text-5xl font-bold text-purple-900 mb-2">{sharedScore}<span className="text-xl font-normal text-purple-500"> / 100</span></p>
+            {iqFromNorm(sharedScore) !== null && norm && (
+              <div className="mt-3">
+                <p className="text-sm text-purple-700 font-medium">{norm.n >= 30 ? "표준화 편차 IQ (해람 규준)" : "예비 추정 IQ"}</p>
+                <p className="text-3xl font-bold text-purple-900">{iqFromNorm(sharedScore)}</p>
+                <p className="text-xs text-purple-600 mt-1">수검자 {norm.n.toLocaleString()}명의 분포 기준 · 평균 100, 표준편차 15</p>
+              </div>
+            )}
+          </div>
+          <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6 text-sm text-blue-900">
+            공유받은 결과를 보고 계십니다. 나의 인지능력도 5개 영역으로 측정해 보세요.
+          </div>
+          <button onClick={reset} className="w-full px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-lg rounded-xl shadow-md transition">나도 검사해보기</button>
+        </div>
+      )}
+
       {phase === "result" && scores && (
         <div className="mt-4">
           <SaveLoginPrompt message="결과를 저장하고 재검사 때 변화 추이를 확인하려면 로그인해 주세요. (익명 점수는 규준 통계에만 반영됩니다)" />
 
+          {/* 간단 결과 — 종합 점수 */}
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-2xl p-6 mb-6 text-center">
             <p className="text-sm text-purple-700 font-medium mb-1">종합 인지 점수</p>
             <p className="text-5xl font-bold text-purple-900 mb-2">{scores.composite}<span className="text-xl font-normal text-purple-500"> / 100</span></p>
-            {iqEstimate !== null && norm ? (
-              <div className="mt-3">
-                <p className="text-sm text-purple-700 font-medium">{norm.n >= 30 ? "표준화 편차 IQ (해람 규준)" : "예비 추정 IQ (규준 수집 중)"}</p>
-                <p className="text-3xl font-bold text-purple-900">{iqEstimate}</p>
-                <p className="text-xs text-purple-600 mt-1">수검자 {norm.n.toLocaleString()}명의 분포 기준 · 평균 100, 표준편차 15</p>
-              </div>
-            ) : (
-              <p className="text-xs text-purple-600 mt-2">규준(표준화) 수집 중 — 수검자가 더 모이면 IQ 환산 점수가 표시됩니다.</p>
+            {unlocked && (
+              <>
+                {iqEstimate !== null && norm ? (
+                  <div className="mt-3">
+                    <p className="text-sm text-purple-700 font-medium">{norm.n >= 30 ? "표준화 편차 IQ (해람 규준)" : "예비 추정 IQ (규준 수집 중)"}</p>
+                    <p className="text-3xl font-bold text-purple-900">{iqEstimate}</p>
+                    <p className="text-xs text-purple-600 mt-1">수검자 {norm.n.toLocaleString()}명의 분포 기준 · 평균 100, 표준편차 15</p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-purple-600 mt-2">규준(표준화) 수집 중 — 수검자가 더 모이면 IQ 환산 점수가 표시됩니다.</p>
+                )}
+                <div className="mt-4">
+                  <button onClick={handleShare} className="w-full px-4 py-2 bg-white/70 hover:bg-white text-gray-800 font-medium rounded-lg transition border border-purple-200">결과 공유하기</button>
+                </div>
+              </>
             )}
+            {shareToast && <p className="mt-3 text-sm text-purple-700">{shareToast}</p>}
           </div>
+
+          {!unlocked && (
+            <ShareUnlockGate
+              onUnlock={handleShare}
+              title="나의 IQ 점수가 잠겨 있어요"
+              desc="결과를 친구에게 공유하면 IQ 환산 점수(평균 100·표준편차 15)와 5개 영역별 프로필, 다른 수검자와의 비교까지 모두 열립니다."
+            />
+          )}
+
+          {unlocked && (
+            <>
 
           <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
             <h2 className="text-lg font-bold text-purple-900 mb-4">영역별 프로필</h2>
@@ -440,6 +513,9 @@ export default function IqTest() {
               { metricKey: "score", label: "종합 인지 점수", color: "rgb(126 34 206)", extract: (r) => r.score as number, unit: "점", yMin: 0, yMax: 100 },
             ]}
           />
+
+            </>
+          )}
 
           <div className="flex gap-3">
             <button onClick={reset} className="flex-1 px-6 py-3 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition">다시 검사하기</button>

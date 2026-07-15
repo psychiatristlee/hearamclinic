@@ -7,17 +7,19 @@
 export default function ShareUnlockGate({
   onUnlock,
   busy = false,
+  title = "심화 분석 결과가 잠겨 있어요",
+  desc = "결과를 친구에게 공유하면 상세 성격 해석과 강점·관계·성장 가이드, 그래프까지 모두 열립니다.",
 }: {
   onUnlock: () => void;
   busy?: boolean;
+  title?: string;
+  desc?: string;
 }) {
   return (
     <div className="bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl p-6 mb-6 text-center">
       <div className="text-3xl mb-2">🔒</div>
-      <p className="text-lg font-bold mb-1">심화 분석 결과가 잠겨 있어요</p>
-      <p className="text-sm text-purple-100 leading-relaxed mb-4">
-        결과를 친구에게 공유하면 상세 성격 해석과 강점·관계·성장 가이드, 그래프까지 모두 열립니다.
-      </p>
+      <p className="text-lg font-bold mb-1">{title}</p>
+      <p className="text-sm text-purple-100 leading-relaxed mb-4">{desc}</p>
       <button
         onClick={onUnlock}
         disabled={busy}

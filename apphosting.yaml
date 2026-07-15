@@ -45,5 +45,10 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  - variable: NEXT_PUBLIC_KAKAO_LOGIN
+    value: "on"
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: GOOGLE_GENAI_API_KEY
     secret: GOOGLE_GENAI_API_KEY

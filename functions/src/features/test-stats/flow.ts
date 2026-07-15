@@ -77,19 +77,27 @@ async function aggregate(
   const db = getFirestore();
   const ref = db.collection("testStats").doc(type);
 
-  const updates: Record<string, unknown> = {
-    lastUpdated: FieldValue.serverTimestamp(),
-    type,
-  };
-
+  // 주의: set(+merge)은 점(.) 표기를 경로로 해석하지 않으므로(통짜 필드명이 됨)
+  // 반드시 중첩 객체로 구성한다. merge:true 는 맵을 딥머지하므로
+  // 다른 metric 키를 보존하면서 leaf 의 increment 가 정상 동작한다.
+  const metricFields: Record<string, unknown> = {};
   for (const [metricKey, value] of Object.entries(metrics)) {
-    updates[`metrics.${metricKey}.count`] = FieldValue.increment(1);
-    updates[`metrics.${metricKey}.sum`] = FieldValue.increment(value);
-    updates[`metrics.${metricKey}.sumSq`] = FieldValue.increment(value * value);
+    metricFields[metricKey] = {
+      count: FieldValue.increment(1),
+      sum: FieldValue.increment(value),
+      sumSq: FieldValue.increment(value * value),
+    };
   }
 
   try {
-    await ref.set(updates, {merge: true});
+    await ref.set(
+      {
+        lastUpdated: FieldValue.serverTimestamp(),
+        type,
+        metrics: metricFields,
+      },
+      {merge: true},
+    );
     logger.info(`[testStats:${source}] ${type} 갱신 완료, metrics: ${Object.keys(metrics).join(", ")}`);
   } catch (err) {
     logger.error(`[testStats:${source}] ${type} 갱신 실패:`, err);

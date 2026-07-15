@@ -16,7 +16,6 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { label: "🏥 해람정신과", href: "/clinic", external: false, group: "main" },
   { label: "🔬 검사", href: "/test", external: false, group: "test" },
-  { label: "💬 인지행동치료", href: "/care/counselor", external: false, group: "care" },
   { label: "🧘 명상", href: "/care/breathing", external: false, group: "care" },
   { label: "📝 사고 기록", href: "/care/thought-record", external: false, group: "care" },
   { label: "🌿 감사 일기", href: "/care/gratitude", external: false, group: "care" },

@@ -23,7 +23,6 @@ const attentionTests = [
 const personalityTests = ["big5", "enneagram", "attachment", "disc", "riasec", "schema"];
 
 const careTools = [
-  "counselor",
   "breathing",
   "thought-record",
   "gratitude",

@@ -4,16 +4,10 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "마음 돌봄",
   description:
-    "인지행동치료 챗봇, 명상 가이드, 사고 기록, 감사 일기 — 자가 돌봄을 위한 다양한 도구.",
+    "명상 가이드, 사고 기록, 감사 일기 — 자가 돌봄을 위한 다양한 도구.",
 };
 
 const TOOLS = [
-  {
-    slug: "counselor",
-    icon: "💬",
-    title: "인지행동치료",
-    description: "CBT와 ACT의 결로 마음을 함께 살피는 대화형 자가 돌봄 챗봇.",
-  },
   {
     slug: "breathing",
     icon: "🧘",

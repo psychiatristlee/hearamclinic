@@ -4,9 +4,30 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "검사",
+  title: "무료 인지능력·두뇌 테스트 모음 | 기억력·집중력·반응속도·IQ·성격 검사",
   description:
-    "심리 설문, 집중력 검사, 성격 검사를 한 곳에서. 우울·불안·ADHD 자가 검사부터 Big 5·에니어그램·애착 유형까지 무료로 진행해보세요.",
+    "기억력 테스트, 반응속도 테스트, 집중력 테스트, IQ 검사부터 우울·불안 자가 설문과 성격 검사까지 — 정신건강의학과에서 만든 무료 두뇌·심리 검사를 한 곳에서 진행해 보세요.",
+  keywords: [
+    "인지능력 테스트",
+    "두뇌 테스트",
+    "두뇌 게임",
+    "기억력 테스트",
+    "집중력 테스트",
+    "주의력 검사",
+    "반응속도 테스트",
+    "IQ 테스트",
+    "치매 예방 게임 무료",
+    "ADHD 테스트",
+    "심리 검사",
+  ],
+  alternates: { canonical: "https://hearam.kr/test" },
+  openGraph: {
+    title: "무료 인지능력·두뇌 테스트 모음 | 해람정신건강의학과",
+    description:
+      "기억력·반응속도·집중력·IQ·성격 검사까지 무료 두뇌 테스트를 한 곳에서.",
+    url: "https://hearam.kr/test",
+    type: "website",
+  },
 };
 
 const attentionTests = [
@@ -44,6 +65,21 @@ const attentionTests = [
     name: "trail-making",
     title: "궤적 잇기 검사",
     description: "흩어진 숫자를 1부터 15까지 순서대로 연결해 시각적 주의력을 측정합니다.",
+  },
+  {
+    name: "reaction-time",
+    title: "반응속도 테스트",
+    description: "초록불이 켜지는 순간 클릭! 평균 반응속도(ms)로 순발력·반사신경을 측정합니다.",
+  },
+  {
+    name: "spatial-span",
+    title: "공간 기억력 테스트 (코르시 블록)",
+    description: "블록이 켜지는 순서를 기억해 재현하며 시공간 작업기억 폭을 측정합니다.",
+  },
+  {
+    name: "task-switching",
+    title: "두뇌 회전 테스트 (과제 전환)",
+    description: "시행마다 바뀌는 규칙에 적응하는 속도로 인지 유연성·전두엽 기능을 살펴봅니다.",
   },
 ];
 

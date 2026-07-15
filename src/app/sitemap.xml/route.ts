@@ -15,6 +15,9 @@ const attentionTests = [
   "digit-span",
   "trail-making",
   "iq",
+  "reaction-time",
+  "spatial-span",
+  "task-switching",
 ];
 
 const personalityTests = ["big5", "enneagram", "attachment", "disc", "riasec", "schema"];

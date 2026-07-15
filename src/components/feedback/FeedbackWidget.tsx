@@ -120,7 +120,7 @@ export default function FeedbackWidget() {
                     rows={4}
                     maxLength={2000}
                     placeholder="어떤 점을 개선하면 좋을까요? 구체적으로 적어 주시면 큰 도움이 됩니다."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm resize-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-base resize-none"
                     autoFocus
                   />
                   <p className="text-xs text-gray-400 mt-1 text-right">{message.length} / 2000</p>
@@ -135,7 +135,7 @@ export default function FeedbackWidget() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="example@email.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-base"
                   />
                 </div>
 

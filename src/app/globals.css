@@ -23,6 +23,16 @@ html, body {
   overflow-x: hidden;
 }
 
+/* iOS Safari에서 글자 16px 미만 입력창에 포커스하면 화면이 자동 확대(줌)되는 문제 방지.
+   모바일에서 텍스트 입력 요소의 최소 글자 크기를 16px로 강제한다. (데스크톱 무영향) */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
 /* MDXEditor 테마 */
 .mdxeditor {
   --accentBase: #f3e8ff;

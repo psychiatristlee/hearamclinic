@@ -17,6 +17,7 @@ import {
 } from "@/lib/test/schema/types";
 import SchemaProfileChart from "./SchemaProfileChart";
 import { saveTestResult } from "@/lib/test-history";
+import { scrollToNextQuestion } from "@/lib/scroll-to-next";
 import { useAuth } from "@/lib/AuthContext";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
@@ -58,7 +59,10 @@ export default function SchemaTest() {
   const pageAllAnswered = pageQuestions.every((q) => answers[q.id] !== undefined);
 
   const handleStart = () => { setStatus("test"); setPage(0); setAnswers({}); };
-  const handleAnswer = (qid: number, value: number) => setAnswers((p) => ({ ...p, [qid]: value }));
+  const handleAnswer = (qid: number, value: number) => {
+    setAnswers((p) => ({ ...p, [qid]: value }));
+    scrollToNextQuestion(qid);
+  };
   const handleNext = () => {
     if (page < totalPages - 1) { setPage(page + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
     else { setStatus("result"); window.scrollTo({ top: 0, behavior: "smooth" }); }
@@ -198,7 +202,7 @@ export default function SchemaTest() {
           <p className="text-sm text-gray-600 mb-4">최근 몇 년간 나에게 얼마나 들어맞는지 떠올리며 솔직하게 선택해 주세요. 정답은 없습니다.</p>
           <div className="space-y-5">
             {pageQuestions.map((q) => (
-              <div key={q.id} className="bg-white border border-gray-200 rounded-xl p-5">
+              <div key={q.id} id={`q-${q.id}`} className="bg-white border border-gray-200 rounded-xl p-5">
                 <p className="text-base font-medium text-gray-800 mb-4">{q.id}. {q.text}</p>
                 <div className="grid grid-cols-5 gap-2">
                   {LIKERT_LABELS.map((label, i) => {

@@ -118,6 +118,31 @@ export default function TestListPage() {
         </div>
       </section>
 
+      {/* 지능 검사 */}
+      <section id="iq" className="mb-12">
+        <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <span>🧩</span> 지능 검사
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          언어·수리·도형·기억·속도 5개 영역으로 인지능력을 종합 측정
+        </p>
+        <Link
+          href="/test/iq"
+          className="group block bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+        >
+          <div className="p-5 flex items-center gap-4">
+            <div className="text-4xl flex-shrink-0">🧩</div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold mb-0.5">종합 인지능력 검사 (IQ)</h3>
+              <p className="text-sm text-indigo-100 leading-relaxed">
+                언어 추리·수리 추리·도형 추리·작업 기억·처리 속도 — 약 20분. 수검자 통계가 쌓일수록 편차 IQ로 나의 위치를 확인할 수 있어요.
+              </p>
+            </div>
+            <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
+          </div>
+        </Link>
+      </section>
+
       {/* 집중력 검사 */}
       <section id="attention" className="mb-12">
         <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">

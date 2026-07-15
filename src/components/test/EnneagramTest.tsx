@@ -16,6 +16,7 @@ import {
 } from "@/lib/test/enneagram/extended";
 import EnneagramRadarChart from "./EnneagramRadarChart";
 import { saveTestResult } from "@/lib/test-history";
+import { scrollToNextQuestion } from "@/lib/scroll-to-next";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
@@ -58,6 +59,7 @@ export default function EnneagramTest() {
   }
   function handleAnswer(qid: number, value: number) {
     setAnswers((prev) => ({ ...prev, [qid]: value }));
+    scrollToNextQuestion(qid);
   }
   function handleNext() {
     if (page < totalPages - 1) {
@@ -310,6 +312,7 @@ export default function EnneagramTest() {
             {pageQuestions.map((q) => (
               <div
                 key={q.id}
+                id={`q-${q.id}`}
                 className="bg-white border border-gray-200 rounded-xl p-5"
               >
                 <p className="text-base font-medium text-gray-800 mb-4">

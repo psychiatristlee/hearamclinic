@@ -1,1 +1,1 @@
-export {onTestResultCreated} from "./flow";
+export {onTestResultCreated, onAnonTestResultCreated} from "./flow";

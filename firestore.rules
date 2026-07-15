@@ -63,10 +63,20 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    // testStats: 집계 통계 - 로그인된 사용자는 읽기 가능, 쓰기는 Cloud Function만
+    // testStats: 집계 통계(개인정보 없음) - 공개 읽기(익명 수검자 IQ 환산 등), 쓰기는 Cloud Function만
     match /testStats/{testType} {
-      allow read: if request.auth != null;
+      allow read: if true;
       allow write: if false;
+    }
+
+    // anonTestResults: 비로그인 수검자의 익명 점수 - 규준(표준화) 통계용.
+    // 제출만 가능, 읽기/수정/삭제 차단. 트리거가 testStats로 집계.
+    match /anonTestResults/{docId} {
+      allow create: if request.resource.data.type is string
+        && request.resource.data.type.size() >= 1
+        && request.resource.data.type.size() <= 40
+        && request.resource.data.result is map;
+      allow read, update, delete: if false;
     }
 
     // feedback: 개선사항 요청 - 누구나(비로그인 포함) 제출만 가능, 읽기/수정/삭제 차단

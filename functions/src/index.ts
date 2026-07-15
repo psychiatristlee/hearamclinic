@@ -52,8 +52,8 @@ export {
   chatWithCounselor,
 } from "./features/care";
 
-// Test stats aggregation
-export {onTestResultCreated} from "./features/test-stats";
+// Test stats aggregation (로그인 + 익명 규준)
+export {onTestResultCreated, onAnonTestResultCreated} from "./features/test-stats";
 
 // Personality 통합 보고서
 export {generatePersonalityReport} from "./features/personality-report";

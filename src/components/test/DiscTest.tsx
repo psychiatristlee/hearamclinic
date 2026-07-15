@@ -11,6 +11,7 @@ import { TYPES, characterImageUrl, coverImageUrl } from "@/lib/test/disc/types";
 import { COMBINATION_PROFILES, COMMUNICATION_GUIDE } from "@/lib/test/disc/extended";
 import DiscRadarChart from "./DiscRadarChart";
 import { saveTestResult } from "@/lib/test-history";
+import { scrollToNextQuestion } from "@/lib/scroll-to-next";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
@@ -44,7 +45,10 @@ export default function DiscTest() {
   const pageAllAnswered = pageQuestions.every((q) => answers[q.id] !== undefined);
 
   const handleStart = () => { setStatus("test"); setPage(0); setAnswers({}); };
-  const handleAnswer = (qid: number, value: number) => setAnswers((p) => ({ ...p, [qid]: value }));
+  const handleAnswer = (qid: number, value: number) => {
+    setAnswers((p) => ({ ...p, [qid]: value }));
+    scrollToNextQuestion(qid);
+  };
   const handleNext = () => {
     if (page < totalPages - 1) {
       setPage(page + 1);
@@ -161,7 +165,7 @@ export default function DiscTest() {
           </div>
           <div className="space-y-5">
             {pageQuestions.map((q) => (
-              <div key={q.id} className="bg-white border border-gray-200 rounded-xl p-5">
+              <div key={q.id} id={`q-${q.id}`} className="bg-white border border-gray-200 rounded-xl p-5">
                 <p className="text-base font-medium text-gray-800 mb-4">{q.id}. {q.text}</p>
                 <div className="grid grid-cols-5 gap-2">
                   {LIKERT_LABELS.map((label, i) => {

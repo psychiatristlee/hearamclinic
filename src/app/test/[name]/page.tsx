@@ -8,6 +8,7 @@ import InterferenceAttentionTest from "@/components/test/InterferenceAttentionTe
 import NBackTest from "@/components/test/NBackTest";
 import DigitSpanTest from "@/components/test/DigitSpanTest";
 import TrailMakingTest from "@/components/test/TrailMakingTest";
+import IqTest from "@/components/test/iq/IqTest";
 import Image from "next/image";
 import type { Metadata } from "next";
 
@@ -39,6 +40,11 @@ const attentionTestMeta: Record<string, { title: string; description: string }> 
   "trail-making": {
     title: "궤적 잇기 검사 (Trail Making Test)",
     description: "궤적 잇기 검사로 시각적 주의력과 처리 속도를 측정해보세요.",
+  },
+  iq: {
+    title: "무료 종합 인지능력 검사 (IQ 테스트) — 언어·수리·도형·기억·속도 5영역",
+    description:
+      "언어 추리, 수리 추리, 도형 행렬 추리, 작업 기억, 처리 속도까지 5개 영역으로 측정하는 무료 온라인 인지능력(IQ) 검사. 수검자 규준 통계가 쌓일수록 편차 IQ(평균 100·표준편차 15)로 나의 상대적 위치를 확인할 수 있습니다.",
   },
 };
 
@@ -83,6 +89,7 @@ function pickTestComponent(name: string) {
   if (name === "n-back") return <NBackTest />;
   if (name === "digit-span") return <DigitSpanTest />;
   if (name === "trail-making") return <TrailMakingTest />;
+  if (name === "iq") return <IqTest />;
   return null;
 }
 

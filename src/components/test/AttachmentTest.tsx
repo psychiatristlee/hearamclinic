@@ -16,6 +16,7 @@ import {
 } from "@/lib/test/attachment/types";
 import AttachmentScatterChart from "./AttachmentScatterChart";
 import { saveTestResult } from "@/lib/test-history";
+import { scrollToNextQuestion } from "@/lib/scroll-to-next";
 import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import GuidedNextButton from "./GuidedNextButton";
@@ -65,6 +66,7 @@ export default function AttachmentTest() {
   }
   function handleAnswer(qid: number, value: number) {
     setAnswers((prev) => ({ ...prev, [qid]: value }));
+    scrollToNextQuestion(qid);
   }
   function handleNext() {
     if (page < totalPages - 1) {
@@ -298,7 +300,7 @@ export default function AttachmentTest() {
 
           <div className="space-y-5">
             {pageQuestions.map((q) => (
-              <div key={q.id} className="bg-white border border-gray-200 rounded-xl p-5">
+              <div key={q.id} id={`q-${q.id}`} className="bg-white border border-gray-200 rounded-xl p-5">
                 <p className="text-base font-medium text-gray-800 mb-4">
                   {q.id}. {q.text}
                 </p>

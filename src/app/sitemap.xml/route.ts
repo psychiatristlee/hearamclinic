@@ -22,12 +22,6 @@ const attentionTests = [
 
 const personalityTests = ["big5", "enneagram", "attachment", "disc", "riasec", "schema"];
 
-const careTools = [
-  "breathing",
-  "thought-record",
-  "gratitude",
-];
-
 // 검사 페이지 최초 배포일 (내용이 변경되면 이 날짜를 업데이트)
 const TEST_LAST_MODIFIED = "2026-07-13";
 
@@ -96,24 +90,6 @@ function buildTestUrls(): string {
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>`;
-
-  // 마음 돌봄 도구들
-  urls += `
-  <url>
-    <loc>${BASE_URL}/care</loc>
-    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>`;
-  for (const name of careTools) {
-    urls += `
-  <url>
-    <loc>${BASE_URL}/care/${name}</loc>
-    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>`;
-  }
 
   return urls;
 }

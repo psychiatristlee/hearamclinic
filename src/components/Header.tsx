@@ -10,15 +10,12 @@ interface MenuItem {
   label: string;
   href: string;
   external: boolean;
-  group: "main" | "test" | "care" | "booking";
+  group: "main" | "test" | "booking";
 }
 
 const menuItems: MenuItem[] = [
   { label: "🏥 해람정신과", href: "/clinic", external: false, group: "main" },
   { label: "🔬 검사", href: "/test", external: false, group: "test" },
-  { label: "🧘 명상", href: "/care/breathing", external: false, group: "care" },
-  { label: "📝 사고 기록", href: "/care/thought-record", external: false, group: "care" },
-  { label: "🌿 감사 일기", href: "/care/gratitude", external: false, group: "care" },
   { label: "📅 예약", href: "https://naver.me/Fy2FWU9A", external: true, group: "booking" },
 ];
 

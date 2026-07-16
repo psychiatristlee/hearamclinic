@@ -43,15 +43,6 @@ export {
   runAutoPublishNow,
 } from "./features/auto-publish";
 
-// Care tools (AI 생성 자가 돌봄)
-export {
-  generateBreathingGuide,
-  generateThoughtRecord,
-  generateGratitudePrompts,
-  generateMindfulnessScript,
-  chatWithCounselor,
-} from "./features/care";
-
 // Test stats aggregation (로그인 + 익명 규준)
 export {onTestResultCreated, onAnonTestResultCreated} from "./features/test-stats";
 

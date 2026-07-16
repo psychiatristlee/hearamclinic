@@ -45,11 +45,6 @@ service cloud.firestore {
       match /dailyLogs/{dateKey} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
-
-      // 자가 돌봄 도구 세션 (호흡/CBT/감사/마음챙김)
-      match /practiceSessions/{sessionId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
     }
 
     // drafts: Cloud Functions(admin SDK)로만 접근, 클라이언트 차단

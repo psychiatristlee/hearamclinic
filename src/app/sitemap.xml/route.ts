@@ -1,30 +1,15 @@
 import { NextResponse } from "next/server";
-import questionnaires from "@/lib/test/questionnaires";
 
 const FUNCTION_URL =
   "https://asia-northeast3-hearamclinic-ef507.cloudfunctions.net/sitemap";
 
 const BASE_URL = "https://hearam.kr";
 
-const attentionTests = [
-  "stroop",
-  "selective-attention",
-  "sustained-inhibition",
-  "interference-attention",
-  "n-back",
-  "digit-span",
-  "trail-making",
-  "iq",
-  "reaction-time",
-  "spatial-span",
-  "task-switching",
-];
-
-const personalityTests = ["big5", "enneagram", "attachment", "disc", "riasec", "schema"];
-
 // 검사 페이지 최초 배포일 (내용이 변경되면 이 날짜를 업데이트)
 const TEST_LAST_MODIFIED = "2026-07-13";
 
+// 개별 검사 페이지는 soundary.life 로 영구 리다이렉트되므로(next.config.ts)
+// 사이트맵에는 허브 페이지만 남긴다.
 function buildTestUrls(): string {
   let urls = `  <url>
     <loc>${BASE_URL}/test</loc>
@@ -32,26 +17,6 @@ function buildTestUrls(): string {
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`;
-
-  for (const q of questionnaires) {
-    urls += `
-  <url>
-    <loc>${BASE_URL}/test/${q.name}</loc>
-    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>`;
-  }
-
-  for (const name of attentionTests) {
-    urls += `
-  <url>
-    <loc>${BASE_URL}/test/${name}</loc>
-    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>`;
-  }
 
   // 집중력 검사 인덱스
   urls += `
@@ -69,26 +34,6 @@ function buildTestUrls(): string {
     <lastmod>${TEST_LAST_MODIFIED}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-  </url>`;
-
-  // 성격 검사 개별
-  for (const name of personalityTests) {
-    urls += `
-  <url>
-    <loc>${BASE_URL}/personality/${name}</loc>
-    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>`;
-  }
-
-  // 종합 성격 보고서
-  urls += `
-  <url>
-    <loc>${BASE_URL}/personality/report</loc>
-    <lastmod>${TEST_LAST_MODIFIED}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
   </url>`;
 
   return urls;

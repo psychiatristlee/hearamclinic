@@ -379,7 +379,7 @@ export default function SchemaTest() {
 
             {!displayResult.isShared && (
               <FullBatteryNudge
-                href="/personality"
+                href="https://soundary.life/ko/personality?utm_source=hearam.kr"
                 emoji="🧭"
                 title="다른 마음의 결도 살펴볼까요?"
                 desc="에니어그램·DISC·애착 유형 등 다른 성격 검사로 나를 더 입체적으로 만나 보세요. 성격 5종을 마치면 AI 종합 보고서도 받을 수 있어요."

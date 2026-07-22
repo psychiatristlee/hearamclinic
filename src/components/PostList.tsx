@@ -4,6 +4,10 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/AuthContext";
+import {
+  soundaryBatteryUrl,
+  soundaryPersonalityUrl,
+} from "@/lib/external-tests";
 
 function safeDecodeSlug(slug: string): string {
   try {
@@ -69,8 +73,8 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
   return (
     <div>
       {/* 종합 성격 보고서 진입 배너 */}
-      <Link
-        href="/personality/report"
+      <a
+        href={soundaryBatteryUrl()}
         className="group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
       >
         <div className="p-5 flex items-center gap-4">
@@ -83,11 +87,11 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
           </div>
           <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
         </div>
-      </Link>
+      </a>
 
       {/* 심리도식 검사 진입 카드 (신규) */}
-      <Link
-        href="/personality/schema"
+      <a
+        href={soundaryPersonalityUrl("schema") ?? "/personality/schema"}
         className="group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
       >
         <div className="flex items-stretch">
@@ -111,7 +115,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
             </p>
           </div>
         </div>
-      </Link>
+      </a>
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">블로그</h1>

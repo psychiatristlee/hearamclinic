@@ -1,9 +1,5 @@
 import { Metadata } from "next";
 import Image from "next/image";
-import {
-  soundaryPersonalityUrl,
-  soundaryBatteryUrl,
-} from "@/lib/external-tests";
 
 export const metadata: Metadata = {
   title: "무료 성격·심리 검사 모음 | Big 5·에니어그램·애착·DISC·RIASEC·심리도식 + AI 종합 보고서",
@@ -119,7 +115,7 @@ export default function PersonalityListPage() {
 
       {/* 종합 보고서 진입 카드 (상단 강조) */}
       <a
-        href={soundaryBatteryUrl()}
+        href={"/personality/report"}
         className="group block mb-8 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
       >
         <div className="p-6 flex items-center gap-5">
@@ -138,7 +134,7 @@ export default function PersonalityListPage() {
         {personalityTests.map((test) => (
           <a
             key={test.name}
-            href={soundaryPersonalityUrl(test.name) ?? `/personality/${test.name}`}
+            href={`/personality/${test.name}`}
             className="group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
           >
             <div className="relative aspect-[16/9] bg-purple-50">

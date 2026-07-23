@@ -4,10 +4,6 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/AuthContext";
-import {
-  soundaryBatteryUrl,
-  soundaryPersonalityUrl,
-} from "@/lib/external-tests";
 
 function safeDecodeSlug(slug: string): string {
   try {
@@ -74,7 +70,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
     <div>
       {/* 종합 성격 보고서 진입 배너 */}
       <a
-        href={soundaryBatteryUrl()}
+        href={"/personality/report"}
         className="group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
       >
         <div className="p-5 flex items-center gap-4">
@@ -91,7 +87,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
 
       {/* 심리도식 검사 진입 카드 (신규) */}
       <a
-        href={soundaryPersonalityUrl("schema") ?? "/personality/schema"}
+        href={"/personality/schema"}
         className="group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
       >
         <div className="flex items-stretch">

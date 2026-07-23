@@ -12,6 +12,8 @@ import IqTest from "@/components/test/iq/IqTest";
 import ReactionTimeTest from "@/components/test/ReactionTimeTest";
 import SpatialSpanTest from "@/components/test/SpatialSpanTest";
 import TaskSwitchingTest from "@/components/test/TaskSwitchingTest";
+import SoundaryHandoff from "@/components/SoundaryHandoff";
+import { soundaryTestUrl } from "@/lib/external-tests";
 import Image from "next/image";
 import type { Metadata } from "next";
 
@@ -138,6 +140,15 @@ function pickTestComponent(name: string) {
 export default async function TestPage(props: TestPageProps) {
   const params = await props.params;
   const name = params.name;
+
+  // soundary.life 로 이관된 검사 — 안내 후 자동 이동
+  const soundary = soundaryTestUrl(name);
+  if (soundary) {
+    const title =
+      attentionTestMeta[name]?.title ??
+      questionnaires.find((q) => q.name === name)?.title;
+    return <SoundaryHandoff targetUrl={soundary} testTitle={title} />;
+  }
 
   const attentionEl = pickTestComponent(name);
   if (attentionEl) return attentionEl;

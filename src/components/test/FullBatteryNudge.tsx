@@ -1,7 +1,6 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { soundaryBatteryUrl } from "@/lib/external-tests";
 
 interface Props {
   href?: string;
@@ -28,7 +27,7 @@ export default function FullBatteryNudge({
 
   return (
     <a
-      href={href ?? soundaryBatteryUrl()}
+      href={href ?? "/personality/report"}
       className="group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-xl transition"
     >
       <div className="p-5 flex items-center gap-4">

@@ -1,11 +1,6 @@
 import { Metadata } from "next";
 import questionnaires from "@/lib/test/questionnaires";
 import Image from "next/image";
-import {
-  soundaryTestUrl,
-  soundaryPersonalityUrl,
-  soundaryBatteryUrl,
-} from "@/lib/external-tests";
 
 export const metadata: Metadata = {
   title: "무료 인지능력·두뇌 테스트 모음 | 기억력·집중력·반응속도·IQ·성격 검사",
@@ -148,7 +143,7 @@ export default function TestListPage() {
           {questionnaires.map((q) => (
             <a
               key={q.id}
-              href={soundaryTestUrl(q.name) ?? `/test/${q.name}`}
+              href={`/test/${q.name}`}
               className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
             >
               <h3 className="font-semibold text-gray-900 mb-1">{q.title}</h3>
@@ -167,7 +162,7 @@ export default function TestListPage() {
           언어·수리·도형·기억·속도 5개 영역으로 인지능력을 종합 측정
         </p>
         <a
-          href={soundaryTestUrl("iq") ?? "/test/iq"}
+          href={"/test/iq"}
           className="group block bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
         >
           <div className="p-5 flex items-center gap-4">
@@ -195,7 +190,7 @@ export default function TestListPage() {
           {attentionTests.map((t) => (
             <a
               key={t.name}
-              href={soundaryTestUrl(t.name) ?? `/test/${t.name}`}
+              href={`/test/${t.name}`}
               className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
             >
               <h3 className="font-semibold text-gray-900 mb-1">{t.title}</h3>
@@ -216,7 +211,7 @@ export default function TestListPage() {
 
         {/* 종합 성격 보고서 진입 카드 */}
         <a
-          href={soundaryBatteryUrl()}
+          href={"/personality/report"}
           className="group block mb-5 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
         >
           <div className="p-5 flex items-center gap-4">
@@ -234,7 +229,7 @@ export default function TestListPage() {
           {personalityTests.map((t) => (
             <a
               key={t.name}
-              href={soundaryPersonalityUrl(t.name) ?? `/personality/${t.name}`}
+              href={`/personality/${t.name}`}
               className="group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
             >
               <div className="relative aspect-[16/9] bg-purple-50">

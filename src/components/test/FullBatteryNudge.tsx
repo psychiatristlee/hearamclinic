@@ -12,7 +12,6 @@ interface Props {
 
 /**
  * 개별 검사 결과 화면에서 "전체 심리검사(종합 성격 보고서)도 해보라"고 유도하는 카드.
- * 종합 보고서는 soundary.life(해람헬스케어)로 연결한다.
  * 가이드 모드(?guided=1)에서는 GuidedNextButton이 흐름을 담당하므로 숨긴다.
  */
 export default function FullBatteryNudge({

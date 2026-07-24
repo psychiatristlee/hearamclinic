@@ -5,8 +5,6 @@ import AttachmentTest from "@/components/test/AttachmentTest";
 import DiscTest from "@/components/test/DiscTest";
 import RiasecTest from "@/components/test/RiasecTest";
 import SchemaTest from "@/components/test/SchemaTest";
-import SoundaryHandoff from "@/components/SoundaryHandoff";
-import { soundaryPersonalityUrl } from "@/lib/external-tests";
 import {
   DOMAINS as SCHEMA_DOMAINS,
   domainImageUrl as schemaDomainImageUrl,
@@ -252,18 +250,6 @@ function quizJsonLd(name: string) {
 
 export default async function PersonalityPage(props: PageProps) {
   const params = await props.params;
-
-  // soundary.life 로 이관된 검사 — 안내 후 자동 이동
-  const soundary = soundaryPersonalityUrl(params.name);
-  if (soundary) {
-    return (
-      <SoundaryHandoff
-        targetUrl={soundary}
-        testTitle={personalityTestMeta[params.name]?.title}
-      />
-    );
-  }
-
   const ld = quizJsonLd(params.name);
   const schemaScript = ld ? (
     <script

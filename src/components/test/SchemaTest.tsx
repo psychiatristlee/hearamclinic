@@ -64,11 +64,20 @@ export default function SchemaTest() {
     scrollToNextQuestion(qid);
   };
   const handleNext = () => {
-    if (page < totalPages - 1) { setPage(page + 1); window.scrollTo({ top: 0, behavior: "smooth" }); }
-    else { setStatus("result"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (page < totalPages - 1) setPage(page + 1);
+    else setStatus("result");
   };
-  const handlePrev = () => { if (page > 0) { setPage(page - 1); window.scrollTo({ top: 0, behavior: "smooth" }); } };
+  const handlePrev = () => { if (page > 0) setPage(page - 1); };
   const reset = () => { setStatus("ready"); setPage(0); setAnswers({}); };
+
+  // 페이지 전환·결과 진입 시 화면 최상단으로 스크롤 업.
+  // setPage 직후 동기로 스크롤하면 문항 교체 리렌더·스크롤 앵커링과 겹쳐 중간에
+  // 멈추는 일이 있어, DOM이 갱신된 뒤(effect)에 실행해 안정적으로 위로 올린다.
+  useEffect(() => {
+    if (status === "test" || status === "result") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [page, status]);
 
   const result = useMemo<DisplayResult | null>(() => {
     if (!allAnswered) return null;

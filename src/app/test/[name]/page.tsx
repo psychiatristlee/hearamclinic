@@ -12,6 +12,8 @@ import IqTest from "@/components/test/iq/IqTest";
 import ReactionTimeTest from "@/components/test/ReactionTimeTest";
 import SpatialSpanTest from "@/components/test/SpatialSpanTest";
 import TaskSwitchingTest from "@/components/test/TaskSwitchingTest";
+import SoundaryHandoff from "@/components/SoundaryHandoff";
+import { soundaryTestUrl, soundaryTestTitle } from "@/lib/external-tests";
 import Image from "next/image";
 import type { Metadata } from "next";
 
@@ -138,6 +140,12 @@ function pickTestComponent(name: string) {
 export default async function TestPage(props: TestPageProps) {
   const params = await props.params;
   const name = params.name;
+
+  // 일부 검사(IQ·스트룹)는 심리검사 플랫폼 Soundary에서 진행 — 안내 후 이동
+  const soundary = soundaryTestUrl(name);
+  if (soundary) {
+    return <SoundaryHandoff targetUrl={soundary} testTitle={soundaryTestTitle(name)} />;
+  }
 
   const attentionEl = pickTestComponent(name);
   if (attentionEl) return attentionEl;

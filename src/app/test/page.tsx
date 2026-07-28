@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import questionnaires from "@/lib/test/questionnaires";
+import { isSoundaryTest } from "@/lib/external-tests";
 import Image from "next/image";
 
 export const metadata: Metadata = {
@@ -168,6 +169,9 @@ export default function TestListPage() {
           <div className="p-5 flex items-center gap-4">
             <div className="text-4xl flex-shrink-0">🧩</div>
             <div className="flex-1 min-w-0">
+              <span className="inline-block mb-1 text-[11px] font-semibold bg-white/20 text-white px-2 py-0.5 rounded-full">
+                🌊 Soundary에서 진행
+              </span>
               <h3 className="text-lg font-bold mb-0.5">종합 인지능력 검사 (IQ)</h3>
               <p className="text-sm text-indigo-100 leading-relaxed">
                 언어 추리·수리 추리·도형 추리·작업 기억·처리 속도 — 약 20분. 수검자 통계가 쌓일수록 편차 IQ로 나의 위치를 확인할 수 있어요.
@@ -193,7 +197,14 @@ export default function TestListPage() {
               href={`/test/${t.name}`}
               className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
             >
-              <h3 className="font-semibold text-gray-900 mb-1">{t.title}</h3>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold text-gray-900">{t.title}</h3>
+                {isSoundaryTest(t.name) && (
+                  <span className="flex-shrink-0 text-[11px] font-semibold text-purple-700 bg-purple-50 border border-purple-100 px-2 py-0.5 rounded-full">
+                    🌊 Soundary
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-gray-600 line-clamp-2">{t.description}</p>
             </a>
           ))}

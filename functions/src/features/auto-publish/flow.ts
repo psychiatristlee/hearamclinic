@@ -97,7 +97,7 @@ async function pickTrendingTopic(
     "";
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash-lite",
     contents: `당신은 정신건강의학과 전문의이자 블로그 운영자입니다.
 웹 검색을 통해 현재 사람들이 가장 관심을 갖고 있는 정신건강 관련 주제를 파악하세요.
 

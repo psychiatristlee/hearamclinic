@@ -36,7 +36,7 @@ export const generatePersonalityReport = onCall(
     }).join("\n\n");
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash-lite",
       contents: `당신은 정신건강의학과 임상 심리 분야의 전문가이며, 여러 성격 검사 결과를 통합 해석하는 보고서를 작성합니다.
 
 [사용자의 검사 결과]

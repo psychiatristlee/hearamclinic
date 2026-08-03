@@ -55,7 +55,7 @@ async function rewriteContent(
   content: string,
 ): Promise<string> {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash-lite",
     contents: PROMPT_TEMPLATE(title, content),
   });
   const text = (response.text ?? "").trim();

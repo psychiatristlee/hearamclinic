@@ -58,7 +58,7 @@ async function generateCharacterImage(
 ): Promise<Buffer | null> {
   try {
     const response = await ai.generate({
-      model: "googleai/gemini-2.5-flash-image",
+      model: "googleai/gemini-3.1-flash-image",
       prompt: buildPrompt(typeName, tagline, summary),
       config: {
         responseModalities: ["IMAGE", "TEXT"],

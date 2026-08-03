@@ -86,7 +86,7 @@ async function gen(prompt: string): Promise<Buffer | null> {
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
       const response = await ai.generate({
-        model: "googleai/gemini-2.5-flash-image",
+        model: "googleai/gemini-3.1-flash-image",
         prompt,
         config: {responseModalities: ["IMAGE", "TEXT"]},
       });

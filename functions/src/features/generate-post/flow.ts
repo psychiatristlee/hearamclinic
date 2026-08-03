@@ -21,7 +21,7 @@ async function resolveWebImages(
   for (const [full, alt, query] of matches) {
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.5-flash-lite",
         contents: `Find a copyright-free image for: "${query.trim()}"
 
 Search the web for a freely usable image from sources like Unsplash, Pixabay, Pexels, or Wikimedia Commons.
@@ -118,7 +118,7 @@ ${sectionList}
   }
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash-lite",
     contents: `당신은 정신건강의학과 전문의가 운영하는 블로그의 글을 작성합니다.
 웹 검색을 통해 최신 의학 정보와 근거를 바탕으로 글을 작성하세요.
 
@@ -204,7 +204,7 @@ export const suggestTopics = onCall(
 
     const ai = new GoogleGenAI({apiKey: apiKey.value()});
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash-lite",
       contents: `당신은 정신건강의학과 전문의이자 블로그 운영자입니다.
 웹 검색을 통해 현재 사람들이 가장 관심을 갖고 있는 정신건강 관련 주제를 파악하세요.
 
@@ -271,7 +271,7 @@ export const chatAboutTopic = onCall(
       : "";
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.5-flash-lite",
       contents: `당신은 정신건강의학과 전문의입니다. 사용자(동료 의사 또는 블로그 작성자)와 블로그 글 주제에 대해 토론하고 있습니다.
 
 웹 검색을 통해 최신 의학 정보를 바탕으로 답변하세요.
@@ -299,7 +299,7 @@ export async function reviewWithGemini(
   markdown: string,
 ): Promise<string> {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash-lite",
     contents: `당신은 한국어 블로그 글 교정 전문가입니다.
 
 아래 블로그 글을 교정해주세요. 교정된 마크다운만 출력하고, 다른 설명은 하지 마세요.
@@ -407,7 +407,7 @@ async function editBlogText(
   instructions: string,
 ): Promise<string> {
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash-lite",
     contents: `당신은 정신건강의학과 전문의입니다. 의사의 관점에서 환자분들에게 직접 설명하듯이 블로그 글을 수정합니다.
 아래 기존 블로그 글을 사용자의 수정 지시사항에 따라 수정해주세요.
 

@@ -50,7 +50,7 @@ export default function GuidedNextButton({ currentType }: Props) {
         {Array.from({ length: TOTAL_TESTS }).map((_, i) => (
           <div
             key={i}
-            className={`flex-1 h-1.5 rounded-full ${
+            className={`flex-1 h-1.5 rounded-full transition-colors duration-300 ${
               i <= currentIndex ? "bg-white" : "bg-white/30"
             }`}
           />

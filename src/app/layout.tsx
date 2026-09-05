@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import NaverMap from "@/components/NaverMap";
 import FeedbackWidget from "@/components/feedback/FeedbackWidget";
 import { AuthProvider } from "@/lib/AuthContext";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// 서체는 globals.css의 시스템 서체 스택을 쓴다 (웹폰트 다운로드 없음 → 첫 렌더 지연 제거).
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://hearam.kr"),
@@ -84,9 +75,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <AuthProvider>
         <Header />
         <main className="mx-auto max-w-4xl px-4 py-8">{children}</main>
@@ -103,7 +92,7 @@ export default function RootLayout({
                   href="https://naver.me/Fy2FWU9A"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block border border-gray-200 rounded-xl p-6 bg-white hover:shadow-lg transition"
+                  className="card-lift block border border-gray-200 rounded-xl p-6 bg-white hover:shadow-lg hover:border-purple-200"
                 >
                   <div className="flex items-center gap-5">
                     <div className="w-16 h-16 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">

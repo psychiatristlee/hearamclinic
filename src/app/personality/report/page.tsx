@@ -1,5 +1,6 @@
 "use client";
 
+import { scrollToTop } from "@/lib/motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -112,7 +113,7 @@ function ReportContent() {
       );
       const res = await fn({ tests });
       setReport(res.data);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } catch (err) {
       console.error(err);
       setError("보고서 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.");

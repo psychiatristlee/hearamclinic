@@ -1,5 +1,6 @@
 "use client";
 
+import { scrollToTop } from "@/lib/motion";
 import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -80,17 +81,17 @@ export default function Big5Test() {
   function handleNext() {
     if (page < totalPages - 1) {
       setPage(page + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     } else {
       setStatus("result");
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   }
 
   function handlePrev() {
     if (page > 0) {
       setPage(page - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   }
 

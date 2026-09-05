@@ -7,20 +7,224 @@
   --color-primary: #6B3FA0;
   --color-primary-dark: #5B2D8E;
   --color-primary-light: #8B5FC0;
+
+  /* 플랫폼 시스템 서체 우선 — 광학 크기·자간 테이블·가독성 튜닝을 OS가 이미 갖고 있다.
+     한글은 Apple SD Gothic Neo(맥/iOS) → Pretendard(설치 시) → Noto Sans KR/맑은 고딕 순으로 폴백. */
+  --font-system:
+    -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard Variable", Pretendard,
+    system-ui, "Segoe UI", Roboto, "Noto Sans KR", "Malgun Gothic", "Helvetica Neue", Arial,
+    sans-serif;
+  --font-system-mono:
+    ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* 모션 토큰 — 입력에 즉시 반응하고 부드럽게 정착하는 감속(ease-out) 곡선을 기본값으로.
+     spring은 iOS 시트 곡선(빠르게 출발 → 길게 정착). */
+  --motion-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-system);
+  --font-mono: var(--font-system-mono);
+
+  /* ease-out-soft / ease-spring 유틸리티 + 모든 transition 유틸리티의 기본 곡선·시간 */
+  --ease-out-soft: var(--motion-ease-out);
+  --ease-spring: var(--motion-ease-spring);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: var(--motion-ease-out);
 }
 
-html, body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
+@layer base {
+  html {
+    font-family: var(--font-system);
+    font-optical-sizing: auto;
+    -webkit-text-size-adjust: 100%;
+    /* 눌림 피드백을 직접 그리므로 iOS 기본 탭 하이라이트는 끈다 */
+    -webkit-tap-highlight-color: transparent;
+    /* 고정 헤더 아래로 앵커(#attention 등)가 숨지 않도록 */
+    scroll-padding-top: 5rem;
+  }
+
+  html,
+  body {
+    background: var(--background);
+    color: var(--foreground);
+  }
+
+  /* 가로 넘침 방지는 html에만 건다. html·body 양쪽에 overflow-x: hidden을 주면
+     body가 별도 스크롤 컨테이너가 되어 헤더의 position: sticky가 뷰포트에 붙지 않는다. */
+  html {
+    overflow-x: hidden;
+  }
+
+  /* 한글 본문은 조금 넉넉한 행간이 읽기 편하다 */
+  body {
+    line-height: 1.6;
+    /* clip은 스크롤 컨테이너를 만들지 않아 sticky를 깨지 않는다 (미지원 브라우저는 무시) */
+    overflow-x: clip;
+  }
+
+  /* 자간은 크기별로 — 큰 제목은 음수 자간으로 조이고, 본문은 0 근처 (Apple §15) */
+  h1 {
+    letter-spacing: -0.025em;
+  }
+  h2 {
+    letter-spacing: -0.02em;
+  }
+  h3 {
+    letter-spacing: -0.01em;
+  }
+
+  /* 모든 버튼은 pointer-down 순간 눌린다 (Apple §1). scale 개별 속성이라 translate 등과 합성된다. */
+  button:not(:disabled) {
+    transition: scale 160ms var(--motion-ease-out);
+  }
+  button:not(:disabled):active {
+    scale: 0.97;
+    transition-duration: 80ms;
+  }
+
+  /* 감소된 모션: 부드러운 스크롤을 끈다 (JS 스크롤은 lib/motion.ts에서 처리) */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ── 상호작용 유틸리티 ────────────────────────────────────────────── */
+
+/* 링크·칩 등 버튼이 아닌 요소에 눌림 피드백을 준다 */
+@utility pressable {
+  transition-property: scale, translate, box-shadow, background-color, border-color, color, opacity;
+  transition-duration: 160ms;
+  transition-timing-function: var(--motion-ease-out);
+  &:active {
+    scale: 0.97;
+    transition-duration: 80ms;
+  }
+}
+
+/* 카드: 호버 시 살짝 떠오르고, 누르면 제자리로 내려앉는다. 절제된 2px. */
+@utility card-lift {
+  transition-property: translate, scale, box-shadow, border-color, background-color, color;
+  transition-duration: 200ms;
+  transition-timing-function: var(--motion-ease-out);
+  @media (hover: hover) {
+    &:hover {
+      translate: 0 -2px;
+    }
+  }
+  &:active {
+    translate: 0 0;
+    scale: 0.985;
+    transition-duration: 80ms;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &:hover {
+      translate: none;
+    }
+  }
+}
+
+/* 반투명 재질 — 콘텐츠가 아래로 흐르는 플로팅 크롬 (Apple §12).
+   투명도 감소·고대비 설정에서는 불투명하게. */
+@utility glass {
+  background-color: rgb(255 255 255 / 0.72);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  @media (prefers-reduced-transparency: reduce) {
+    background-color: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  @media (prefers-contrast: more) {
+    background-color: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* ── 오버레이 / 시트 진입·퇴장 (Apple §7 대칭 경로, §12 딤 처리, §14 감소된 모션) ── */
+@layer components {
+  .overlay-scrim {
+    transition: opacity 200ms var(--motion-ease-out);
+    @starting-style {
+      opacity: 0;
+    }
+  }
+  .overlay-scrim[data-closing] {
+    opacity: 0;
+  }
+
+  /* 모바일: 아래에서 올라오는 시트. 나갈 때도 같은 길로 내려간다. */
+  .sheet-panel {
+    transition:
+      translate 320ms var(--motion-ease-spring),
+      scale 320ms var(--motion-ease-spring),
+      opacity 200ms var(--motion-ease-out);
+    @starting-style {
+      translate: 0 100%;
+    }
+  }
+  .sheet-panel[data-closing] {
+    translate: 0 100%;
+    transition-duration: 240ms, 240ms, 160ms;
+  }
+
+  /* 데스크톱: 트리거 위치(transform-origin은 컴포넌트에서 지정)에서 자라나는 카드 */
+  @media (min-width: 640px) {
+    .sheet-panel {
+      @starting-style {
+        translate: 0 12px;
+        scale: 0.96;
+        opacity: 0;
+      }
+    }
+    .sheet-panel[data-closing] {
+      translate: 0 12px;
+      scale: 0.96;
+      opacity: 0;
+    }
+  }
+
+  /* 감소된 모션: 이동·확대 대신 짧은 크로스페이드 */
+  @media (prefers-reduced-motion: reduce) {
+    .sheet-panel {
+      transition: opacity 160ms var(--motion-ease-out);
+      @starting-style {
+        translate: none;
+        scale: none;
+        opacity: 0;
+      }
+    }
+    .sheet-panel[data-closing] {
+      translate: none;
+      scale: none;
+      opacity: 0;
+    }
+  }
+
+  /* 페이지 진입: 새 화면이 살짝 떠오르며 나타난다 (template.tsx) */
+  .page-enter {
+    transition:
+      opacity 220ms var(--motion-ease-out),
+      translate 220ms var(--motion-ease-out);
+    @starting-style {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .page-enter {
+      transition: opacity 160ms var(--motion-ease-out);
+      @starting-style {
+        translate: none;
+      }
+    }
+  }
 }
 
 /* iOS Safari에서 글자 16px 미만 입력창에 포커스하면 화면이 자동 확대(줌)되는 문제 방지.
@@ -48,5 +252,5 @@ html, body {
   --accentText: #6b3fa0;
   --accentTextContrast: #4c1d95;
   border-radius: 0.75rem;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-system);
 }

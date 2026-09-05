@@ -34,7 +34,7 @@ export default function SoundaryHandoff({
     <div className="mx-auto max-w-lg mt-8 sm:mt-16 px-4">
       <div className="bg-white border border-purple-100 rounded-2xl shadow-sm p-8 text-center">
         <div className="text-5xl mb-4">🌊</div>
-        <h1 className="text-2xl font-bold text-purple-900 mb-3">
+        <h1 className="text-2xl font-bold tracking-tight text-purple-900 mb-3">
           {testTitle ? `「${testTitle}」는 ` : "이 검사는 "}Soundary에서 진행됩니다
         </h1>
         <p className="text-gray-700 leading-relaxed mb-2">
@@ -47,7 +47,7 @@ export default function SoundaryHandoff({
 
         <a
           href={finalUrl}
-          className="block w-full px-6 py-3.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition"
+          className="pressable block w-full px-6 py-3.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg shadow-purple-900/15"
         >
           Soundary에서 검사 시작하기 →
         </a>

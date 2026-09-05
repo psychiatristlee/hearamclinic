@@ -10,6 +10,7 @@ import { contributeAnonStats } from "@/lib/anon-stats";
 import { fetchTestStats, getMetric } from "@/lib/test-stats";
 import { useAuth } from "@/lib/AuthContext";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
+import { scrollBehavior } from "@/lib/motion";
 import ResultInsights from "../ResultInsights";
 import ShareUnlockGate from "../ShareUnlockGate";
 
@@ -27,7 +28,7 @@ const SECTION_INFO: Array<{ key: Phase; name: string; desc: string; count: strin
 // 답 선택 시 다음 문항으로 부드럽게 스크롤
 function scrollToNext(prefix: string, nextId: number) {
   requestAnimationFrame(() => {
-    document.getElementById(`${prefix}-${nextId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById(`${prefix}-${nextId}`)?.scrollIntoView({ behavior: scrollBehavior(), block: "center" });
   });
 }
 

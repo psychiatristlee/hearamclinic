@@ -1,5 +1,6 @@
 "use client";
 
+import { scrollToTop } from "@/lib/motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -75,7 +76,7 @@ export default function SchemaTest() {
   // 멈추는 일이 있어, DOM이 갱신된 뒤(effect)에 실행해 안정적으로 위로 올린다.
   useEffect(() => {
     if (status === "test" || status === "result") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollToTop();
     }
   }, [page, status]);
 

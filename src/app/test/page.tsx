@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import questionnaires from "@/lib/test/questionnaires";
 import { isSoundaryTest } from "@/lib/external-tests";
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "무료 인지능력·두뇌 테스트 모음 | 기억력·집중력·반응속도·IQ·성격 검사",
@@ -142,14 +143,14 @@ export default function TestListPage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {questionnaires.map((q) => (
-            <a
+            <Link
               key={q.id}
               href={`/test/${q.name}`}
-              className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
+              className="card-lift block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300"
             >
               <h3 className="font-semibold text-gray-900 mb-1">{q.title}</h3>
               <p className="text-sm text-gray-600 line-clamp-2">{q.description}</p>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -162,9 +163,9 @@ export default function TestListPage() {
         <p className="text-sm text-gray-500 mb-4">
           언어·수리·도형·기억·속도 5개 영역으로 인지능력을 종합 측정
         </p>
-        <a
-          href={"/test/iq"}
-          className="group block bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+        <Link
+          href="/test/iq"
+          className="card-lift group block bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-indigo-900/30"
         >
           <div className="p-5 flex items-center gap-4">
             <div className="text-4xl flex-shrink-0">🧩</div>
@@ -179,7 +180,7 @@ export default function TestListPage() {
             </div>
             <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
           </div>
-        </a>
+        </Link>
       </section>
 
       {/* 집중력 검사 */}
@@ -192,10 +193,10 @@ export default function TestListPage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {attentionTests.map((t) => (
-            <a
+            <Link
               key={t.name}
               href={`/test/${t.name}`}
-              className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
+              className="card-lift block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300"
             >
               <div className="flex items-center gap-2 mb-1">
                 <h3 className="font-semibold text-gray-900">{t.title}</h3>
@@ -206,7 +207,7 @@ export default function TestListPage() {
                 )}
               </div>
               <p className="text-sm text-gray-600 line-clamp-2">{t.description}</p>
-            </a>
+            </Link>
           ))}
         </div>
       </section>
@@ -221,9 +222,9 @@ export default function TestListPage() {
         </p>
 
         {/* 종합 성격 보고서 진입 카드 */}
-        <a
-          href={"/personality/report"}
-          className="group block mb-5 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+        <Link
+          href="/personality/report"
+          className="card-lift group block mb-5 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-purple-900/30"
         >
           <div className="p-5 flex items-center gap-4">
             <div className="text-4xl flex-shrink-0">📊</div>
@@ -235,13 +236,13 @@ export default function TestListPage() {
             </div>
             <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
           </div>
-        </a>
+        </Link>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {personalityTests.map((t) => (
-            <a
+            <Link
               key={t.name}
               href={`/personality/${t.name}`}
-              className="group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
+              className="card-lift group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
             >
               <div className="relative aspect-[16/9] bg-purple-50">
                 <Image
@@ -259,7 +260,7 @@ export default function TestListPage() {
                 </h3>
                 <p className="text-sm text-gray-600">{t.description}</p>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </section>

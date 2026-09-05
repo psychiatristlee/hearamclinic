@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -34,12 +34,34 @@ function isActivePath(pathname: string, href: string): boolean {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { user, claims, loading, signOut } = useAuth();
   const pathname = usePathname() ?? "";
 
+  // 스크롤 엣지 효과: 콘텐츠가 헤더 아래로 들어갈 때만 옅은 그림자를 띄운다 (항상 보이는 1px 선 대신)
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // 경로가 바뀌면 모바일 메뉴를 닫고, Esc로도 닫을 수 있게
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   function linkClass(href: string, base = ""): string {
     const active = isActivePath(pathname, href);
-    return `${base} text-sm font-medium px-3 py-1.5 rounded-full transition whitespace-nowrap ${
+    return `${base} pressable text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
       active
         ? "bg-purple-100 text-purple-800"
         : "text-gray-600 hover:bg-gray-100 hover:text-purple-700"
@@ -48,7 +70,7 @@ export default function Header() {
 
   function mobileLinkClass(href: string): string {
     const active = isActivePath(pathname, href);
-    return `block py-3 px-3 rounded-lg transition ${
+    return `pressable block py-3 px-3 rounded-lg ${
       active
         ? "bg-purple-50 text-purple-800 font-semibold"
         : "text-gray-700 hover:bg-gray-50 hover:text-purple-700"
@@ -56,11 +78,17 @@ export default function Header() {
   }
 
   return (
-    <nav className="border-b border-purple-100 bg-white/90 backdrop-blur-sm sticky top-0 z-50">
+    <nav
+      className={`glass sticky top-0 z-50 transition-shadow duration-300 ${
+        scrolled || open
+          ? "shadow-[0_1px_0_0_rgba(107,63,160,0.10),0_12px_28px_-20px_rgba(17,12,46,0.35)]"
+          : "shadow-none"
+      }`}
+    >
       <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg lg:text-xl font-bold text-purple-900 whitespace-nowrap"
+          className="pressable flex items-center gap-2 text-lg lg:text-xl font-bold tracking-tight text-purple-900 whitespace-nowrap rounded-lg"
         >
           <Image src="/logo.png" alt="해람" width={36} height={36} className="rounded-lg" />
           <span className="hidden sm:inline">해람정신건강의학과</span>
@@ -127,6 +155,8 @@ export default function Header() {
           className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition"
           onClick={() => setOpen(!open)}
           aria-label="메뉴"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
         >
           {open ? (
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,10 +170,17 @@ export default function Header() {
         </button>
       </div>
 
-      {/* 모바일 메뉴 드롭다운 */}
-      {open && (
-        <div className="lg:hidden border-t border-purple-100 bg-white">
-          <div className="px-3 py-2 space-y-1">
+      {/* 모바일 메뉴 드롭다운 — 항상 마운트해 두고 높이(grid-rows)·투명도로 열고 닫는다.
+          열릴 때와 닫힐 때 같은 경로를 지나므로 중간에 다시 눌러도 자연스럽게 되돌아간다. */}
+      <div
+        id="mobile-menu"
+        inert={!open}
+        className={`lg:hidden grid transition-[grid-template-rows,opacity] duration-200 ease-out-soft motion-reduce:transition-[opacity] ${
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="min-h-0 overflow-hidden">
+          <div className="border-t border-purple-100/70 px-3 py-2 space-y-1">
             {menuItems.map((item, idx) => {
               const prev = menuItems[idx - 1];
               const showDivider = prev && prev.group !== item.group;
@@ -210,7 +247,7 @@ export default function Header() {
             )}
           </div>
         </div>
-      )}
+      </div>
     </nav>
   );
 }

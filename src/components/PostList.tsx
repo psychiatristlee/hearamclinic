@@ -69,9 +69,9 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
   return (
     <div>
       {/* 종합 성격 보고서 진입 배너 */}
-      <a
-        href={"/personality/report"}
-        className="group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+      <Link
+        href="/personality/report"
+        className="card-lift group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-purple-900/30"
       >
         <div className="p-5 flex items-center gap-4">
           <div className="text-4xl flex-shrink-0">📊</div>
@@ -83,12 +83,12 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
           </div>
           <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
         </div>
-      </a>
+      </Link>
 
       {/* 심리도식 검사 진입 카드 (신규) */}
-      <a
-        href={"/personality/schema"}
-        className="group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
+      <Link
+        href="/personality/schema"
+        className="card-lift group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
       >
         <div className="flex items-stretch">
           <div className="relative w-32 sm:w-44 flex-shrink-0 bg-purple-50">
@@ -111,7 +111,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
             </p>
           </div>
         </div>
-      </a>
+      </Link>
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">블로그</h1>
@@ -165,7 +165,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
             <Link
               key={post.id}
               href={`/${encodeURIComponent(safeDecodeSlug(post.slug))}`}
-              className="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition"
+              className="card-lift block border border-gray-200 rounded-xl overflow-hidden hover:shadow-md hover:border-purple-200"
             >
               <div className="flex flex-col sm:flex-row">
                 {post.featuredImage && (

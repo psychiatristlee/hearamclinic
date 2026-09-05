@@ -7,6 +7,7 @@ import WarningModal from "./WarningModal";
 import { GroupedResult, Question, Questionnaire } from "@/lib/test/types";
 import { arrayToQueryString } from "@/lib/test/utils";
 import { saveTestResult } from "@/lib/test-history";
+import { scrollBehavior } from "@/lib/motion";
 
 interface QuestionnaireFormProps {
   questionnaire: Questionnaire;
@@ -37,7 +38,7 @@ export default function QuestionnaireForm({ questionnaire }: QuestionnaireFormPr
   const scrollToElement = (elementId: string) => {
     const element = document.getElementById(elementId);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      element.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     }
   };
 

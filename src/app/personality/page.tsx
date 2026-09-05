@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "무료 성격·심리 검사 모음 | Big 5·에니어그램·애착·DISC·RIASEC·심리도식 + AI 종합 보고서",
@@ -114,9 +115,9 @@ export default function PersonalityListPage() {
       </div>
 
       {/* 종합 보고서 진입 카드 (상단 강조) */}
-      <a
-        href={"/personality/report"}
-        className="group block mb-8 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl transition"
+      <Link
+        href="/personality/report"
+        className="card-lift group block mb-8 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-purple-900/30"
       >
         <div className="p-6 flex items-center gap-5">
           <div className="text-5xl flex-shrink-0">📊</div>
@@ -128,14 +129,14 @@ export default function PersonalityListPage() {
           </div>
           <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
         </div>
-      </a>
+      </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {personalityTests.map((test) => (
-          <a
+          <Link
             key={test.name}
             href={`/personality/${test.name}`}
-            className="group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300 transition"
+            className="card-lift group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
           >
             <div className="relative aspect-[16/9] bg-purple-50">
               <Image
@@ -155,7 +156,7 @@ export default function PersonalityListPage() {
                 {test.description}
               </p>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

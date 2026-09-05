@@ -58,7 +58,7 @@ export default function AttentionListPage() {
           <Link
             key={test.name}
             href={`/test/${test.name}`}
-            className="block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-purple-300 transition"
+            className="card-lift block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-purple-300"
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
               {test.title}

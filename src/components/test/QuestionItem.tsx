@@ -32,7 +32,7 @@ export default function QuestionItem({
         {answers.map((questionItemAnswer, index) => (
           <label
             key={index}
-            className={`inline-flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition ${
+            className={`pressable inline-flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer ${
               questions[question.index].currentItemIndex === questionItemAnswer.index
                 ? "bg-purple-50 border border-purple-200"
                 : "hover:bg-gray-50 border border-transparent"

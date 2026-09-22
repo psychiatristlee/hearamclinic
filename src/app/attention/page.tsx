@@ -1,10 +1,11 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import SoundaryBanner from "@/components/SoundaryBanner";
 
 export const metadata: Metadata = {
   title: "집중력 검사",
   description:
-    "스트룹, N-back, 숫자 폭, 궤적 잇기 등 집중력과 주의력을 측정하는 다양한 검사를 무료로 진행해보세요.",
+    "스트룹, N-back, 숫자 폭, 궤적 잇기 등 집중력 검사는 이동 안내 후 사운더리에서 무료로 진행합니다.",
 };
 
 const attentionTests = [
@@ -50,8 +51,10 @@ export default function AttentionListPage() {
     <div>
       <h1 className="text-3xl font-bold text-purple-900 mb-2">집중력 검사</h1>
       <p className="text-gray-600 mb-8">
-        다양한 인지 과제로 집중력과 주의력의 여러 측면을 점검해보세요.
+        다양한 인지 과제로 집중력과 주의력의 여러 측면을 사운더리에서 점검해보세요.
       </p>
+
+      <SoundaryBanner className="mb-8" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {attentionTests.map((test) => (
@@ -66,6 +69,7 @@ export default function AttentionListPage() {
             <p className="text-sm text-gray-600 line-clamp-2">
               {test.description}
             </p>
+            <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
           </Link>
         ))}
       </div>

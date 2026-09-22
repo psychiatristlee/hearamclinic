@@ -93,7 +93,7 @@ export async function generateMetadata(props: TestPageProps): Promise<Metadata> 
   if (questionnaire) {
     return {
       title: questionnaire.title,
-      description: questionnaire.description,
+      description: `${questionnaire.title}와 관련된 자가 점검 검사는 사운더리에서 진행합니다. 이동 안내를 확인해 주세요.`,
     };
   }
 
@@ -102,7 +102,7 @@ export async function generateMetadata(props: TestPageProps): Promise<Metadata> 
     const canonical = `https://hearam.kr/test/${name}`;
     return {
       title: attention.title,
-      description: attention.description,
+      description: `${attention.description} 검사는 사운더리에서 진행합니다.`,
       keywords: attention.keywords,
       alternates: { canonical },
       openGraph: {
@@ -141,7 +141,7 @@ export default async function TestPage(props: TestPageProps) {
   const params = await props.params;
   const name = params.name;
 
-  // 일부 검사(IQ·스트룹)는 심리검사 플랫폼 Soundary에서 진행 — 안내 후 이동
+  // 신규 검사는 사운더리에서 진행하고, 기존 결과 화면은 별도 경로에서 유지한다.
   const soundary = soundaryTestUrl(name);
   if (soundary) {
     return <SoundaryHandoff targetUrl={soundary} testTitle={soundaryTestTitle(name)} />;

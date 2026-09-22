@@ -1,11 +1,12 @@
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import SoundaryBanner from "@/components/SoundaryBanner";
 
 export const metadata: Metadata = {
-  title: "무료 성격·심리 검사 모음 | Big 5·에니어그램·애착·DISC·RIASEC·심리도식 + AI 종합 보고서",
+  title: "무료 성격·심리 검사 안내 | 사운더리에서 검사하기",
   description:
-    "정신건강의학과에서 만든 무료 성격·심리 검사(Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC·심리도식)와 AI 종합 성격 보고서를 한 곳에서. 가입 없이 바로 검사 가능, 결과 저장은 로그인 시 가능.",
+    "Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC·심리도식 검사는 사운더리에서 무료로 진행합니다. 검사별 안내를 확인하고 이동하세요.",
   keywords: [
     "성격 검사",
     "무료 성격 검사",
@@ -30,17 +31,17 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://hearam.kr/personality" },
   openGraph: {
-    title: "무료 성격·직업흥미 검사 5종 + AI 종합 보고서 | 해람정신건강의학과",
+    title: "무료 성격·심리 검사 안내 | 해람정신건강의학과",
     description:
-      "Big 5·에니어그램·애착·DISC·직업흥미(RIASEC) 무료 검사 한 곳에서. 모두 마치면 AI가 통합 보고서를 만들어 드립니다.",
+      "Big 5·에니어그램·애착·DISC·직업흥미·심리도식 검사는 사운더리에서 진행합니다.",
     url: "https://hearam.kr/personality",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "무료 성격·직업흥미 검사 5종 + AI 종합 보고서",
+    title: "무료 성격·심리 검사 안내",
     description:
-      "Big 5·에니어그램·애착·DISC 무료 성격 검사 한 곳에서.",
+      "Big 5·에니어그램·애착·DISC 무료 성격 검사는 사운더리에서 진행합니다.",
   },
 };
 
@@ -88,7 +89,7 @@ const ITEM_LIST_JSONLD = {
   "@type": "ItemList",
   name: "무료 성격·심리 검사 6종",
   description:
-    "Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC·심리도식 6가지 검사와 AI 종합 보고서",
+    "Big 5·에니어그램·애착 유형·DISC·직업흥미 RIASEC·심리도식 6가지 검사는 사운더리에서 진행",
   itemListElement: personalityTests.map((t, i) => ({
     "@type": "ListItem",
     position: i + 1,
@@ -110,26 +111,11 @@ export default function PersonalityListPage() {
           무료 성격·심리 검사 — Big 5·에니어그램·애착·DISC·RIASEC·심리도식
         </h1>
         <p className="text-gray-600">
-          정신건강의학과에서 만든 성격·심리 무료 검사 6종을 한 곳에서 진행하시고, 성격 검사는 AI 종합 보고서까지 받아 보세요.
+          성격·심리 검사 6종을 선택하면 이동 안내 후 사운더리에서 무료로 진행하실 수 있습니다.
         </p>
       </div>
 
-      {/* 종합 보고서 진입 카드 (상단 강조) */}
-      <Link
-        href="/personality/report"
-        className="card-lift group block mb-8 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-purple-900/30"
-      >
-        <div className="p-6 flex items-center gap-5">
-          <div className="text-5xl flex-shrink-0">📊</div>
-          <div className="flex-1">
-            <h3 className="text-xl font-bold mb-1">종합 성격 보고서</h3>
-            <p className="text-sm text-purple-100 leading-relaxed">
-              성격 4종과 직업흥미(RIASEC)까지 5가지 검사 결과를 AI가 통합 분석하여 한 사람의 다면적 프로필로 정리해 드립니다.
-            </p>
-          </div>
-          <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
-        </div>
-      </Link>
+      <SoundaryBanner className="mb-8" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {personalityTests.map((test) => (
@@ -155,6 +141,7 @@ export default function PersonalityListPage() {
               <p className="text-sm text-gray-600 leading-relaxed">
                 {test.description}
               </p>
+              <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
             </div>
           </Link>
         ))}

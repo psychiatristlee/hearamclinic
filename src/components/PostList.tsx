@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/AuthContext";
+import SoundaryBanner from "@/components/SoundaryBanner";
 
 function safeDecodeSlug(slug: string): string {
   try {
@@ -68,24 +69,9 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
 
   return (
     <div>
-      {/* 종합 성격 보고서 진입 배너 */}
-      <Link
-        href="/personality/report"
-        className="card-lift group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-purple-900/30"
-      >
-        <div className="p-5 flex items-center gap-4">
-          <div className="text-4xl flex-shrink-0">📊</div>
-          <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold mb-0.5">AI 종합 성격 보고서</h2>
-            <p className="text-sm text-purple-100 leading-relaxed">
-              Big 5·에니어그램·애착·DISC·직업흥미 5가지 검사를 AI가 통합 분석해 나만의 프로필로 정리해 드려요.
-            </p>
-          </div>
-          <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
-        </div>
-      </Link>
+      <SoundaryBanner className="mb-5" />
 
-      {/* 심리도식 검사 진입 카드 (신규) */}
+      {/* 심리도식 검사 진입 카드 */}
       <Link
         href="/personality/schema"
         className="card-lift group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
@@ -103,12 +89,13 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
           </div>
           <div className="p-4 sm:p-5 flex-1 min-w-0 flex flex-col justify-center">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">NEW</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">사운더리</span>
               <h2 className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition">심리도식 검사</h2>
             </div>
             <p className="text-sm text-gray-600 leading-relaxed">
               어린 시절에 만들어져 지금도 반복되는 마음의 무늬를 18가지 도식·5개 영역으로 부드럽게 살펴보는 무료 심리검사예요.
             </p>
+            <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
           </div>
         </div>
       </Link>

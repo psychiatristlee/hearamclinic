@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import SoundaryHandoff from "@/components/SoundaryHandoff";
+import { soundaryPersonalityTitle, soundaryPersonalityUrl } from "@/lib/external-tests";
 import Big5Test from "@/components/test/Big5Test";
 import EnneagramTest from "@/components/test/EnneagramTest";
 import AttachmentTest from "@/components/test/AttachmentTest";
@@ -75,6 +77,17 @@ type PageProps = {
 };
 
 const VALID_CODE_RE = /^[HL]{5}$/;
+
+function isLegacySharedResult(name: string, result: string | undefined): boolean {
+  if (!result) return false;
+  if (name === "big5") return VALID_CODE_RE.test(result);
+  if (name === "enneagram") return /^[1-9]$/.test(result);
+  if (name === "attachment") return ["secure", "anxious", "avoidant", "disorganized"].includes(result);
+  if (name === "disc") return /^[DISC]$/.test(result);
+  if (name === "riasec") return /^[RIASEC]$/.test(result);
+  if (name === "schema") return /^(DR|IA|IL|OD|OI)$/.test(result);
+  return false;
+}
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const params = await props.params;
@@ -201,19 +214,19 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const canonical = `https://hearam.kr/personality/${params.name}`;
     return {
       title: meta.title,
-      description: meta.description,
+      description: `${meta.title} 검사는 사운더리에서 진행합니다. 해람에서 이동 안내를 확인해 주세요.`,
       keywords: meta.keywords,
       alternates: { canonical },
       openGraph: {
         title: meta.title,
-        description: meta.description,
+        description: `${meta.title} 검사는 사운더리에서 진행합니다.`,
         url: canonical,
         type: "website",
       },
       twitter: {
         card: "summary_large_image",
         title: meta.title,
-        description: meta.description,
+        description: `${meta.title} 검사는 사운더리에서 진행합니다.`,
       },
     };
   }
@@ -250,6 +263,14 @@ function quizJsonLd(name: string) {
 
 export default async function PersonalityPage(props: PageProps) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
+
+  // 이전에 공유한 결과 링크는 그대로 열고, 새 검사는 사운더리로 안내한다.
+  const soundary = soundaryPersonalityUrl(params.name);
+  if (soundary && !isLegacySharedResult(params.name, searchParams.result)) {
+    return <SoundaryHandoff targetUrl={soundary} testTitle={soundaryPersonalityTitle(params.name)} />;
+  }
+
   const ld = quizJsonLd(params.name);
   const schemaScript = ld ? (
     <script

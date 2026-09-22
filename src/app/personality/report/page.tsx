@@ -3,15 +3,11 @@
 import { scrollToTop } from "@/lib/motion";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { httpsCallable } from "firebase/functions";
 import { functions, auth } from "@/lib/firebase";
 import { listUserTestResults, type TestResultRecord } from "@/lib/test-history";
 import RequireAuth from "@/components/auth/RequireAuth";
-import {
-  getNextGuidedTest,
-  guidedPath,
-} from "@/lib/test/personality-guide";
+import { SOUNDARY_TEST_CATALOG_URL } from "@/lib/external-tests";
 
 interface ReportPayload {
   headline: string;
@@ -50,13 +46,11 @@ export default function PersonalityReportPage() {
 }
 
 function ReportContent() {
-  const router = useRouter();
   const [latestByType, setLatestByType] = useState<Record<string, TestResultRecord>>({});
   const [loadingResults, setLoadingResults] = useState(true);
   const [report, setReport] = useState<ReportPayload | null>(null);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
-  const [startingGuided, setStartingGuided] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -79,17 +73,6 @@ function ReportContent() {
 
   const completedCount = Object.keys(latestByType).length;
   const allCompleted = completedCount === CATALOG.length;
-
-  async function handleStartGuided() {
-    setStartingGuided(true);
-    const next = await getNextGuidedTest();
-    if (next) {
-      router.push(guidedPath(next.path));
-    } else {
-      // 이미 모두 완료 - 그냥 보고서 생성으로 진행
-      setStartingGuided(false);
-    }
-  }
 
   async function handleGenerate() {
     setGenerating(true);
@@ -203,8 +186,8 @@ function ReportContent() {
         <div className="text-5xl mb-3">📊</div>
         <h1 className="text-2xl sm:text-3xl font-bold mb-2">종합 성격 보고서</h1>
         <p className="text-sm text-purple-50 leading-relaxed">
-          5가지 검사(성격 4종+직업흥미) 결과를 AI가 통합 분석하여 한 사람의 다면적 프로필로 정리해 드립니다.
-          각 검사가 서로 보완·일치되는 지점을 찾아 본인을 더 깊이 이해하실 수 있습니다.
+          해람에서 이전에 완료하고 저장한 5가지 검사 결과가 있으면 AI 종합 보고서를 만들 수 있습니다.
+          새 검사는 사운더리에서 진행되며, 사운더리 결과는 이 보고서에 자동으로 합쳐지지 않습니다.
         </p>
       </div>
 
@@ -236,13 +219,13 @@ function ReportContent() {
                         ✓ {latestByType[c.type].summary}
                       </p>
                     ) : (
-                      <p className="text-xs text-gray-500 mt-0.5">아직 진행 전</p>
+                      <p className="text-xs text-gray-500 mt-0.5">해람에 저장된 결과 없음 · 새 검사는 사운더리에서 진행</p>
                     )}
                   </div>
                   {done ? (
                     <span className="text-green-600 text-lg">✓</span>
                   ) : (
-                    <span className="text-purple-600 text-sm font-medium">시작하기 →</span>
+                    <span className="text-purple-600 text-sm font-medium">사운더리 →</span>
                   )}
                 </Link>
               </li>
@@ -263,23 +246,13 @@ function ReportContent() {
           {error && <p className="text-red-500 text-sm mt-3 text-center">{error}</p>}
         </>
       ) : (
-        <div className="space-y-3">
-          <button
-            onClick={handleStartGuided}
-            disabled={startingGuided}
-            className="w-full px-6 py-4 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white font-bold text-lg rounded-xl shadow-md transition"
-          >
-            {startingGuided
-              ? "다음 검사로 이동 중..."
-              : completedCount === 0
-                ? "🚀 5개 검사 순차 시작하기"
-                : `▶ 남은 ${CATALOG.length - completedCount}개 검사 이어서 진행하기`}
-          </button>
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
-            <p className="text-xs text-amber-800 leading-relaxed">
-              "순차 시작"을 누르시면 검사를 자동으로 안내해 드립니다. 각 검사가 끝날 때마다 다음 검사 버튼이 보이고, 모두 마치시면 보고서 화면으로 돌아옵니다.
-            </p>
-          </div>
+        <div className="rounded-2xl border border-purple-100 bg-purple-50 p-5 text-center">
+          <p className="text-sm text-gray-700 mb-4">
+            이 보고서는 해람에 저장된 이전 검사 결과 5종이 모두 있어야 생성할 수 있습니다. 새 검사는 사운더리에서 진행해 주세요.
+          </p>
+          <a href={SOUNDARY_TEST_CATALOG_URL} className="inline-block rounded-xl bg-purple-600 px-6 py-3 text-sm font-bold text-white hover:bg-purple-700">
+            사운더리 검사 둘러보기 ↗
+          </a>
         </div>
       )}
     </div>

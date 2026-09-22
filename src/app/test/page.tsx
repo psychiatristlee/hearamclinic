@@ -1,13 +1,14 @@
 import { Metadata } from "next";
 import questionnaires from "@/lib/test/questionnaires";
 import { isSoundaryTest } from "@/lib/external-tests";
+import SoundaryBanner from "@/components/SoundaryBanner";
 import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "무료 인지능력·두뇌 테스트 모음 | 기억력·집중력·반응속도·IQ·성격 검사",
+  title: "심리·성격·집중력 검사 안내 | 사운더리에서 검사하기",
   description:
-    "기억력 테스트, 반응속도 테스트, 집중력 테스트, IQ 검사부터 우울·불안 자가 설문과 성격 검사까지 — 정신건강의학과에서 만든 무료 두뇌·심리 검사를 한 곳에서 진행해 보세요.",
+    "우울·불안 자가 설문부터 성격·집중력·IQ 검사까지, 검사는 사운더리에서 무료로 진행합니다. 검사별 안내를 확인하고 이동하세요.",
   keywords: [
     "인지능력 테스트",
     "두뇌 테스트",
@@ -23,9 +24,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "https://hearam.kr/test" },
   openGraph: {
-    title: "무료 인지능력·두뇌 테스트 모음 | 해람정신건강의학과",
+    title: "심리·성격·집중력 검사 안내 | 해람정신건강의학과",
     description:
-      "기억력·반응속도·집중력·IQ·성격 검사까지 무료 두뇌 테스트를 한 곳에서.",
+      "기억력·반응속도·집중력·IQ·성격 검사는 사운더리에서 진행합니다.",
     url: "https://hearam.kr/test",
     type: "website",
   },
@@ -133,13 +134,15 @@ export default function TestListPage() {
         </p>
       </div>
 
-      {/* 심리 설문 */}
+      <SoundaryBanner className="mb-10" />
+
+      {/* 마음건강 자가검사 */}
       <section id="questionnaire" className="mb-12">
         <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
-          <span>📋</span> 심리 설문
+          <span>📋</span> 마음건강 자가검사
         </h2>
         <p className="text-sm text-gray-500 mb-4">
-          우울·불안·ADHD·스트레스 등 마음의 상태를 점검하는 임상 설문
+          우울·불안·ADHD·스트레스 등 마음의 상태를 살펴보는 검사
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {questionnaires.map((q) => (
@@ -150,6 +153,7 @@ export default function TestListPage() {
             >
               <h3 className="font-semibold text-gray-900 mb-1">{q.title}</h3>
               <p className="text-sm text-gray-600 line-clamp-2">{q.description}</p>
+              <p className="mt-2 text-xs font-semibold text-purple-700">사운더리의 관련 검사로 이동 ↗</p>
             </Link>
           ))}
         </div>
@@ -207,6 +211,7 @@ export default function TestListPage() {
                 )}
               </div>
               <p className="text-sm text-gray-600 line-clamp-2">{t.description}</p>
+              {isSoundaryTest(t.name) && <p className="mt-2 text-xs text-purple-700">이동 안내 후 사운더리로 연결됩니다</p>}
             </Link>
           ))}
         </div>
@@ -221,22 +226,6 @@ export default function TestListPage() {
           본인의 성격 유형을 다양한 방식으로 살펴보기
         </p>
 
-        {/* 종합 성격 보고서 진입 카드 */}
-        <Link
-          href="/personality/report"
-          className="card-lift group block mb-5 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-purple-900/30"
-        >
-          <div className="p-5 flex items-center gap-4">
-            <div className="text-4xl flex-shrink-0">📊</div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-bold mb-0.5">AI 종합 성격 보고서</h3>
-              <p className="text-sm text-purple-100 leading-relaxed">
-                5가지 검사(성격 4종 + 직업흥미)를 마치면 AI가 통합 분석해 한 장의 프로필로 정리해 드려요.
-              </p>
-            </div>
-            <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
-          </div>
-        </Link>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {personalityTests.map((t) => (
             <Link
@@ -259,6 +248,7 @@ export default function TestListPage() {
                   {t.title}
                 </h3>
                 <p className="text-sm text-gray-600">{t.description}</p>
+                <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
               </div>
             </Link>
           ))}

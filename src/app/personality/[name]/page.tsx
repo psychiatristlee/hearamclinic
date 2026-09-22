@@ -214,7 +214,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     const canonical = `https://hearam.kr/personality/${params.name}`;
     return {
       title: meta.title,
-      description: `${meta.title} 검사는 사운더리에서 진행합니다. 해람에서 이동 안내를 확인해 주세요.`,
+      description: `${meta.title} 검사는 사운더리로 이동 후 진행합니다.`,
       keywords: meta.keywords,
       alternates: { canonical },
       openGraph: {

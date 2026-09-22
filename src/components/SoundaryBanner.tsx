@@ -8,7 +8,7 @@ export default function SoundaryBanner({ className = "" }: { className?: string 
           <p className="text-sm font-semibold text-violet-100 mb-1">🌊 Soundary · 사운더리</p>
           <h2 className="text-xl font-bold mb-1">심리검사는 이제 사운더리에서 진행합니다</h2>
           <p className="text-sm text-violet-100 leading-relaxed">
-            우울·불안·성격·집중력 검사까지 사운더리에서 무료로 받아보세요. 검사 링크를 누르면 이동 안내가 표시됩니다.
+            우울·불안·성격·집중력 검사까지 사운더리로 이동 후 무료로 진행할 수 있습니다.
           </p>
         </div>
         <a

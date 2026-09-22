@@ -95,7 +95,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
             <p className="text-sm text-gray-600 leading-relaxed">
               어린 시절에 만들어져 지금도 반복되는 마음의 무늬를 18가지 도식·5개 영역으로 부드럽게 살펴보는 무료 심리검사예요.
             </p>
-            <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
+            <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
           </div>
         </div>
       </Link>

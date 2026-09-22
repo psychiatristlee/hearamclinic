@@ -153,7 +153,7 @@ export default function TestListPage() {
             >
               <h3 className="font-semibold text-gray-900 mb-1">{q.title}</h3>
               <p className="text-sm text-gray-600 line-clamp-2">{q.description}</p>
-              <p className="mt-2 text-xs font-semibold text-purple-700">사운더리의 관련 검사로 이동 ↗</p>
+              <p className="mt-2 text-xs font-semibold text-purple-700">사운더리의 관련 검사로 이동 후 진행 ↗</p>
             </Link>
           ))}
         </div>
@@ -211,7 +211,7 @@ export default function TestListPage() {
                 )}
               </div>
               <p className="text-sm text-gray-600 line-clamp-2">{t.description}</p>
-              {isSoundaryTest(t.name) && <p className="mt-2 text-xs text-purple-700">이동 안내 후 사운더리로 연결됩니다</p>}
+              {isSoundaryTest(t.name) && <p className="mt-2 text-xs text-purple-700">사운더리로 이동 후 진행 ↗</p>}
             </Link>
           ))}
         </div>
@@ -248,7 +248,7 @@ export default function TestListPage() {
                   {t.title}
                 </h3>
                 <p className="text-sm text-gray-600">{t.description}</p>
-                <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
+                <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
               </div>
             </Link>
           ))}

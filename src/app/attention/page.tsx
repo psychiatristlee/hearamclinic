@@ -5,7 +5,7 @@ import SoundaryBanner from "@/components/SoundaryBanner";
 export const metadata: Metadata = {
   title: "집중력 검사",
   description:
-    "스트룹, N-back, 숫자 폭, 궤적 잇기 등 집중력 검사는 이동 안내 후 사운더리에서 무료로 진행합니다.",
+    "스트룹, N-back, 숫자 폭, 궤적 잇기 등 집중력 검사는 사운더리로 이동 후 무료로 진행합니다.",
 };
 
 const attentionTests = [
@@ -69,7 +69,7 @@ export default function AttentionListPage() {
             <p className="text-sm text-gray-600 line-clamp-2">
               {test.description}
             </p>
-            <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
+            <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
           </Link>
         ))}
       </div>

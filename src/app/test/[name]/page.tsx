@@ -93,7 +93,7 @@ export async function generateMetadata(props: TestPageProps): Promise<Metadata> 
   if (questionnaire) {
     return {
       title: questionnaire.title,
-      description: `${questionnaire.title}와 관련된 자가 점검 검사는 사운더리에서 진행합니다. 이동 안내를 확인해 주세요.`,
+      description: `${questionnaire.title}와 관련된 자가 점검 검사는 사운더리로 이동 후 진행합니다.`,
     };
   }
 

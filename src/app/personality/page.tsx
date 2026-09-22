@@ -111,7 +111,7 @@ export default function PersonalityListPage() {
           무료 성격·심리 검사 — Big 5·에니어그램·애착·DISC·RIASEC·심리도식
         </h1>
         <p className="text-gray-600">
-          성격·심리 검사 6종을 선택하면 이동 안내 후 사운더리에서 무료로 진행하실 수 있습니다.
+          성격·심리 검사 6종을 선택하면 사운더리로 이동 후 무료로 진행하실 수 있습니다.
         </p>
       </div>
 
@@ -141,7 +141,7 @@ export default function PersonalityListPage() {
               <p className="text-sm text-gray-600 leading-relaxed">
                 {test.description}
               </p>
-              <p className="mt-2 text-xs font-semibold text-purple-700">이동 안내 후 사운더리에서 진행 ↗</p>
+              <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
             </div>
           </Link>
         ))}

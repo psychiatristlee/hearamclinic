@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import EditLink from "@/components/EditLink";
 import ViewTracker from "@/components/blog/ViewTracker";
+import { SoundaryRelatedCard, SoundaryRelatedInline } from "@/components/blog/SoundaryRelated";
 import { formatViewCount } from "@/lib/blog-views/format";
 
 export const revalidate = 60;
@@ -206,6 +207,7 @@ export default async function BlogPostPage({
         <EditLink slug={post.slug} />
       </div>
       <ViewTracker slug={post.id} />
+      <SoundaryRelatedInline post={post} />
 
       <div className="prose prose-lg max-w-none prose-a:text-purple-600 prose-a:hover:text-purple-800">
         <Markdown
@@ -227,6 +229,8 @@ export default async function BlogPostPage({
           {post.content.replace(/^\s*#\s+.+\n*/, "").trimStart()}
         </Markdown>
       </div>
+
+      <SoundaryRelatedCard post={post} />
 
       {recommended && (
         <div className="mt-16 pt-8 border-t border-gray-200">

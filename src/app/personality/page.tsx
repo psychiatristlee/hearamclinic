@@ -1,7 +1,10 @@
 import { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import SoundaryBanner from "@/components/SoundaryBanner";
+import {
+  SOUNDARY_PERSONALITY_CATALOG_URL,
+  soundaryPersonalityUrl,
+} from "@/lib/external-tests";
 
 export const metadata: Metadata = {
   title: "무료 성격·심리 검사 안내 | 사운더리에서 검사하기",
@@ -119,9 +122,9 @@ export default function PersonalityListPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {personalityTests.map((test) => (
-          <Link
+          <a
             key={test.name}
-            href={`/personality/${test.name}`}
+            href={soundaryPersonalityUrl(test.name) ?? SOUNDARY_PERSONALITY_CATALOG_URL}
             className="card-lift group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
           >
             <div className="relative aspect-[16/9] bg-purple-50">
@@ -143,7 +146,7 @@ export default function PersonalityListPage() {
               </p>
               <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
             </div>
-          </Link>
+          </a>
         ))}
       </div>
     </div>

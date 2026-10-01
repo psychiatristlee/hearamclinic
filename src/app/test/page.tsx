@@ -1,9 +1,14 @@
 import { Metadata } from "next";
 import questionnaires from "@/lib/test/questionnaires";
-import { isSoundaryTest } from "@/lib/external-tests";
+import {
+  SOUNDARY_PERSONALITY_CATALOG_URL,
+  SOUNDARY_TEST_CATALOG_URL,
+  isSoundaryTest,
+  soundaryPersonalityUrl,
+  soundaryTestUrl,
+} from "@/lib/external-tests";
 import SoundaryBanner from "@/components/SoundaryBanner";
 import Image from "next/image";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "심리·성격·집중력 검사 안내 | 사운더리에서 검사하기",
@@ -146,15 +151,15 @@ export default function TestListPage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {questionnaires.map((q) => (
-            <Link
+            <a
               key={q.id}
-              href={`/test/${q.name}`}
+              href={soundaryTestUrl(q.name) ?? SOUNDARY_TEST_CATALOG_URL}
               className="card-lift block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300"
             >
               <h3 className="font-semibold text-gray-900 mb-1">{q.title}</h3>
               <p className="text-sm text-gray-600 line-clamp-2">{q.description}</p>
               <p className="mt-2 text-xs font-semibold text-purple-700">사운더리의 관련 검사로 이동 후 진행 ↗</p>
-            </Link>
+            </a>
           ))}
         </div>
       </section>
@@ -167,8 +172,8 @@ export default function TestListPage() {
         <p className="text-sm text-gray-500 mb-4">
           언어·수리·도형·기억·속도 5개 영역으로 인지능력을 종합 측정
         </p>
-        <Link
-          href="/test/iq"
+        <a
+          href={soundaryTestUrl("iq") ?? SOUNDARY_TEST_CATALOG_URL}
           className="card-lift group block bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-indigo-900/30"
         >
           <div className="p-5 flex items-center gap-4">
@@ -184,7 +189,7 @@ export default function TestListPage() {
             </div>
             <div className="text-2xl opacity-70 group-hover:translate-x-1 transition-transform">→</div>
           </div>
-        </Link>
+        </a>
       </section>
 
       {/* 집중력 검사 */}
@@ -197,9 +202,9 @@ export default function TestListPage() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {attentionTests.map((t) => (
-            <Link
+            <a
               key={t.name}
-              href={`/test/${t.name}`}
+              href={soundaryTestUrl(t.name) ?? SOUNDARY_TEST_CATALOG_URL}
               className="card-lift block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300"
             >
               <div className="flex items-center gap-2 mb-1">
@@ -212,7 +217,7 @@ export default function TestListPage() {
               </div>
               <p className="text-sm text-gray-600 line-clamp-2">{t.description}</p>
               {isSoundaryTest(t.name) && <p className="mt-2 text-xs text-purple-700">사운더리로 이동 후 진행 ↗</p>}
-            </Link>
+            </a>
           ))}
         </div>
       </section>
@@ -228,9 +233,9 @@ export default function TestListPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {personalityTests.map((t) => (
-            <Link
+            <a
               key={t.name}
-              href={`/personality/${t.name}`}
+              href={soundaryPersonalityUrl(t.name) ?? SOUNDARY_PERSONALITY_CATALOG_URL}
               className="card-lift group block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
             >
               <div className="relative aspect-[16/9] bg-purple-50">
@@ -250,7 +255,7 @@ export default function TestListPage() {
                 <p className="text-sm text-gray-600">{t.description}</p>
                 <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
               </div>
-            </Link>
+            </a>
           ))}
         </div>
       </section>

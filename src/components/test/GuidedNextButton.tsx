@@ -8,6 +8,7 @@ import {
   TOTAL_TESTS,
   PERSONALITY_TEST_ORDER,
 } from "@/lib/test/personality-guide";
+import { SOUNDARY_PERSONALITY_CATALOG_URL } from "@/lib/external-tests";
 
 interface Props {
   currentType: "big5" | "enneagram" | "attachment" | "disc" | "riasec";
@@ -35,7 +36,7 @@ export default function GuidedNextButton({ currentType }: Props) {
     if (next) {
       router.push(guidedPath(next.path));
     } else {
-      router.push("/personality/report?ready=1");
+      window.location.assign(SOUNDARY_PERSONALITY_CATALOG_URL);
     }
   }
 

@@ -24,6 +24,7 @@ import ResultInsights from "./ResultInsights";
 import SaveLoginPrompt from "@/components/auth/SaveLoginPrompt";
 import FullBatteryNudge from "./FullBatteryNudge";
 import ShareUnlockGate from "./ShareUnlockGate";
+import { SOUNDARY_PERSONALITY_CATALOG_URL } from "@/lib/external-tests";
 
 type Status = "ready" | "test" | "result";
 const QUESTIONS_PER_PAGE = 9;
@@ -389,11 +390,11 @@ export default function SchemaTest() {
 
             {!displayResult.isShared && (
               <FullBatteryNudge
-                href="/personality"
+                href={SOUNDARY_PERSONALITY_CATALOG_URL}
                 emoji="🧭"
                 title="다른 마음의 결도 살펴볼까요?"
-                desc="에니어그램·DISC·애착 유형 등 다른 성격 검사로 나를 더 입체적으로 만나 보세요. 성격 5종을 마치면 AI 종합 보고서도 받을 수 있어요."
-                cta="다른 검사 보러 가기"
+                desc="에니어그램·DISC·애착 유형 등 다른 성격 검사를 사운더리에서 이어서 진행해 보세요."
+                cta="사운더리에서 다른 검사 보기"
               />
             )}
 

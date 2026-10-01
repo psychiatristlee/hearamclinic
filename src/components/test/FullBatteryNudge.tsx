@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { SOUNDARY_PERSONALITY_CATALOG_URL } from "@/lib/external-tests";
 
 interface Props {
   href?: string;
@@ -17,16 +18,16 @@ interface Props {
 export default function FullBatteryNudge({
   href,
   emoji = "📊",
-  title = "이 검사 하나로는 아쉽죠?",
-  desc = "성격 4종과 직업흥미까지 5가지 검사를 모두 마치면, AI가 통합 분석한 ‘종합 성격 보고서’를 만들어 드려요.",
-  cta = "종합 보고서 이어서 하기",
+  title = "다른 성격 검사도 이어서 해보세요",
+  desc = "성격·애착·직업흥미 등 다양한 검사를 Soundary에서 계속 진행할 수 있습니다.",
+  cta = "사운더리에서 검사 이어서 하기",
 }: Props) {
   const searchParams = useSearchParams();
   if (searchParams?.get("guided") === "1") return null;
 
   return (
     <a
-      href={href ?? "/personality/report"}
+      href={href ?? SOUNDARY_PERSONALITY_CATALOG_URL}
       className="group block mb-4 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-2xl overflow-hidden hover:shadow-xl transition"
     >
       <div className="p-5 flex items-center gap-4">

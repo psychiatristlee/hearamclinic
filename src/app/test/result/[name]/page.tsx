@@ -1,8 +1,8 @@
 import questionnaires from "@/lib/test/questionnaires";
 import QuestionnaireResult from "@/components/test/QuestionnaireResult";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { SOUNDARY_TEST_CATALOG_URL, soundaryTestUrl } from "@/lib/external-tests";
 
 export async function generateStaticParams() {
   return questionnaires.map((questionnaire) => ({ name: questionnaire.name }));
@@ -51,9 +51,9 @@ export default async function ResultPage(props: ResultPageProps) {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {otherTests.map((test) => (
-            <Link
+            <a
               key={test.id}
-              href={`/test/${test.name}`}
+              href={soundaryTestUrl(test.name) ?? SOUNDARY_TEST_CATALOG_URL}
               className="block bg-white border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-purple-300 transition"
             >
               <h3 className="font-semibold text-gray-900 text-sm mb-1">
@@ -62,7 +62,7 @@ export default async function ResultPage(props: ResultPageProps) {
               <p className="text-xs text-gray-500 line-clamp-1">
                 {test.description}
               </p>
-            </Link>
+            </a>
           ))}
         </div>
       </div>

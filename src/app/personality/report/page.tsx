@@ -6,8 +6,12 @@ import Link from "next/link";
 import { httpsCallable } from "firebase/functions";
 import { functions, auth } from "@/lib/firebase";
 import { listUserTestResults, type TestResultRecord } from "@/lib/test-history";
-import RequireAuth from "@/components/auth/RequireAuth";
-import { SOUNDARY_TEST_CATALOG_URL } from "@/lib/external-tests";
+import SoundaryHandoff from "@/components/SoundaryHandoff";
+import { useAuth } from "@/lib/AuthContext";
+import {
+  SOUNDARY_PERSONALITY_CATALOG_URL,
+  SOUNDARY_TEST_CATALOG_URL,
+} from "@/lib/external-tests";
 
 interface ReportPayload {
   headline: string;
@@ -38,11 +42,20 @@ const CATALOG: TestCatalogItem[] = [
 ];
 
 export default function PersonalityReportPage() {
-  return (
-    <RequireAuth message="종합 보고서를 만들고 본인 계정에 저장하기 위해 로그인이 필요합니다.">
-      <ReportContent />
-    </RequireAuth>
-  );
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <p className="text-center py-12 text-gray-500">불러오는 중...</p>;
+  }
+  if (!user) {
+    return (
+      <SoundaryHandoff
+        targetUrl={SOUNDARY_PERSONALITY_CATALOG_URL}
+        testTitle="종합 성격 검사"
+      />
+    );
+  }
+  return <ReportContent />;
 }
 
 function ReportContent() {

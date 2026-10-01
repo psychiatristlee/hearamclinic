@@ -5,6 +5,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/AuthContext";
 import SoundaryBanner from "@/components/SoundaryBanner";
+import {
+  SOUNDARY_PERSONALITY_CATALOG_URL,
+  soundaryPersonalityUrl,
+} from "@/lib/external-tests";
 
 function safeDecodeSlug(slug: string): string {
   try {
@@ -72,8 +76,8 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
       <SoundaryBanner className="mb-5" />
 
       {/* 심리도식 검사 진입 카드 */}
-      <Link
-        href="/personality/schema"
+      <a
+        href={soundaryPersonalityUrl("schema") ?? SOUNDARY_PERSONALITY_CATALOG_URL}
         className="card-lift group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
       >
         <div className="flex items-stretch">
@@ -98,7 +102,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
             <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
           </div>
         </div>
-      </Link>
+      </a>
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">블로그</h1>

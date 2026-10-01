@@ -63,3 +63,19 @@ export function soundaryPersonalityTitle(slug: string): string | undefined {
 }
 
 export const SOUNDARY_TEST_CATALOG_URL = "https://soundary.life/ko/test?utm_source=hearam.kr";
+export const SOUNDARY_PERSONALITY_CATALOG_URL =
+  "https://soundary.life/ko/personality?utm_source=hearam.kr";
+
+export function soundaryUrlForLegacyPath(pathname: string): string {
+  const segments = pathname.split("/").filter(Boolean);
+  if (segments[0] === "personality" && segments[1]) {
+    return soundaryPersonalityUrl(segments[1]) ?? SOUNDARY_PERSONALITY_CATALOG_URL;
+  }
+  if (segments[0] === "test" && segments[1] === "result" && segments[2]) {
+    return soundaryTestUrl(segments[2]) ?? SOUNDARY_TEST_CATALOG_URL;
+  }
+  if (segments[0] === "test" && segments[1]) {
+    return soundaryTestUrl(segments[1]) ?? SOUNDARY_TEST_CATALOG_URL;
+  }
+  return SOUNDARY_TEST_CATALOG_URL;
+}

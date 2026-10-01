@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import SoundaryBanner from "@/components/SoundaryBanner";
+import { SOUNDARY_TEST_CATALOG_URL, soundaryTestUrl } from "@/lib/external-tests";
 
 export const metadata: Metadata = {
   title: "집중력 검사",
@@ -58,9 +58,9 @@ export default function AttentionListPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {attentionTests.map((test) => (
-          <Link
+          <a
             key={test.name}
-            href={`/test/${test.name}`}
+            href={soundaryTestUrl(test.name) ?? SOUNDARY_TEST_CATALOG_URL}
             className="card-lift block bg-white border border-gray-200 rounded-xl p-5 hover:shadow-lg hover:border-purple-300"
           >
             <h3 className="text-lg font-semibold text-gray-900 mb-1">
@@ -70,7 +70,7 @@ export default function AttentionListPage() {
               {test.description}
             </p>
             <p className="mt-2 text-xs font-semibold text-purple-700">사운더리로 이동 후 진행 ↗</p>
-          </Link>
+          </a>
         ))}
       </div>
     </div>

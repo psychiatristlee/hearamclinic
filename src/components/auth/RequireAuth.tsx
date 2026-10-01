@@ -25,11 +25,10 @@ export default function RequireAuth({ children, message }: Props) {
         <div className="bg-white border border-purple-200 rounded-2xl p-8 text-center shadow-sm">
           <div className="text-5xl mb-4">🔒</div>
           <h2 className="text-2xl font-bold text-purple-900 mb-2">
-            로그인이 필요해요
+            관리자 전용 페이지입니다
           </h2>
           <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-            {message ??
-              "본인의 결과를 계정에 안전하게 기록하고 추세를 확인하기 위해 로그인이 필요합니다."}
+            {message ?? "허용된 관리자 Google 계정으로 로그인해 주세요."}
             <br />
             블로그는 로그인 없이 자유롭게 보실 수 있어요.
           </p>
@@ -40,7 +39,7 @@ export default function RequireAuth({ children, message }: Props) {
             로그인하기
           </Link>
           <p className="text-xs text-gray-400 mt-4">
-            처음 방문이신가요? 같은 화면에서 가입하실 수 있어요.
+            신규 회원가입은 받지 않습니다.
           </p>
         </div>
       </div>

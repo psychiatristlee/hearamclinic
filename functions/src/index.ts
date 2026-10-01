@@ -4,6 +4,9 @@ import {setGlobalOptions} from "firebase-functions";
 initializeApp();
 setGlobalOptions({maxInstances: 10});
 
+// Authentication allowlist
+export {allowlistedUserCreated, allowlistedUserSignedIn} from "./auth-allowlist";
+
 // Generate Post features
 export {
   suggestTopics,

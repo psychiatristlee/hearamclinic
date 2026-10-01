@@ -1,6 +1,7 @@
 import {onCall, HttpsError} from "firebase-functions/https";
 import {GoogleGenAI} from "@google/genai";
 import {apiKey} from "../generate-post/flow";
+import {verifyAllowedAccount} from "../../shared/auth";
 
 interface TestSummary {
   type: string; // big5, enneagram, attachment, disc
@@ -17,9 +18,7 @@ export const generatePersonalityReport = onCall(
     region: "asia-northeast3",
   },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "로그인이 필요합니다.");
-    }
+    verifyAllowedAccount(request);
     const tests = request.data?.tests as TestSummary[] | undefined;
     if (!tests || tests.length === 0) {
       throw new HttpsError("invalid-argument", "검사 결과가 필요합니다.");

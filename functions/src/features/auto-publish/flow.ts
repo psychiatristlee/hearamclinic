@@ -12,6 +12,7 @@ import {
 } from "../generate-post/flow";
 import {generateImage} from "../generate-image";
 import {createGenkitInstance, uploadImage} from "../../shared";
+import {verifyAllowedAccount} from "../../shared/auth";
 
 const CONFIG_DOC_PATH = "adminConfig/blogAutoPublish";
 const DEFAULT_AUTHOR = "해람정신건강의학과";
@@ -42,9 +43,7 @@ interface SuggestedTopic {
 function verifyAdminAuth(
   request: {auth?: {token: Record<string, unknown>} | null},
 ): void {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "인증이 필요합니다.");
-  }
+  verifyAllowedAccount(request);
   if (request.auth.token.admin !== true) {
     throw new HttpsError("permission-denied", "admin 권한이 필요합니다.");
   }
@@ -377,9 +376,7 @@ export const getAutoPublishConfig = onCall(
     region: "asia-northeast3",
   },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "인증이 필요합니다.");
-    }
+    verifyAllowedAccount(request);
     if (
       request.auth.token.admin !== true &&
       request.auth.token.editor !== true

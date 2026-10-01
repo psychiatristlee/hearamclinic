@@ -1,13 +1,11 @@
 import {onCall, HttpsError} from "firebase-functions/https";
 import {getAuth} from "firebase-admin/auth";
+import {verifyAllowedAccount} from "./shared/auth";
 
 export const setRole = onCall(
   {region: "asia-northeast3"},
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "인증이 필요합니다.");
-    }
-
+    verifyAllowedAccount(request);
     if (request.auth.token.admin !== true) {
       throw new HttpsError("permission-denied", "관리자 권한이 필요합니다.");
     }

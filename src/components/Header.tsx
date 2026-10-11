@@ -1,22 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType, type SVGProps } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
+import {
+  IconArrowUpRight,
+  IconCalendar,
+  IconClinic,
+  IconClose,
+  IconLogOut,
+  IconMenu,
+  IconSettings,
+  IconTest,
+  IconUser,
+} from "@/components/icons";
+
+type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
 interface MenuItem {
   label: string;
   href: string;
   external: boolean;
-  group: "main" | "test" | "booking";
+  icon: Icon;
+  /** 주 행동(예약)은 채워진 버튼으로 강조한다 */
+  primary?: boolean;
 }
 
 const menuItems: MenuItem[] = [
-  { label: "🏥 해람정신과", href: "/clinic", external: false, group: "main" },
-  { label: "🔬 검사", href: "/test", external: false, group: "test" },
-  { label: "📅 예약", href: "https://naver.me/Fy2FWU9A", external: true, group: "booking" },
+  { label: "해람정신과", href: "/clinic", external: false, icon: IconClinic },
+  { label: "검사", href: "/test", external: false, icon: IconTest },
+  { label: "예약", href: "https://naver.me/Fy2FWU9A", external: true, icon: IconCalendar, primary: true },
 ];
 
 function isActivePath(pathname: string, href: string): boolean {
@@ -46,10 +61,14 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // 경로가 바뀌면 모바일 메뉴를 닫고, Esc로도 닫을 수 있게
-  useEffect(() => {
+  // 경로가 바뀌면 모바일 메뉴를 닫는다 — 렌더 중 상태 조정 패턴(effect 대신)이라 깜빡임 없이 닫힌다
+  const [menuPath, setMenuPath] = useState(pathname);
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
+
+  // Esc로도 닫을 수 있게
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -59,21 +78,30 @@ export default function Header() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  function linkClass(href: string, base = ""): string {
+  function linkClass(href: string, primary = false): string {
+    const base =
+      "pressable inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap";
+    if (primary) {
+      return `${base} bg-purple-700 text-white shadow-sm shadow-purple-900/20 hover:bg-purple-800`;
+    }
     const active = isActivePath(pathname, href);
-    return `${base} pressable text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
+    return `${base} ${
       active
-        ? "bg-purple-100 text-purple-800"
-        : "text-gray-600 hover:bg-gray-100 hover:text-purple-700"
+        ? "bg-purple-100 text-purple-900"
+        : "text-gray-600 hover:bg-gray-100 hover:text-purple-800"
     }`;
   }
 
-  function mobileLinkClass(href: string): string {
+  function mobileLinkClass(href: string, primary = false): string {
+    const base = "pressable flex items-center gap-3 py-3 px-3 rounded-xl";
+    if (primary) {
+      return `${base} bg-purple-700 text-white font-semibold`;
+    }
     const active = isActivePath(pathname, href);
-    return `pressable block py-3 px-3 rounded-lg ${
+    return `${base} ${
       active
-        ? "bg-purple-50 text-purple-800 font-semibold"
-        : "text-gray-700 hover:bg-gray-50 hover:text-purple-700"
+        ? "bg-purple-50 text-purple-900 font-semibold"
+        : "text-gray-700 hover:bg-gray-50 hover:text-purple-800"
     }`;
   }
 
@@ -84,65 +112,66 @@ export default function Header() {
           ? "shadow-[0_1px_0_0_rgba(107,63,160,0.10),0_12px_28px_-20px_rgba(17,12,46,0.35)]"
           : "shadow-none"
       }`}
+      aria-label="주 메뉴"
     >
       <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between gap-3">
         <Link
           href="/"
-          className="pressable flex items-center gap-2 text-lg lg:text-xl font-bold tracking-tight text-purple-900 whitespace-nowrap rounded-lg"
+          className="pressable flex items-center gap-2.5 text-lg lg:text-xl font-bold tracking-tight text-purple-950 whitespace-nowrap rounded-lg"
         >
-          <Image src="/logo.png" alt="해람" width={36} height={36} className="rounded-lg" />
+          <Image src="/logo.png" alt="해람" width={36} height={36} className="rounded-lg" priority />
           <span className="hidden sm:inline">해람정신건강의학과</span>
         </Link>
 
         {/* 데스크탑 메뉴 */}
         <div className="hidden lg:flex items-center gap-1">
-          {menuItems.map((item, idx) => {
-            const prev = menuItems[idx - 1];
-            const showDivider = prev && prev.group !== item.group;
-            return (
-              <div key={item.label} className="flex items-center gap-1">
-                {showDivider && (
-                  <span className="w-px h-4 bg-gray-200 mx-1" aria-hidden="true" />
-                )}
-                {item.external ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={linkClass(item.href, "")}
-                  >
-                    {item.label}
-                  </a>
-                ) : (
-                  <Link href={item.href} className={linkClass(item.href, "")}>
-                    {item.label}
-                  </Link>
-                )}
-              </div>
+          {menuItems.map((item) => {
+            const IconComp = item.icon;
+            const content = (
+              <>
+                <IconComp className="w-4 h-4" />
+                {item.label}
+                {item.external && <IconArrowUpRight className="w-3.5 h-3.5 opacity-70 -ml-0.5" />}
+              </>
+            );
+            return item.external ? (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${linkClass(item.href, item.primary)} ${item.primary ? "ml-2" : ""}`}
+              >
+                {content}
+              </a>
+            ) : (
+              <Link key={item.label} href={item.href} className={linkClass(item.href)}>
+                {content}
+              </Link>
             );
           })}
 
-          {!loading && (
+          {!loading && (claims.admin || user) && (
             <>
+              <span className="w-px h-4 bg-gray-200 mx-2" aria-hidden="true" />
               {claims.admin && (
-                <>
-                  <span className="w-px h-4 bg-gray-200 mx-1" aria-hidden="true" />
-                  <Link href="/admin" className={linkClass("/admin", "")}>
-                    ⚙️ 관리
-                  </Link>
-                </>
+                <Link href="/admin" className={linkClass("/admin")}>
+                  <IconSettings className="w-4 h-4" />
+                  관리
+                </Link>
               )}
               {user && (
                 <>
-                  <span className="w-px h-4 bg-gray-200 mx-1" aria-hidden="true" />
-                  <Link href="/profile" className={linkClass("/profile", "")}>
-                    👤 프로필
+                  <Link href="/profile" className={linkClass("/profile")}>
+                    <IconUser className="w-4 h-4" />
+                    프로필
                   </Link>
                   <button
                     onClick={signOut}
-                    className="text-sm font-medium px-3 py-1.5 rounded-full text-gray-500 hover:bg-gray-100 hover:text-purple-700 transition whitespace-nowrap"
+                    className="pressable inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-gray-500 hover:bg-gray-100 hover:text-purple-800 whitespace-nowrap"
                   >
-                    👋 로그아웃
+                    <IconLogOut className="w-4 h-4" />
+                    로그아웃
                   </button>
                 </>
               )}
@@ -152,21 +181,13 @@ export default function Header() {
 
         {/* 모바일 햄버거 */}
         <button
-          className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition"
+          className="lg:hidden p-2 -mr-2 rounded-lg text-gray-700 hover:bg-gray-100 transition"
           onClick={() => setOpen(!open)}
-          aria-label="메뉴"
+          aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
           aria-expanded={open}
           aria-controls="mobile-menu"
         >
-          {open ? (
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
+          {open ? <IconClose className="w-6 h-6" /> : <IconMenu className="w-6 h-6" />}
         </button>
       </div>
 
@@ -180,47 +201,49 @@ export default function Header() {
         }`}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="border-t border-purple-100/70 px-3 py-2 space-y-1">
-            {menuItems.map((item, idx) => {
-              const prev = menuItems[idx - 1];
-              const showDivider = prev && prev.group !== item.group;
-              return (
-                <div key={item.label}>
-                  {showDivider && (
-                    <div className="h-px bg-gray-100 my-1.5 mx-3" aria-hidden="true" />
-                  )}
-                  {item.external ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={mobileLinkClass(item.href)}
-                      onClick={() => setOpen(false)}
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className={mobileLinkClass(item.href)}
-                      onClick={() => setOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
-                  )}
-                </div>
+          <div className="border-t border-purple-100/70 px-3 py-3 space-y-1">
+            {menuItems.map((item) => {
+              const IconComp = item.icon;
+              const content = (
+                <>
+                  <IconComp className="w-5 h-5 shrink-0" />
+                  <span className="flex-1">{item.label}</span>
+                  {item.external && <IconArrowUpRight className="w-4 h-4 opacity-70" />}
+                </>
+              );
+              return item.external ? (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${mobileLinkClass(item.href, item.primary)} ${item.primary ? "mt-2" : ""}`}
+                  onClick={() => setOpen(false)}
+                >
+                  {content}
+                </a>
+              ) : (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={mobileLinkClass(item.href)}
+                  onClick={() => setOpen(false)}
+                >
+                  {content}
+                </Link>
               );
             })}
-            {!loading && (
+            {!loading && (claims.admin || user) && (
               <>
-                <div className="h-px bg-gray-100 my-1.5 mx-3" aria-hidden="true" />
+                <div className="h-px bg-gray-100 my-2 mx-3" aria-hidden="true" />
                 {claims.admin && (
                   <Link
                     href="/admin"
                     className={mobileLinkClass("/admin")}
                     onClick={() => setOpen(false)}
                   >
-                    ⚙️ 관리
+                    <IconSettings className="w-5 h-5 shrink-0" />
+                    관리
                   </Link>
                 )}
                 {user && (
@@ -230,16 +253,18 @@ export default function Header() {
                       className={mobileLinkClass("/profile")}
                       onClick={() => setOpen(false)}
                     >
-                      👤 프로필
+                      <IconUser className="w-5 h-5 shrink-0" />
+                      프로필
                     </Link>
                     <button
                       onClick={() => {
                         signOut();
                         setOpen(false);
                       }}
-                      className="block w-full text-left py-3 px-3 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-purple-700 transition"
+                      className="pressable flex w-full items-center gap-3 text-left py-3 px-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-purple-800"
                     >
-                      👋 로그아웃
+                      <IconLogOut className="w-5 h-5 shrink-0" />
+                      로그아웃
                     </button>
                   </>
                 )}

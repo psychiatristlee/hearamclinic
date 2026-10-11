@@ -10,6 +10,8 @@ import EditLink from "@/components/EditLink";
 import ViewTracker from "@/components/blog/ViewTracker";
 import { SoundaryRelatedCard, SoundaryRelatedInline } from "@/components/blog/SoundaryRelated";
 import { formatViewCount } from "@/lib/blog-views/format";
+import { formatPostDate } from "@/lib/format-date";
+import { IconChevronLeft, IconEye } from "@/components/icons";
 
 export const revalidate = 60;
 
@@ -162,54 +164,68 @@ export default async function BlogPostPage({
   }
 
   const recommended = await getRandomPost(post.slug);
+  const date = formatPostDate(post.dateSeconds);
 
   return (
     <article>
-      <div className="mb-8">
+      <div className="mb-6">
         <Link
           href="/"
-          className="text-sm text-purple-500 hover:text-purple-700"
+          className="pressable inline-flex items-center gap-1 -ml-1 pl-1 pr-2 py-1 rounded-full text-sm font-medium text-purple-700 hover:bg-purple-50 hover:text-purple-900"
         >
-          &larr; 블로그 목록
+          <IconChevronLeft className="w-4 h-4" />
+          블로그 목록
         </Link>
       </div>
 
       {post.featuredImage && (
-        <div className="relative w-full h-96 mb-8">
+        <div className="relative w-full aspect-[16/9] mb-8 rounded-2xl overflow-hidden bg-purple-50 shadow-sm">
           <Image
             src={post.featuredImage}
             alt={post.title}
             fill
             sizes="(max-width: 896px) 100vw, 896px"
-            className="object-cover rounded-lg"
+            className="object-cover"
             priority
           />
         </div>
       )}
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-4">{post.title}</h1>
-
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 mb-8 pb-4 border-b">
-        <span>{post.author}</span>
-        <span>
-          {new Date(post.dateSeconds * 1000).toLocaleDateString("ko-KR")}
-        </span>
+      <header className="mb-8 pb-5 border-b border-gray-200">
         {post.categories.length > 0 && (
-          <span>{post.categories.join(", ")}</span>
+          <p className="mb-3 flex flex-wrap gap-1.5">
+            {post.categories.map((cat) => (
+              <span
+                key={cat}
+                className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700"
+              >
+                {cat}
+              </span>
+            ))}
+          </p>
         )}
-        <span className="inline-flex items-center gap-1">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          조회 {formatViewCount(post.viewCount)}
-        </span>
-        <EditLink slug={post.slug} />
-      </div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{post.title}</h1>
+
+        <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500">
+          <span className="font-medium text-gray-700">{post.author}</span>
+          {date.label && (
+            <>
+              <span className="text-gray-300" aria-hidden="true">·</span>
+              <time dateTime={date.iso}>{date.label}</time>
+            </>
+          )}
+          <span className="text-gray-300" aria-hidden="true">·</span>
+          <span className="inline-flex items-center gap-1">
+            <IconEye className="w-4 h-4" />
+            조회 {formatViewCount(post.viewCount)}
+          </span>
+          <EditLink slug={post.slug} />
+        </div>
+      </header>
       <ViewTracker slug={post.id} />
       <SoundaryRelatedInline post={post} />
 
-      <div className="prose prose-lg max-w-none prose-a:text-purple-600 prose-a:hover:text-purple-800">
+      <div className="prose prose-lg max-w-none prose-headings:tracking-tight prose-a:text-purple-700 prose-a:underline-offset-2 prose-a:hover:text-purple-900 prose-img:rounded-xl prose-blockquote:border-purple-200 prose-blockquote:text-gray-600">
         <Markdown
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[rehypeRaw]}
@@ -234,12 +250,12 @@ export default async function BlogPostPage({
 
       {recommended && (
         <div className="mt-16 pt-8 border-t border-gray-200">
-          <p className="text-sm font-medium text-gray-500 mb-4">
+          <p className="text-sm font-semibold text-gray-500 mb-4">
             이런 글은 어떠세요?
           </p>
           <Link
             href={`/${encodeURIComponent(safeDecodeSlug(recommended.slug))}`}
-            className="block border border-gray-200 rounded-xl overflow-hidden bg-white hover:shadow-lg transition group"
+            className="surface surface-hover card-lift group block overflow-hidden"
           >
             <div className="flex flex-col sm:flex-row">
               {recommended.featuredImage && (
@@ -254,7 +270,7 @@ export default async function BlogPostPage({
                 </div>
               )}
               <div className="p-5 flex flex-col justify-center">
-                <p className="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
+                <p className="font-bold text-gray-900 group-hover:text-purple-800 transition-colors">
                   {recommended.title}
                 </p>
                 <p className="text-sm text-gray-500 mt-2">
@@ -265,7 +281,7 @@ export default async function BlogPostPage({
                     {recommended.categories.map((cat) => (
                       <span
                         key={cat}
-                        className="text-xs bg-purple-50 text-purple-600 px-2 py-0.5 rounded-full"
+                        className="text-xs font-semibold bg-purple-50 text-purple-700 px-2 py-0.5 rounded-full"
                       >
                         {cat}
                       </span>

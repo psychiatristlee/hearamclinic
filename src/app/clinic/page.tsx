@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { IconArrowUpRight, IconChevronRight, IconClock, IconMapPin, IconPhone } from "@/components/icons";
 
 export const metadata: Metadata = {
   title: "해람정신건강의학과 소개",
@@ -171,18 +172,40 @@ export default function ClinicPage() {
       />
       {/* 클리닉 소개 */}
       <section className="text-center">
-        <h1 className="text-3xl font-bold text-purple-900 mb-4">
+        <p className="text-sm font-semibold text-purple-700 mb-2">서울 마포구 · 홍대입구역 4번 출구</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-purple-950 mb-4">
           해람정신건강의학과
         </h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
           충분한 상담이 이루어질 수 있도록 예약제로 운영하고 있습니다.
         </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <a
+            href="https://naver.me/Fy2FWU9A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pressable inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-purple-700 text-white text-sm font-semibold shadow-sm shadow-purple-900/20 hover:bg-purple-800"
+          >
+            네이버 예약
+            <IconArrowUpRight className="w-4 h-4 opacity-80" />
+          </a>
+          <a
+            href="tel:0507-1352-8189"
+            className="pressable inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold hover:border-purple-300 hover:text-purple-900"
+          >
+            <IconPhone className="w-4 h-4 text-purple-600" />
+            0507-1352-8189
+          </a>
+        </div>
       </section>
 
       {/* 진료 시간 */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">진료 시간</h2>
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <IconClock className="w-6 h-6 text-purple-600" />
+          진료 시간
+        </h2>
+        <div className="surface overflow-hidden">
           <table className="w-full text-left">
             <tbody className="divide-y divide-gray-100">
               <tr>
@@ -221,7 +244,7 @@ export default function ClinicPage() {
           {doctors.map((doc) => (
             <div
               key={doc.name}
-              className="bg-white border border-gray-200 rounded-xl p-6 flex flex-col sm:flex-row gap-6"
+              className="surface p-6 flex flex-col sm:flex-row gap-6"
             >
               {/* 사진 */}
               <div className="flex-shrink-0 flex flex-col items-center sm:items-start">
@@ -231,10 +254,10 @@ export default function ClinicPage() {
                     alt={`${doc.name} ${doc.role}`}
                     width={140}
                     height={140}
-                    className="rounded-xl object-cover w-[140px] h-[140px]"
+                    className="rounded-2xl object-cover w-[140px] h-[140px] ring-1 ring-black/5"
                   />
                 ) : (
-                  <div className="w-[140px] h-[140px] rounded-xl bg-purple-50 flex items-center justify-center">
+                  <div className="w-[140px] h-[140px] rounded-2xl bg-purple-50 flex items-center justify-center">
                     <span className="text-4xl text-purple-300">👤</span>
                   </div>
                 )}
@@ -246,12 +269,12 @@ export default function ClinicPage() {
                   <h3 className="text-xl font-bold text-gray-900">
                     {doc.name}
                   </h3>
-                  <span className="text-sm text-purple-600 font-medium">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">
                     {doc.role}
                   </span>
                 </div>
                 <p className="text-sm text-gray-500 mb-3">
-                  진료일: {doc.schedule}
+                  <span className="font-medium text-gray-700">진료일</span> {doc.schedule}
                 </p>
                 <ul className="space-y-1">
                   {doc.credentials.map((cred, i) => (
@@ -271,8 +294,8 @@ export default function ClinicPage() {
       <section>
         <h2 className="text-2xl font-bold text-gray-900 mb-6">주차 안내사항</h2>
         <div className="grid gap-4">
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <ul className="text-sm text-gray-600 leading-relaxed space-y-1.5">
+          <div className="surface p-6">
+            <ul className="text-sm text-gray-600 leading-relaxed space-y-2 list-disc pl-5 marker:text-purple-300">
               <li>건물 내 기계식 주차장이 있습니다.</li>
               <li>승용차량 이외는 주차가 불가합니다. (SUV, RV, 승합차량 불가)</li>
               <li>기계식 주차장 앞에 주차하시고 들어오시면 안 됩니다. 관리인이 안 보이더라도 대기 후 주차하셔야 합니다. (건물 내 다른 분들 출차가 불가능합니다)</li>
@@ -288,8 +311,9 @@ export default function ClinicPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Link
             href="/clinic/diagnosis-info"
-            className="bg-white border border-gray-200 rounded-xl p-6 hover:border-purple-300 hover:bg-purple-50/30 transition-colors"
+            className="surface surface-hover card-lift group relative p-6 pr-10"
           >
+            <IconChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-hover:text-purple-600 transition-colors" />
             <h3 className="font-bold text-gray-900 mb-1">진단서 발급</h3>
             <p className="text-sm text-gray-500">
               진단서 발급에 관한 안내사항
@@ -297,8 +321,9 @@ export default function ClinicPage() {
           </Link>
           <Link
             href="/clinic/fees"
-            className="bg-white border border-gray-200 rounded-xl p-6 hover:border-purple-300 hover:bg-purple-50/30 transition-colors"
+            className="surface surface-hover card-lift group relative p-6 pr-10"
           >
+            <IconChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-hover:text-purple-600 transition-colors" />
             <h3 className="font-bold text-gray-900 mb-1">비급여진료비용 안내</h3>
             <p className="text-sm text-gray-500">
               진단서, 심리검사 등 비급여 항목별 비용
@@ -306,8 +331,9 @@ export default function ClinicPage() {
           </Link>
           <Link
             href="/clinic/prescriptions-info"
-            className="bg-white border border-gray-200 rounded-xl p-6 hover:border-purple-300 hover:bg-purple-50/30 transition-colors"
+            className="surface surface-hover card-lift group relative p-6 pr-10"
           >
+            <IconChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-hover:text-purple-600 transition-colors" />
             <h3 className="font-bold text-gray-900 mb-1">대리처방 서류 안내</h3>
             <p className="text-sm text-gray-500">
               대리처방 시 필요 서류 및 양식 다운로드
@@ -315,8 +341,9 @@ export default function ClinicPage() {
           </Link>
           <Link
             href="/clinic/medical-records-info"
-            className="bg-white border border-gray-200 rounded-xl p-6 hover:border-purple-300 hover:bg-purple-50/30 transition-colors"
+            className="surface surface-hover card-lift group relative p-6 pr-10"
           >
+            <IconChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-hover:text-purple-600 transition-colors" />
             <h3 className="font-bold text-gray-900 mb-1">진료기록사본 안내</h3>
             <p className="text-sm text-gray-500">
               진료기록 발급 안내 및 동의서·위임장 양식
@@ -327,14 +354,28 @@ export default function ClinicPage() {
 
       {/* 위치 */}
       <section>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">오시는 길</h2>
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <p className="font-medium text-gray-900 mb-2">
-            서울특별시 마포구 양화로 178 4층, 7층
-          </p>
-          <p className="text-sm text-gray-600">
-            홍대입구역 4번 출구 · 스타벅스 홍대공항철도역점 건물
-          </p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <IconMapPin className="w-6 h-6 text-purple-600" />
+          오시는 길
+        </h2>
+        <div className="surface p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="font-medium text-gray-900 mb-1">
+              서울특별시 마포구 양화로 178 4층, 7층
+            </p>
+            <p className="text-sm text-gray-600">
+              홍대입구역 4번 출구 · 스타벅스 홍대공항철도역점 건물
+            </p>
+          </div>
+          <a
+            href="https://naver.me/Fy2FWU9A"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pressable shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white border border-gray-200 text-sm font-semibold text-gray-800 hover:border-purple-300 hover:text-purple-900"
+          >
+            네이버 지도에서 보기
+            <IconArrowUpRight className="w-4 h-4 text-purple-600" />
+          </a>
         </div>
       </section>
     </div>

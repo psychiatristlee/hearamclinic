@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useId } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/lib/AuthContext";
 import SoundaryBanner from "@/components/SoundaryBanner";
+import { IconEye, IconSearch } from "@/components/icons";
+import { formatPostDate } from "@/lib/format-date";
 import {
   SOUNDARY_PERSONALITY_CATALOG_URL,
   soundaryPersonalityUrl,
@@ -29,6 +31,11 @@ function decodeHtmlEntities(text: string): string {
     .replace(/&#x2F;/g, "/");
 }
 
+function formatViews(n: number): string {
+  if (n >= 10000) return `${(n / 10000).toFixed(n / 10000 < 10 ? 1 : 0)}만`;
+  return n.toLocaleString("ko-KR");
+}
+
 export interface PostSummary {
   id: string;
   title: string;
@@ -44,6 +51,7 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
   const { claims } = useAuth();
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
+  const searchId = useId();
 
   const categoryList = useMemo(() => {
     const set = new Set<string>();
@@ -78,23 +86,23 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
       {/* 심리도식 검사 진입 카드 */}
       <a
         href={soundaryPersonalityUrl("schema") ?? SOUNDARY_PERSONALITY_CATALOG_URL}
-        className="card-lift group block mb-8 bg-white border border-purple-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-purple-300"
+        className="surface surface-hover card-lift group block mb-10 overflow-hidden"
       >
         <div className="flex items-stretch">
-          <div className="relative w-32 sm:w-44 flex-shrink-0 bg-purple-50">
+          <div className="relative w-32 sm:w-44 shrink-0 bg-purple-50">
             <Image
               src="https://firebasestorage.googleapis.com/v0/b/hearamclinic-ef507.firebasestorage.app/o/personality%2Fschema%2Fcover.png?alt=media"
               alt="심리도식 검사"
               fill
               sizes="(max-width: 640px) 128px, 176px"
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out-soft motion-reduce:transition-none"
               unoptimized
             />
           </div>
           <div className="p-4 sm:p-5 flex-1 min-w-0 flex flex-col justify-center">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 font-semibold">사운더리</span>
-              <h2 className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition">심리도식 검사</h2>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 font-semibold">사운더리</span>
+              <h2 className="text-lg font-bold text-gray-900 group-hover:text-purple-800 transition-colors">심리도식 검사</h2>
             </div>
             <p className="text-sm text-gray-600 leading-relaxed">
               어린 시절에 만들어져 지금도 반복되는 마음의 무늬를 18가지 도식·5개 영역으로 부드럽게 살펴보는 무료 심리검사예요.
@@ -104,107 +112,147 @@ export default function PostList({ posts }: { posts: PostSummary[] }) {
         </div>
       </a>
 
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">블로그</h1>
+      <div className="flex items-end justify-between gap-4 mb-5">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">블로그</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            해람정신건강의학과 의료진이 전하는 마음 건강 이야기
+          </p>
+        </div>
         {(claims.admin || claims.editor) && (
           <Link
             href="/blog/new"
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium"
+            className="pressable shrink-0 px-4 py-2 bg-purple-700 text-white rounded-full hover:bg-purple-800 text-sm font-medium shadow-sm shadow-purple-900/20"
           >
             + AI로 새 글 작성
           </Link>
         )}
       </div>
 
-      {categoryList.length > 1 && (
-        <div className="mb-6 flex flex-wrap gap-2">
-          {categoryList.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
-                selectedCategory === cat
-                  ? "bg-purple-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+      {/* 검색 + 카테고리 필터 */}
+      <div className="mb-8 space-y-3">
+        <div className="relative">
+          <label htmlFor={searchId} className="sr-only">
+            글 검색
+          </label>
+          <IconSearch className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-gray-400" />
+          <input
+            id={searchId}
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="제목, 내용으로 검색"
+            className="w-full h-11 pl-10 pr-4 rounded-xl bg-gray-100/80 text-gray-900 placeholder:text-gray-400 border border-transparent focus:bg-white focus:border-purple-300 focus:outline-none focus:ring-4 focus:ring-purple-500/15 transition-[background-color,border-color,box-shadow]"
+          />
         </div>
-      )}
 
-      <div className="mb-8">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="제목, 내용으로 검색..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
+        {categoryList.length > 1 && (
+          <div
+            role="group"
+            aria-label="카테고리"
+            className="flex gap-2 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {categoryList.map((cat) => {
+              const active = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`pressable shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium border ${
+                    active
+                      ? "bg-purple-700 border-purple-700 text-white shadow-sm shadow-purple-900/20"
+                      : "bg-white border-gray-200 text-gray-600 hover:border-purple-300 hover:text-purple-800"
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-gray-500">
-          {posts.length === 0
-            ? "아직 블로그 글이 없습니다."
-            : "검색 결과가 없습니다."}
-        </p>
-      ) : (
-        <div className="grid gap-6">
-          {filtered.map((post) => (
-            <Link
-              key={post.id}
-              href={`/${encodeURIComponent(safeDecodeSlug(post.slug))}`}
-              className="card-lift block border border-gray-200 rounded-xl overflow-hidden hover:shadow-md hover:border-purple-200"
+        <div className="surface p-10 text-center">
+          <p className="font-medium text-gray-900">
+            {posts.length === 0 ? "아직 블로그 글이 없습니다." : "검색 결과가 없습니다."}
+          </p>
+          {posts.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setSelectedCategory("전체");
+              }}
+              className="pressable mt-3 text-sm font-medium text-purple-700 hover:text-purple-900"
             >
-              <div className="flex flex-col sm:flex-row">
-                {post.featuredImage && (
-                  <div className="relative w-full sm:w-48 h-48 sm:h-36 flex-shrink-0">
-                    <Image
-                      src={post.featuredImage}
-                      alt={post.title}
-                      fill
-                      sizes="(max-width: 640px) 100vw, 192px"
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                <div className="p-4 flex-1">
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                    {post.title}
-                  </h2>
-                  <p className="text-sm text-gray-500 mb-2 flex flex-wrap items-center gap-x-2">
-                    <span>
-                      {new Date(post.dateSeconds * 1000).toLocaleDateString(
-                        "ko-KR"
-                      )}
-                    </span>
-                    {post.categories.length > 0 && (
-                      <span className="text-gray-400">
-                        {post.categories.join(", ")}
-                      </span>
-                    )}
-                    {typeof post.viewCount === "number" && post.viewCount > 0 && (
-                      <span className="text-gray-400 inline-flex items-center gap-0.5">
-                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {post.viewCount >= 10000
-                          ? `${(post.viewCount / 10000).toFixed(post.viewCount / 10000 < 10 ? 1 : 0)}만`
-                          : post.viewCount.toLocaleString("ko-KR")}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-gray-600 text-sm line-clamp-2">
-                    {decodeHtmlEntities(post.excerpt)}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
+              검색 조건 초기화
+            </button>
+          )}
         </div>
+      ) : (
+        <ul className="grid gap-4 sm:gap-5">
+          {filtered.map((post) => {
+            const date = formatPostDate(post.dateSeconds);
+            return (
+              <li key={post.id}>
+                <Link
+                  href={`/${encodeURIComponent(safeDecodeSlug(post.slug))}`}
+                  className="surface surface-hover card-lift group block overflow-hidden"
+                >
+                  <article className="flex flex-col sm:flex-row">
+                    {post.featuredImage && (
+                      <div className="relative w-full aspect-[16/9] sm:aspect-auto sm:w-52 sm:self-stretch sm:min-h-[150px] shrink-0 bg-purple-50">
+                        <Image
+                          src={post.featuredImage}
+                          alt=""
+                          fill
+                          sizes="(max-width: 640px) 100vw, 208px"
+                          className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out-soft motion-reduce:transition-none"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4 sm:p-5 flex-1 min-w-0 flex flex-col">
+                      {post.categories.length > 0 && (
+                        <p className="mb-1.5 flex flex-wrap gap-1.5">
+                          {post.categories.map((c) => (
+                            <span
+                              key={c}
+                              className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700"
+                            >
+                              {c}
+                            </span>
+                          ))}
+                        </p>
+                      )}
+                      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 leading-snug group-hover:text-purple-800 transition-colors">
+                        {post.title}
+                      </h2>
+                      <p className="mt-1.5 text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                        {decodeHtmlEntities(post.excerpt)}
+                      </p>
+                      <p className="mt-auto pt-3 text-xs text-gray-500 flex items-center gap-x-2">
+                        {date.label && <time dateTime={date.iso}>{date.label}</time>}
+                        {typeof post.viewCount === "number" && post.viewCount > 0 && (
+                          <>
+                            <span className="text-gray-300" aria-hidden="true">·</span>
+                            <span className="inline-flex items-center gap-1">
+                              <IconEye className="w-3.5 h-3.5" />
+                              <span className="sr-only">조회 </span>
+                              {formatViews(post.viewCount)}
+                            </span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </article>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </div>
   );
